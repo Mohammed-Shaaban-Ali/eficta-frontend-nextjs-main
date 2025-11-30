@@ -1,0 +1,187 @@
+@use "../abstracts/tools" as *;
+@use "../abstracts/variables" as *;
+
+.search-container {
+  min-height: 3rem !important;
+  height: auto !important;
+  padding: 0.5rem !important;
+
+  // Large desktop screens - Extra compact
+  @media (min-width: 1400px) {
+    min-height: 2.75rem !important;
+    padding: 0.375rem !important;
+  }
+
+  // Very large screens - Ultra compact
+  @media (min-width: 1920px) {
+    min-height: 2.5rem !important;
+    padding: 0.25rem !important;
+  }
+
+  // Large screens and tablets (below 1200px)
+  @include media-below(lg) {
+    padding: 1rem !important;
+    margin: 0 0.75rem;
+  }
+
+  // Medium screens (below 992px)
+  @include media-below(md) {
+    padding: 0.875rem !important;
+    margin: 0 0.5rem;
+  }
+
+  // Small screens (below 768px)
+  @include media-below(sm) {
+    padding: 0.75rem !important;
+    margin: 0 0.25rem;
+  }
+
+  .search-column {
+    position: relative;
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+
+    // Large desktop screens
+    @media (min-width: 1400px) {
+      min-height: 2.25rem;
+    }
+
+    // Very large screens
+    @media (min-width: 1920px) {
+      min-height: 2rem;
+    }
+
+    @include media-below(lg) {
+      min-height: 3.5rem;
+      margin-bottom: 0.5rem;
+
+      &:last-of-type {
+        margin-bottom: 1rem;
+      }
+    }
+
+    @include media-below(md) {
+      min-height: 3.25rem;
+    }
+
+    @include media-below(sm) {
+      min-height: 3rem;
+      margin-bottom: 0.375rem;
+
+      &:last-of-type {
+        margin-bottom: 0.75rem;
+      }
+    }
+
+    // Extra small devices
+    @media (max-width: 480px) {
+      min-height: 2.75rem;
+      margin-bottom: 0.25rem;
+    }
+
+    // Very small devices
+    @media (max-width: 360px) {
+      min-height: 2.5rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  // Responsive form adjustments
+  .row {
+    @include media-below(lg) {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+
+  // Button responsive styles
+  .btn {
+    min-height: 2.5rem;
+    padding: 0.5rem 1.25rem;
+    font-size: 1.125rem;
+
+    // Large desktop screens - More compact button
+    @media (min-width: 1400px) {
+      min-height: 2.25rem;
+      padding: 0.375rem 1rem;
+      font-size: 1rem;
+    }
+
+    // Very large screens - Ultra compact button
+    @media (min-width: 1920px) {
+      min-height: 2rem;
+      padding: 0.25rem 0.875rem;
+      font-size: 0.9375rem;
+    }
+
+    @include media-below(lg) {
+      padding: 0.875rem 1.25rem;
+      font-size: 1rem;
+      min-height: 3.125rem;
+    }
+
+    @include media-below(md) {
+      font-size: 0.9375rem;
+      min-height: 2.8125rem;
+      padding: 0.75rem 1rem;
+    }
+
+    @include media-below(sm) {
+      font-size: 0.875rem;
+      min-height: 2.5rem;
+      padding: 0.625rem 1rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 0.8125rem;
+      min-height: 2.25rem;
+      padding: 0.5rem 0.875rem;
+    }
+
+    @media (max-width: 360px) {
+      font-size: 0.75rem;
+      min-height: 2rem;
+      padding: 0.5rem 0.75rem;
+    }
+  }
+}
+
+// RTL Support
+[dir="rtl"] .search-container {
+  @include media-below(lg) {
+    margin: 0 0.75rem;
+  }
+
+  @include media-below(md) {
+    margin: 0 0.5rem;
+  }
+
+  @include media-below(sm) {
+    margin: 0 0.25rem;
+  }
+
+  @media (max-width: 360px) {
+    margin: 0;
+  }
+}
+
+// Additional responsive improvements for search column dividers
+.search-column:not(:last-of-type)::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: 0;
+  top: 15%;
+  height: 70%;
+  width: 1px;
+  background-color: #e5e5e5;
+
+  @include media-below(md) {
+    inset-inline-end: 50%;
+    top: auto;
+    bottom: 0;
+    height: 1px;
+    width: 90%;
+    transform: translateX(50%);
+  }
+}

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" fill="none">
+  <circle cx="120" cy="120" r="110" fill="#F5F7FA" />
+  <path d="M156.789 70H83.2109C77.1328 70 72.1875 75.0312 72.1875 81.1094V139.961C72.1875 146.039 77.1328 151.07 83.2109 151.07H156.789C162.867 151.07 167.812 146.039 167.812 139.961V81.1094C167.812 75.0312 162.867 70 156.789 70Z" fill="#FFFFFF" stroke="#3554D1" stroke-width="3" stroke-miterlimit="10" stroke-linecap="round"/>
+  <path d="M167.812 101.68H72.1875" stroke="#3554D1" stroke-width="3" stroke-miterlimit="10" stroke-linecap="round"/>
+  <path d="M95.9691 85.8477H81.8066" stroke="#3554D1" stroke-width="3" stroke-miterlimit="10" stroke-linecap="round"/>
+  <path d="M112.699 85.8477H98.5195" stroke="#3554D1" stroke-width="3" stroke-miterlimit="10" stroke-linecap="round"/>
+  <path d="M144.695 126.375H95.3047" stroke="#3554D1" stroke-width="3" stroke-miterlimit="10" stroke-linecap="round"/>
+  <path d="M144.695 135.723H95.3047" stroke="#3554D1" stroke-width="3" stroke-miterlimit="10" stroke-linecap="round"/>
+  <path d="M120 170C154.183 170 182 174.477 182 180C182 185.523 154.183 190 120 190C85.8172 190 58 185.523 58 180C58 174.477 85.8172 170 120 170Z" fill="#E8EEFB"/>
+  <path d="M134.219 144.766L149.609 160.156" stroke="#3554D1" stroke-width="8" stroke-miterlimit="10" stroke-linecap="round"/>
+  <circle cx="115" cy="125" r="25" fill="#E8EEFB" stroke="#3554D1" stroke-width="5"/>
+  <path d="M173 160.156L149.609 160.156" stroke="#3554D1" stroke-width="8" stroke-miterlimit="10" stroke-linecap="round"/>
+  <line x1="165.906" y1="177.18" x2="137.906" y2="149.18" stroke="#E54545" stroke-width="4" stroke-linecap="round"/>
+  <line x1="165.906" y1="149.18" x2="137.906" y2="177.18" stroke="#E54545" stroke-width="4" stroke-linecap="round"/>
+</svg>

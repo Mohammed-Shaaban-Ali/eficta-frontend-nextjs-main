@@ -1,0 +1,92 @@
+/* Minimal custom CSS for flight cards - Bootstrap override styles only */
+
+/* Card hover effects */
+.card:hover {
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+  background-color: rgba(128, 127, 127, 0.1);
+}
+
+/* Flight route line with airplane icon */
+.flight-route-line {
+  position: relative;
+}
+
+.flight-route-line::after {
+  content: '✈';
+  position: absolute;
+  top: 50%;
+  right: -8px;
+  transform: translateY(-50%);
+  color: var(--bs-primary);
+  background: white;
+  font-size: 12px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth animations */
+.flight-card-animation {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RTL support for Arabic */
+[dir='rtl'] .flight-route-line::after {
+  right: auto;
+  left: -8px;
+  transform: translateY(-50%) scaleX(-1);
+}
+
+/* RTL text alignment */
+[dir='rtl'] .text-start {
+  text-align: right !important;
+}
+
+[dir='rtl'] .text-end {
+  text-align: left !important;
+}
+
+/* RTL margin and padding adjustments */
+[dir='rtl'] .me-1,
+[dir='rtl'] .me-2,
+[dir='rtl'] .me-3 {
+  margin-right: 0 !important;
+  margin-left: var(--bs-spacer) !important;
+}
+
+[dir='rtl'] .ms-1,
+[dir='rtl'] .ms-2,
+[dir='rtl'] .ms-3 {
+  margin-left: 0 !important;
+  margin-right: var(--bs-spacer) !important;
+}
+
+/* RTL badge positioning */
+[dir='rtl'] .badge {
+  direction: rtl;
+}
+
+/* RTL card layout adjustments */
+[dir='rtl'] .card-body {
+  text-align: right;
+}
+
+[dir='rtl'] .d-flex.justify-content-between {
+  flex-direction: row-reverse;
+}

@@ -1,0 +1,62 @@
+// First import Sass module system
+@use "sass:math";
+@use "sass:map";
+
+// Now use the new @use syntax for Sass files
+@use "./abstracts/tools" as *;
+@use "./abstracts/variables" as *;
+
+@use "./animations/easings";
+@use "./animations/animations";
+@use "./animations/core";
+
+@use "./base/base";
+@use "./base/button";
+@use "./base/form";
+@use "./base/typography";
+
+@use "./components/404" as c_error_page;
+@use "./components/sectionTitle";
+@use "./components/masthead";
+@use "./components/citiesCard";
+@use "./components/ctaCard";
+@use "./components/tabs";
+@use "./components/accordion";
+@use "./components/header";
+@use "./components/cardImage";
+@use "./components/footer";
+@use "./components/mainSearch";
+@use "./components/featureIcon";
+@use "./components/testimonials";
+@use "./components/pagination";
+@use "./components/dashboard";
+@use "./components/blogCard";
+@use "./components/dragSlider";
+@use "./components/niceSelect";
+@use "./components/mapFilter";
+@use "./components/hotelsCard";
+@use "./components/preloader";
+@use "./components/searchBox";
+
+@use "./utilities/spacing";
+@use "./utilities/utilities";
+
+@use "./vendors/icons";
+
+// custom scss for all site & slick
+@use "./custom/custom-slick";
+@use "./custom/price-range-slider";
+@use "./custom/custom-next";
+
+// Modal video - using forward to properly handle node_modules imports
+@forward "react-modal-video/scss/modal-video";
+
+// External libraries - load these from the layout.tsx file using Next.js imports
+// instead of importing CSS files in SCSS which is deprecated
+// These will be commented out as they should be moved to your JS/TS files
+/*
+The following CSS files should be imported in your app layout instead:
+- slick-carousel/slick/slick.css
+- slick-carousel/slick/slick-theme.css
+- bootstrap/dist/css/bootstrap.min.css
+*/

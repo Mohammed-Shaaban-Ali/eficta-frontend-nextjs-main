@@ -1,0 +1,117 @@
+.profile-dropdown-wrapper {
+    position: relative;
+  }
+  
+  .profile-trigger {
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+  }
+  
+  .profile-trigger:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  .profile-avatar {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .profile-status-indicator {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+  }
+  
+  .profile-status-indicator.online {
+    background-color: #4caf50;
+  }
+  
+  .profile-arrow {
+    transition: transform 0.3s ease;
+  }
+  
+  .rotate-180 {
+    transform: rotate(180deg);
+  }
+  
+  .profile-dropdown-menu {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    width: 280px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .profile-dropdown-header {
+    padding: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile-avatar-lg {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile-dropdown-body {
+    padding: 10px 0;
+  }
+  
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: #333;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+  
+  .dropdown-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  .dropdown-divider {
+    height: 1px;
+    margin: 8px 0;
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  .text-red-1 {
+    color: #ff5a5f;
+  }
+  

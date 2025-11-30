@@ -1,0 +1,89 @@
+.flight-details-panel {
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.flight-details-panel.slide-in {
+  transform: translateX(0);
+}
+
+.flight-details-panel.slide-out {
+  transform: translateX(100%);
+}
+
+/* RTL Support for flight details panel */
+[dir='rtl'] .flight-details-panel.slide-out {
+  transform: translateX(-100%);
+}
+
+/* Smooth transitions for all elements */
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+/* Custom scrollbar for better UX */
+.flight-details-panel .overflow-auto::-webkit-scrollbar {
+  width: 4px;
+}
+
+.flight-details-panel .overflow-auto::-webkit-scrollbar-track {
+  background: #f1f3f4;
+}
+
+.flight-details-panel .overflow-auto::-webkit-scrollbar-thumb {
+  background: #c1c7cd;
+  border-radius: 2px;
+}
+
+.flight-details-panel .overflow-auto::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Enhanced card hover effects */
+.card {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Button hover enhancements */
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+/* RTL adjustments for flight details */
+[dir='rtl'] .flight-details-panel {
+  text-align: right;
+}
+
+[dir='rtl'] .flight-details-panel .text-start {
+  text-align: right !important;
+}
+
+[dir='rtl'] .flight-details-panel .text-end {
+  text-align: left !important;
+}
+
+[dir='rtl'] .flight-details-panel .me-2,
+[dir='rtl'] .flight-details-panel .me-3 {
+  margin-right: 0 !important;
+  margin-left: 0.5rem !important;
+}
+
+[dir='rtl'] .flight-details-panel .ms-2,
+[dir='rtl'] .flight-details-panel .ms-3 {
+  margin-left: 0 !important;
+  margin-right: 0.5rem !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .flight-details-panel {
+    max-width: 100% !important;
+  }
+}

@@ -1,0 +1,295 @@
+/* Minimal custom styles for offer selection - using Bootstrap utilities instead */
+
+/* Swiper custom styling */
+.offer-swiper {
+  padding-bottom: 2rem !important;
+  overflow: visible !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+.offer-swiper .swiper-slide {
+  height: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 300px !important;
+  max-width: 300px !important;
+  min-width: 300px !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+.offer-swiper .swiper-wrapper {
+  align-items: stretch !important;
+  display: flex !important;
+}
+
+/* Prevent text selection and dragging */
+.offer-swiper * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  -webkit-user-drag: none !important;
+  -khtml-user-drag: none !important;
+  -moz-user-drag: none !important;
+  -o-user-drag: none !important;
+  user-drag: none !important;
+}
+
+/* Smooth touch interactions */
+.offer-swiper {
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-x !important;
+}
+
+/* Better drag prevention */
+.offer-swiper .swiper-slide * {
+  pointer-events: auto !important;
+}
+
+.swiper-button-prev-custom,
+.swiper-button-next-custom {
+  pointer-events: auto !important;
+}
+
+/* Ensure slides don't overlap */
+.offer-swiper .swiper-slide .position-relative {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Custom pagination bullets */
+.swiper-pagination-custom {
+  position: relative !important;
+  bottom: auto !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-top: 1rem !important;
+}
+
+.swiper-pagination-custom .swiper-pagination-bullet {
+  width: 12px !important;
+  height: 12px !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  opacity: 0.4 !important;
+  background: var(--bs-gray-500) !important;
+  border: 2px solid transparent !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  display: inline-block !important;
+}
+
+.swiper-pagination-custom .swiper-pagination-bullet:hover {
+  opacity: 0.7 !important;
+  transform: scale(1.1) !important;
+}
+
+.swiper-pagination-custom .swiper-pagination-bullet-active {
+  opacity: 1 !important;
+  background: var(--bs-warning) !important;
+  border-color: var(--bs-warning-bg) !important;
+  transform: scale(1.2) !important;
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3) !important;
+}
+
+/* Selected card styling - yellow theme */
+.offer-card.selected {
+  border-color: var(--bs-warning) !important;
+  background-color: rgba(255, 193, 7, 0.05) !important;
+}
+
+.offer-card.selected .bg-primary {
+  background-color: var(--bs-warning) !important;
+}
+
+.offer-card.selected .text-primary {
+  color: var(--bs-warning) !important;
+}
+
+.offer-card.selected .btn-primary {
+  background-color: var(--bs-warning) !important;
+  border-color: var(--bs-warning) !important;
+  color: var(--bs-dark) !important;
+}
+
+/* Hide default Swiper buttons */
+.offer-swiper .swiper-button-next,
+.offer-swiper .swiper-button-prev {
+  display: none !important;
+}
+
+/* Card hover effects using CSS (fallback for JS hover) */
+.offer-card:hover {
+  transform: translateY(-2px);
+}
+
+.offer-card.selected {
+  transform: translateY(-1px);
+}
+
+/* Transition utility class */
+.transition-all {
+  transition: all 0.3s ease !important;
+}
+
+/* Enhanced card styling */
+.offer-selection-container {
+  overflow-x: hidden !important;
+  width: 100% !important;
+}
+
+.offer-selection-container .card {
+  border-radius: 1rem !important;
+  overflow: hidden;
+}
+
+/* Gray theme for unselected cards */
+.offer-card:not(.selected) {
+  border-color: var(--bs-secondary) !important;
+  background-color: rgba(108, 117, 125, 0.05) !important;
+}
+
+.offer-card:not(.selected) .text-primary {
+  color: var(--bs-secondary) !important;
+}
+
+.offer-card:not(.selected) .btn-outline-primary {
+  border-color: var(--bs-secondary) !important;
+  color: var(--bs-secondary) !important;
+}
+
+.offer-card:not(.selected) .btn-outline-primary:hover {
+  background-color: var(--bs-secondary) !important;
+  border-color: var(--bs-secondary) !important;
+  color: white !important;
+}
+
+/* Navigation button improvements */
+.swiper-button-prev-custom.disabled,
+.swiper-button-next-custom.disabled {
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+.offer-selection-container .card-body {
+  padding: 1.5rem !important;
+}
+
+/* Baggage info cards enhancement */
+.offer-selection-container .bg-light.border {
+  transition: all 0.2s ease;
+}
+
+.offer-selection-container .bg-light.border:hover {
+  background-color: var(--bs-primary) !important;
+  color: white !important;
+}
+
+.offer-selection-container .bg-light.border:hover .text-primary {
+  color: white !important;
+}
+
+.offer-selection-container .bg-light.border:hover .text-muted {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* RTL support for custom navigation buttons */
+[dir='rtl'] .swiper-button-prev-custom {
+  left: auto !important;
+  right: -20px !important;
+}
+
+[dir='rtl'] .swiper-button-next-custom {
+  right: auto !important;
+  left: -20px !important;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 576px) {
+  .offer-swiper {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .offer-swiper .swiper-slide {
+    width: 280px !important;
+    max-width: 280px !important;
+    min-width: 280px !important;
+  }
+
+  .swiper-button-prev-custom,
+  .swiper-button-next-custom {
+    display: none !important;
+  }
+
+  .offer-selection-container .card {
+    min-height: 360px !important;
+    max-height: 360px !important;
+  }
+
+  /* Show pagination on mobile when navigation is hidden */
+  .swiper-pagination-custom {
+    margin-top: 1.5rem !important;
+  }
+
+  .swiper-pagination-custom .swiper-pagination-bullet {
+    width: 10px !important;
+    height: 10px !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .offer-selection-container .card {
+    min-height: 400px !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  /* On large screens, ensure proper spacing for 3 cards */
+  .offer-swiper[data-slides='3'] {
+    max-width: 960px !important; /* 3 * 300px + 2 * 24px spacing */
+    margin: 0 auto !important;
+  }
+
+  /* Hide pagination when all 3 cards are visible on desktop */
+  .offer-swiper[data-slides='3'] + div .swiper-pagination-custom {
+    display: none !important;
+  }
+
+  .offer-selection-container .card {
+    min-height: 420px !important;
+  }
+}
+
+/* Focus states for accessibility */
+.offer-card:focus-within {
+  outline: 2px solid var(--bs-primary) !important;
+  outline-offset: 2px !important;
+}
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .swiper-pagination-custom .swiper-pagination-bullet {
+    background: var(--bs-gray-600) !important;
+    border-color: var(--bs-gray-500) !important;
+  }
+
+  .swiper-pagination-custom .swiper-pagination-bullet-active {
+    background: var(--bs-warning) !important;
+    border-color: var(--bs-warning-bg) !important;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.4) !important;
+  }
+}
