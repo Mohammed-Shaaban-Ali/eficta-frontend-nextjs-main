@@ -6,7 +6,8 @@ type Props = { token: string };
 
 function SetToken({ token }: Props) {
   if (token) {
-    setCookie('api-token', token);
+    // make time 1 hour
+    setCookie('api-token', token, { maxAge: 3600 });
   }
   return null;
 }

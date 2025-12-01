@@ -37,7 +37,7 @@ export const refreshApiToken = async (): Promise<string | null> => {
     );
 
     const newToken = res.data?.access_token;
-    if (newToken) setCookie('api-token', newToken);
+    if (newToken) setCookie('api-token', newToken, { maxAge: 3600 });
 
     return newToken;
   } catch (err) {
