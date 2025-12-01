@@ -1,42 +1,36 @@
-import { useTranslations, useLocale } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleStop } from '@/store/flightFilterSlice';
+import { toggleProvider } from '@/store/flightFilterSlice';
 import { RootState } from '@/store/store';
 
-interface StopItem {
-  id: number;
-  text: string;
-  count: number;
-}
-
-const Stops = ({ stops = [] }: { stops?: StopItem[] }) => {
+const Providers = ({
+  providers = [],
+}: {
+  providers?: {
+    id: string;
+    text: string;
+    count: number;
+  }[];
+}) => {
   const locale = useLocale();
   const isRTL = locale === 'ar';
 
   const dispatch = useDispatch();
-  const selectedStops = useSelector(
-    (state: RootState) => state.flightFilter.stops,
+  const selectedProviders = useSelector(
+    (state: RootState) => state.flightFilter.providers,
   );
 
-  // Map API stop IDs to Redux stop types
-  // const stopTypeMapping: {
-  //   [key: number]: 'direct' | 'oneStopOrLess';
-  // } = {
-  //   0: 'direct', // Direct flights (0 stops)
-  //   1: 'oneStopOrLess', // 1 stop or less
-  // };
-
-  const handleStopToggle = (stopId: number) => {
-    dispatch(toggleStop(stopId));
+  const handleStopToggle = (stopId: string) => {
+    dispatch(toggleProvider(stopId));
   };
 
-  const stopsToRender = stops.length > 0 ? stops : [];
+  const providersToRender = providers.length > 0 ? providers : [];
 
   return (
     <div>
-      {stopsToRender.map((stop, index) => {
+      {providersToRender.map((provider, index) => {
         // const stopType = stopTypeMapping[stop.id];
-        const isChecked = selectedStops.includes(stop.id);
+        const isChecked = selectedProviders.includes(provider.id);
 
         return (
           <div
@@ -48,18 +42,18 @@ const Stops = ({ stops = [] }: { stops?: StopItem[] }) => {
                 <input
                   type="checkbox"
                   checked={isChecked}
-                  onChange={() => handleStopToggle(stop.id)}
+                  onChange={() => handleStopToggle(provider.id)}
                 />
                 <div className="form-checkbox__mark">
                   <div className="form-checkbox__icon icon-check" />
                 </div>
                 <div className={`text-15 ${isRTL ? 'mr-10' : 'ml-10'}`}>
-                  {stop.text}
+                  {provider.text}
                 </div>
               </div>
             </div>
             <div className="col-auto">
-              <div className="text-15 text-light-1">{stop.count || 0}</div>
+              <div className="text-15 text-light-1">{provider.count || 0}</div>
             </div>
           </div>
         );
@@ -68,4 +62,4 @@ const Stops = ({ stops = [] }: { stops?: StopItem[] }) => {
   );
 };
 
-export default Stops;
+export default Providers;

@@ -5,10 +5,9 @@ interface PriceRange {
   max: number;
 }
 
-interface StopsFilter {
-  direct: boolean;
-  oneStopOrLess: boolean;
-}
+// interface StopsFilter {
+
+// }
 
 // Interface for airline data from API
 interface AirlineItem {
@@ -24,11 +23,15 @@ export interface FlightFilterState {
   // Airlines filter
   selectedAirlines: string[];
 
+  // Providers filter
+  providers: string[];
+
   // Stops filter
-  stops: StopsFilter;
+  stops: number[];
 
   // Sorting
-  sortBy: 'price' | 'duration' | 'departure' | 'arrival' | null;
+  sortBy: 'price' | 'duration' | null;
+
   sortOrder: 'asc' | 'desc';
 
   // Applied filters tracking
@@ -41,10 +44,8 @@ export interface FlightFilterState {
 const initialState: FlightFilterState = {
   priceRange: { min: 0, max: 5000 },
   selectedAirlines: [],
-  stops: {
-    direct: false,
-    oneStopOrLess: false,
-  },
+  providers: [],
+  stops: [],
   sortBy: null,
   sortOrder: 'asc',
   appliedFiltersCount: 0,
@@ -78,14 +79,37 @@ const flightFilterSlice = createSlice({
       updateAppliedFiltersCount(state);
     },
 
-    // Stops actions
-    toggleStop: (state, action: PayloadAction<keyof StopsFilter>) => {
-      const stopType = action.payload;
-      state.stops[stopType] = !state.stops[stopType];
+    // Providers actions
+    toggleProvider: (state, action: PayloadAction<string>) => {
+      const provider = action.payload;
+      const index = state.providers.indexOf(provider);
+      if (index > -1) {
+        state.providers.splice(index, 1);
+      } else {
+        state.providers.push(provider);
+      }
+      updateAppliedFiltersCount(state);
+    },
+    setProviders: (state, action: PayloadAction<string[]>) => {
+      state.providers = action.payload;
       updateAppliedFiltersCount(state);
     },
 
-    setStops: (state, action: PayloadAction<StopsFilter>) => {
+    // Stops actions
+    toggleStop: (state, action: PayloadAction<number>) => {
+      // state.stops[stopType] = !state.stops[stopType];
+
+      const stopType = action.payload;
+      const index = state.stops.indexOf(stopType);
+      if (index > -1) {
+        state.stops.splice(index, 1);
+      } else {
+        state.stops.push(stopType);
+      }
+      updateAppliedFiltersCount(state);
+    },
+
+    setStops: (state, action: PayloadAction<number[]>) => {
       state.stops = action.payload;
       updateAppliedFiltersCount(state);
     },
@@ -111,7 +135,7 @@ const flightFilterSlice = createSlice({
     resetFilters: (state) => {
       state.priceRange = { min: 0, max: 5000 };
       state.selectedAirlines = [];
-      state.stops = { direct: false, oneStopOrLess: false };
+      state.stops = [];
       state.sortBy = null;
       state.sortOrder = 'asc';
       updateAppliedFiltersCount(state);
@@ -142,7 +166,7 @@ const updateAppliedFiltersCount = (state: FlightFilterState) => {
   if (state.selectedAirlines.length > 0) count++;
 
   // Count stops filter
-  if (state.stops.direct || state.stops.oneStopOrLess) count++;
+  if (state.stops.length > 0) count++;
 
   state.appliedFiltersCount = count;
 };
@@ -151,6 +175,8 @@ export const {
   setPriceRange,
   toggleAirline,
   setSelectedAirlines,
+  toggleProvider,
+  setProviders,
   toggleStop,
   setStops,
   setSortBy,

@@ -126,6 +126,11 @@ export interface FlightFilteringOptions {
     text: string;
     count: number;
   }[];
+  provider: {
+    id: string;
+    text: string;
+    count: number;
+  }[];
 }
 
 export interface flightTypes {

@@ -66,7 +66,6 @@ const FlightSerachResults = () => {
     min: filteringOptions?.minPrice || 0,
     max: filteringOptions?.maxPrice || 5000,
   };
-
   return (
     <>
       <section className="layout-pt-md layout-pb-md bg-light-2">
@@ -78,8 +77,10 @@ const FlightSerachResults = () => {
                   <Sidebar
                     availableAirlines={data?.filteringOptions?.airline}
                     stops={data?.filteringOptions?.stops}
+                    providers={data?.filteringOptions?.provider}
                     priceRange={priceRange}
                     flightCount={flightCount}
+                    sortingOptions={data?.sortingOptions}
                   />
                 </div>
               </aside>
@@ -105,6 +106,8 @@ const FlightSerachResults = () => {
                       stops={data?.filteringOptions?.stops}
                       priceRange={priceRange}
                       flightCount={flightCount}
+                      providers={data?.filteringOptions?.provider}
+                      sortingOptions={data?.sortingOptions}
                     />
                   </aside>
                 </div>

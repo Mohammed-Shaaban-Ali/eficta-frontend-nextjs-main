@@ -153,57 +153,41 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
 
     // Stops filter - using correct data structure and logic matching API
     // Note: API provides mutually exclusive categories, so "1 Stops or less" means exactly 1 stop
-    if (typedFilters.stops.direct || typedFilters.stops.oneStopOrLess) {
+    if (typedFilters.stops.length > 0) {
       const beforeCount = filtered.length;
       filtered = filtered.filter((flight: any) => {
-        // Get number of stops from the first leg's time_info
-        const numberOfStops = parseInt(
-          flight.legs?.[0]?.time_info?.number_of_stops || '0',
-        );
-
-        // Check if flight matches any selected stop criteria
-        const matches =
-          (typedFilters.stops.direct && numberOfStops === 0) ||
-          (typedFilters.stops.oneStopOrLess && numberOfStops === 1);
-
-        return matches;
+        const legCount = flight.legs?.length - 1;
+        return typedFilters.stops.includes(legCount);
       });
     }
 
-    // Sort flights - using correct data structure
+    // Providers filter
+    if (typedFilters.providers.length > 0) {
+      filtered = filtered.filter((flight: any) => {
+        const provider_key = flight.provider_key;
+        return typedFilters.providers.includes(provider_key);
+      });
+    }
+
+    // Sort by => price => lowest to highest || duration => shortest to longest
     if (typedFilters.sortBy) {
       filtered.sort((a: any, b: any) => {
         let aValue, bValue;
 
         switch (typedFilters.sortBy) {
           case 'price':
-            aValue =
-              a.fares?.[0]?.fare_info?.fare_detail?.price_info?.total_fare || 0;
-            bValue =
-              b.fares?.[0]?.fare_info?.fare_detail?.price_info?.total_fare || 0;
+            aValue = a.fares?.minimum_package_price || 0;
+            bValue = b.fares?.minimum_package_price || 0;
             break;
           case 'duration':
-            aValue = a.legs?.[0]?.time_info?.leg_duration_time_minute || 0;
-            bValue = b.legs?.[0]?.time_info?.leg_duration_time_minute || 0;
+            aValue =
+              a.legs?.[0]?.time_info?.flight_time_hour * 60 +
+                a.legs?.[0]?.time_info?.flight_time_minute || 0;
+            bValue =
+              b.legs?.[0]?.time_info?.flight_time_hour * 60 +
+                b.legs?.[0]?.time_info?.flight_time_minute || 0;
             break;
-          case 'departure':
-            aValue = new Date(
-              a.legs?.[0]?.departure_info?.date || '',
-            ).getTime();
-            bValue = new Date(
-              b.legs?.[0]?.departure_info?.date || '',
-            ).getTime();
-            break;
-          case 'arrival':
-            const aLastLeg = (a.legs?.length || 1) - 1;
-            const bLastLeg = (b.legs?.length || 1) - 1;
-            aValue = new Date(
-              a.legs?.[aLastLeg]?.arrival_info?.date || '',
-            ).getTime();
-            bValue = new Date(
-              b.legs?.[bLastLeg]?.arrival_info?.date || '',
-            ).getTime();
-            break;
+
           default:
             return 0;
         }

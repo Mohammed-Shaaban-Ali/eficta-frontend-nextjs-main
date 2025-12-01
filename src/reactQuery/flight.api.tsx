@@ -22,6 +22,10 @@ export interface FlightSearchParams {
 interface FlightSearchResponse {
   data: flightTypes;
   filteringOptions: FlightFilteringOptions;
+  sortingOptions: {
+    id: 'price' | 'duration';
+    text: string;
+  }[];
   meta: metaTypes;
 }
 interface FlightFairRequest {

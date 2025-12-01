@@ -12,7 +12,6 @@ import { useState } from 'react';
 const HotelCard = ({ hotel, Uuid }: any) => {
   const t = useTranslations('HotelList.hotel_card');
   const [isFavorite, setIsFavorite] = useState(false);
-
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsFavorite(!isFavorite);
@@ -176,13 +175,18 @@ const HotelCard = ({ hotel, Uuid }: any) => {
                       />
                     </div>
                   </div>
-                  <Link
-                    href={`/hotel/${hotel.id}/${Uuid}`}
-                    onClick={OnSeaAvailability}
-                    className="btn btn-primary px-20"
-                  >
-                    {t('see_availability')}
-                  </Link>
+                  <div className="">
+                    {/* provider kkey */}
+
+                    <span></span>
+                    <Link
+                      href={`/hotel/${hotel.id}/${Uuid}`}
+                      onClick={OnSeaAvailability}
+                      className="btn btn-primary px-20"
+                    >
+                      {t('see_availability')}
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>

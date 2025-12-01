@@ -6,6 +6,8 @@ import PirceSlider from './sidebar/PirceSlider';
 import Stops from './sidebar/Stops';
 
 import { setAvailableAirlines } from '@/store/flightFilterSlice';
+import Providers from './sidebar/Providers';
+import SortingOptions from './sidebar/SortingOptions';
 
 interface SidebarProps {
   availableAirlines?: { id?: string; count?: string; text?: string }[];
@@ -15,6 +17,8 @@ interface SidebarProps {
   availableArrivalAirports?: { code: string; name: string; count?: number }[];
   priceRange?: { min: number; max: number };
   flightCount?: number;
+  providers?: { id: string; text: string; count: number }[];
+  sortingOptions?: { id: 'price' | 'duration'; text: string }[];
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -25,6 +29,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   availableArrivalAirports = [],
   priceRange = { min: 0, max: 5000 },
   flightCount = 0,
+  providers = [],
+  sortingOptions = [],
 }) => {
   const t = useTranslations('FlightSearch.filters');
   const dispatch = useDispatch();
@@ -35,13 +41,24 @@ const Sidebar: React.FC<SidebarProps> = ({
       dispatch(setAvailableAirlines(availableAirlines as any));
     }
   }, [dispatch, availableAirlines]);
-
   return (
     <>
       <div className="sidebar__item -no-border">
+        <h5 className="text-18 fw-500 mb-10">Providers</h5>
+        <div className="sidebar-checkbox">
+          <Providers providers={providers} />
+        </div>
+      </div>
+      <div className="sidebar__item no-border">
         <h5 className="text-18 fw-500 mb-10">{t('stops')}</h5>
         <div className="sidebar-checkbox">
           <Stops stops={stops} />
+        </div>
+      </div>
+      <div className="sidebar__item no-border">
+        <h5 className="text-18 fw-500 mb-10">Sort By</h5>
+        <div className="sidebar-checkbox">
+          <SortingOptions sortingOptions={sortingOptions} />
         </div>
       </div>
 
