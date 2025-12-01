@@ -3,114 +3,138 @@ import axios, {
   AxiosInstance,
   InternalAxiosRequestConfig,
 } from 'axios';
-import { getCookie, deleteCookie } from 'cookies-next';
+import { getCookie, setCookie } from 'cookies-next';
 import { signOut } from './auth';
 
-// Set the base URL for API requests
 const apiClient: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_APP_EFICTA,
-  // withCredentials: true,
 });
 
-// Helper function to get the current language from URL or cookie
+// ---------- Helpers ----------
 const getCurrentLanguage = (): string => {
-  // Check if we're on the client side
   if (typeof window !== 'undefined') {
-    // Extract language from URL path
     const pathSegments = window.location.pathname.split('/');
-    // First segment after the initial '/' should be the language code
     const langFromUrl = pathSegments[1];
 
-    // Validate language code (only accept 'en' or 'ar')
-    if (langFromUrl === 'en' || langFromUrl === 'ar') {
-      return langFromUrl;
-    }
+    if (langFromUrl === 'en' || langFromUrl === 'ar') return langFromUrl;
 
-    // Fallback to cookie if URL doesn't contain valid language
-    const langFromCookie = getCookie('NEXT_LOCALE');
-    if (
-      typeof langFromCookie === 'string' &&
-      (langFromCookie === 'en' || langFromCookie === 'ar')
-    ) {
-      return langFromCookie;
-    }
+    const langCookie = getCookie('NEXT_LOCALE');
+    if (langCookie === 'en' || langCookie === 'ar') return langCookie;
   }
 
-  // Default to 'en' if no language is detected
   return 'en';
 };
 
-// Request interceptor to handle headers and tokens
+// ======  API to Refresh x-api-token ======
+export const refreshApiToken = async (): Promise<string | null> => {
+  try {
+    const res = await axios.post(
+      `${process.env.NEXT_PUBLIC_APP_EFICTA}/api/api-auth/login`,
+      {
+        username: process.env.NEXT_PUBLIC_APP_USERNAME,
+        password: process.env.NEXT_PUBLIC_APP_PASSWORD,
+      },
+    );
+
+    const newToken = res.data?.access_token;
+    if (newToken) setCookie('api-token', newToken);
+
+    return newToken;
+  } catch (err) {
+    return null;
+  }
+};
+
+// ---------- Requests Interceptor ----------
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Ensure headers object is defined
     config.headers = config.headers || {};
 
-    // Get token from cookies
     const token = getCookie('access-token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    if (token) config.headers.Authorization = `Bearer ${token}`;
 
-    // Add language header based on current selected language
-    const currentLanguage = getCurrentLanguage();
-    config.headers['lng'] = currentLanguage;
+    const apiToken = getCookie('api-token');
+    if (apiToken) config.headers['x-api-token'] = apiToken;
+
+    config.headers['lng'] = getCurrentLanguage();
 
     const formdata = config.headers['Content-Type'];
-
     if (formdata) {
-      if (formdata === 'application/pdf') {
-        config.responseType = 'blob';
-      }
+      if (formdata === 'application/pdf') config.responseType = 'blob';
     } else {
       config.headers['Content-Type'] = 'application/json';
     }
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error),
 );
 
-// Response interceptor to handle unauthorized or forbidden responses
+// ---------- Response Interceptor ----------
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((promise) => {
+    if (token) promise.resolve(token);
+    else promise.reject(error);
+  });
+
+  failedQueue = [];
+};
+
 apiClient.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (
-      error.response &&
-      (error.response.status === 401 || error.response.status === 403)
-    ) {
-      // Delete auth token
-      // deleteCookie('accessToken');
-      signOut();
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    //  in case of 403 and jwt expired → Refresh x-api-token
+    if (error.response?.data.status === 'EXPIRED' && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then((token) => {
+          originalRequest.headers['x-api-token'] = token;
+          return apiClient(originalRequest);
+        });
+      }
+
+      isRefreshing = true;
+
+      const newToken = await refreshApiToken();
+
+      if (!newToken) {
+        processQueue(null, null);
+        return Promise.reject(error);
+      }
+
+      processQueue(null, newToken);
+      isRefreshing = false;
+
+      originalRequest.headers['x-api-token'] = newToken;
+      return apiClient(originalRequest);
     }
+    //  in case of 401 or 403 → Sign Out User
+    else if (error.response?.status === 401 || error.response?.status === 403) {
+      signOut();
+      return Promise.reject(error);
+    }
+
     return Promise.reject(error);
   },
 );
 
+// ---------- Exported Function ----------
 export async function executeApiRequest<T>(
   config: AxiosRequestConfig = {},
   formdata?: 'application/pdf' | 'multipart/form-data' | 'application/json',
 ): Promise<T> {
-  try {
-    // Ensure headers object is defined
-    config.headers = config.headers || {};
+  config.headers = config.headers || {};
 
-    // Set the Content-Type header based on formdata parameter
-    if (formdata) {
-      config.headers['Content-Type'] = formdata;
-    }
+  if (formdata) config.headers['Content-Type'] = formdata;
+  if (!config.headers['lng']) config.headers['lng'] = getCurrentLanguage();
 
-    // Ensure the language header is included in individual requests
-    if (!config.headers['lng']) {
-      config.headers['lng'] = getCurrentLanguage();
-    }
-
-    const response = await apiClient(config);
-    return response.data as T;
-  } catch (error: any) {
-    throw error;
-  }
+  const response = await apiClient(config);
+  return response.data as T;
 }

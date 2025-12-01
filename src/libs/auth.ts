@@ -3,6 +3,9 @@ import GoogleProvider from 'next-auth/providers/google';
 import GithubProvider from 'next-auth/providers/github';
 import { userTypes } from '@/types/app/userTypes';
 import type { NextAuthOptions } from 'next-auth';
+import { getCookie } from 'cookies-next';
+import { cookies } from 'next/headers';
+import { refreshApiToken } from '@/utils/executeApiRequest';
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_EFICTA;
 interface UserResponse {
@@ -34,22 +37,31 @@ export const authOptions: NextAuthOptions = {
         email: { label: 'email', type: 'text' },
         password: { label: 'password', type: 'password' },
       },
-
-      async authorize(credentials): Promise<any> {
+      async authorize(credentials, req): Promise<any> {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Please provide both email and password');
         }
-
+        const cookieStore = await cookies();
+        let finaltoken = '';
+        const apiToken = cookieStore.get('api-token')?.value;
+        finaltoken = apiToken || '';
+        if (!apiToken) {
+          const token = await refreshApiToken();
+          finaltoken = token || '';
+        }
         try {
           const response = await fetch(`${baseUrl}/api/auth/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'x-api-token': finaltoken || '',
             },
             body: JSON.stringify(credentials),
           });
 
           if (!response.ok) {
+            const errorData = await response.json();
+            console.log(errorData);
             throw new Error(
               'Invalid email or password. Please check your credentials and try again.',
             );

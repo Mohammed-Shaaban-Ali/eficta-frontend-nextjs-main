@@ -19,6 +19,7 @@ import Toast from '@/libs/Toast';
 import '../../styles/global.css';
 import ClientLayoutWraper from './(app)/ClientLayoutWraper';
 import ScrollToTop from '@/views/common/ScrollTop';
+import SetToken from '../../components/layout/SetToken';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -64,10 +65,18 @@ export default async function RootLayout({
     locale === 'ar'
       ? `${notoKufiArabic.variable} ${notoKufiArabic.className}`
       : `${geistSans.variable} ${geistMono.variable}`;
+
+  // Fetch will trigger the API route which handles cookie setting
+  const res = await fetch(process.env.NEXT_PUBLIC_APP_URL + '/api/app-token', {
+    cache: 'no-store',
+    credentials: 'include',
+  });
+  const { token } = await res.json();
   return (
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <body className={`${fontClasses} antialiased`}>
         <main>
+          <SetToken token={token} />
           <Toast />
           <NextIntlClientProvider locale={locale}>
             <ClientLayoutWraper>

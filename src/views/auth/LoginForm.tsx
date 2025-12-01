@@ -54,7 +54,6 @@ const LoginForm = () => {
       } else if (result?.ok) {
         // Get the session to access the token
         const session = await getSession();
-        console.log(session?.accessToken, 'session');
         // Set access token as cookie if available
         if (session?.accessToken) {
           setCookie('access-token', session.accessToken, 1); // 1 hour expiry to match session
