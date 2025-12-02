@@ -139,38 +139,40 @@ const FlightCard = memo<FlightCardProps>(
                   }}
                   className="d-flex flex-row align-items-center justify-content-center mt-3 gap-3"
                 >
-                  {departureFlightData?.legs?.length === 1 ? (
-                    <span className="badge bg-info text-white rounded-pill">
-                      {t('nonstop')}
-                    </span>
-                  ) : (
-                    <div className="d-flex flex-row align-items-center justify-content-center gap-2 position-relative">
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '-20px',
-                          left: '0',
-                          right: '0',
-                          marginBottom: '20px',
-                          color: 'gray',
-                          whiteSpace: 'nowrap',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                        className="d-flex align-items-center gap-1 "
-                      >
-                        <span className="small bg-transparent text-center  d-flex align-items-center gap-1 ">
-                          {/* <FaClock size={10} /> */}
-                          {formatDuration(
+                  <div className="d-flex flex-row align-items-center justify-content-center gap-2 position-relative">
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '-20px',
+                        left: '0',
+                        right: '0',
+                        marginBottom: '20px',
+                        color: 'gray',
+                        whiteSpace: 'nowrap',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                      className="d-flex align-items-center gap-1 "
+                    >
+                      <span className="small bg-transparent text-center  d-flex align-items-center gap-1 ">
+                        {/* <FaClock size={10} /> */}
+                        {formatDuration(
+                          departureFlightData?.legs?.[0]?.time_info
+                            ?.flight_time_hour *
+                            60 +
                             departureFlightData?.legs?.[0]?.time_info
-                              ?.flight_time_hour *
-                              60 +
-                              departureFlightData?.legs?.[0]?.time_info
-                                ?.flight_time_minute,
-                          )}
+                              ?.flight_time_minute,
+                        )}
+                      </span>
+                    </div>
+                    {departureFlightData?.legs?.length === 1 ? (
+                      <div className="d-flex flex-row align-items-center justify-content-center gap-2 mt-2">
+                        <span className="badge bg-primary text-white rounded p-2">
+                          {t('nonstop')}
                         </span>
                       </div>
-                      {departureFlightData?.legs?.map((leg: any, i: number) => {
+                    ) : (
+                      departureFlightData?.legs?.map((leg: any, i: number) => {
                         if (i === 0) return null;
                         return (
                           <div
@@ -182,9 +184,9 @@ const FlightCard = memo<FlightCardProps>(
                             </span>
                           </div>
                         );
-                      })}
-                    </div>
-                  )}
+                      })
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
