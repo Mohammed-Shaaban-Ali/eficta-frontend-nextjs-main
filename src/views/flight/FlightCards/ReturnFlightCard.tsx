@@ -15,6 +15,7 @@ interface ReturnFlightCardProps {
   ) => void;
   formatTime: (dateString: string) => string;
   formatDuration: (minutes: number) => string;
+  formatDate: (dateString: string) => string;
 }
 
 const ReturnFlightCard = memo<ReturnFlightCardProps>(
@@ -26,6 +27,7 @@ const ReturnFlightCard = memo<ReturnFlightCardProps>(
     onSelectFlight,
     formatTime,
     formatDuration,
+    formatDate,
   }) => {
     const t = useTranslations('FlightSearch.return_flights');
     const locale = useLocale();
@@ -58,17 +60,23 @@ const ReturnFlightCard = memo<ReturnFlightCardProps>(
         <div className="card-body p-3">
           <div className="row align-items-center g-3">
             {/* Airline Info */}
-            <div className="col-auto">
-              <div
-                className="badge bg-primary rounded-pill d-flex align-items-center justify-content-center text-white fw-bold"
-                style={{
-                  width: '50px',
-                  height: '50px',
-                  fontSize: '14px',
-                }}
-              >
-                {returnFlight?.legs?.[0]?.airline_info?.carrier_code}
+            <div className="col-auto d-flex flex-column max-w-20 ">
+              <div className="">
+                <img
+                  src={departureFlightData?.legs?.[0]?.airline_info?.logo}
+                  alt={
+                    departureFlightData?.legs?.[0]?.airline_info?.carrier_code
+                  }
+                  width={50}
+                  height={50}
+                />
               </div>
+              <p className="text-truncate">
+                {departureFlightData?.legs?.[0]?.airline_info?.carrier_name}
+              </p>
+              <p className="">
+                ({departureFlightData?.legs?.[0]?.flight_number})
+              </p>
             </div>
 
             {/* Flight Route - Opposite Direction */}
@@ -83,7 +91,7 @@ const ReturnFlightCard = memo<ReturnFlightCardProps>(
                     {departureInfo?.airport_code}
                   </div>
                   <div className="small text-muted">
-                    {departureInfo?.airport_name}
+                    {formatDate(departureInfo?.date || '')}
                   </div>
                 </div>
 
@@ -116,7 +124,7 @@ const ReturnFlightCard = memo<ReturnFlightCardProps>(
                     {arrivalInfo?.airport_code}
                   </div>
                   <div className="small text-muted">
-                    {arrivalInfo?.airport_name}
+                    {formatDate(arrivalInfo?.date || '')}
                   </div>
                 </div>
               </div>
@@ -124,9 +132,10 @@ const ReturnFlightCard = memo<ReturnFlightCardProps>(
               <div className="d-flex align-items-center justify-content-center mt-3 gap-3">
                 <span className="badge bg-success text-white rounded-pill d-flex align-items-center gap-1">
                   <FaClock size={10} />
+
                   {formatDuration(
-                    returnFlight?.legs?.[0]?.time_info
-                      ?.leg_duration_time_minute || 0,
+                    returnFlight?.legs?.[0]?.time_info?.flight_time_hour * 60 +
+                      returnFlight?.legs?.[0]?.time_info?.flight_time_minute,
                   )}
                 </span>
                 {stops === '0' ? (
@@ -147,13 +156,25 @@ const ReturnFlightCard = memo<ReturnFlightCardProps>(
                 <div className="h5 fw-bold text-primary mb-1">
                   {isRTL ? (
                     <>
-                      {fareInfo?.fare_detail?.price_info?.total_fare}{' '}
+                      +{' '}
+                      {(
+                        fareInfo?.fare_detail?.price_info?.total_fare +
+                        departureFlightData?.fares?.[0]?.fare_info?.fare_detail
+                          ?.price_info?.total_fare -
+                        departureFlightData?.minimum_package_price
+                      ).toFixed(2)}{' '}
                       {fareInfo?.fare_detail?.currency_code}
                     </>
                   ) : (
                     <>
                       {fareInfo?.fare_detail?.currency_code}{' '}
-                      {fareInfo?.fare_detail?.price_info?.total_fare}
+                      {(
+                        fareInfo?.fare_detail?.price_info?.total_fare +
+                        departureFlightData?.fares?.[0]?.fare_info?.fare_detail
+                          ?.price_info?.total_fare -
+                        departureFlightData?.minimum_package_price
+                      ).toFixed(2)}{' '}
+                      +
                     </>
                   )}
                 </div>

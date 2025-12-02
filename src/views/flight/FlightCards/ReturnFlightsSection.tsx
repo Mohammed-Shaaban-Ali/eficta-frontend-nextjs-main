@@ -15,6 +15,7 @@ interface ReturnFlightsSectionProps {
   departureFlightData: any;
   onSelectFlight: (departureFlightData: any, returnFlightData?: any) => void;
   formatTime: (dateString: string) => string;
+  formatDate: (dateString: string) => string;
   formatDuration: (minutes: number) => string;
 }
 
@@ -24,6 +25,7 @@ const ReturnFlightsSection = memo<ReturnFlightsSectionProps>(
     departureFlightData,
     onSelectFlight,
     formatTime,
+    formatDate,
     formatDuration,
   }) => {
     const t = useTranslations('FlightSearch.return_flights');
@@ -164,6 +166,14 @@ const ReturnFlightsSection = memo<ReturnFlightsSectionProps>(
                           <div className="small text-muted">
                             {departureInfo?.airport_name}
                           </div>
+
+                          <div className="small text-muted fw-semibold">
+                            {formatDate(
+                              departureFlightData?.legs?.[
+                                departureFlightData?.legs?.length - 1
+                              ]?.arrival_info?.date || '',
+                            )}
+                          </div>
                         </div>
 
                         <div className="text-center flex-grow-1 mx-4">
@@ -181,8 +191,11 @@ const ReturnFlightsSection = memo<ReturnFlightsSectionProps>(
                           <div className="small text-muted d-flex align-items-center justify-content-center gap-1">
                             <FaClock size={10} />
                             {formatDuration(
-                              returnFlight?.legs?.[0]?.time_info
-                                ?.leg_duration_time_minute || 0,
+                              departureFlightData?.legs?.[0]?.time_info
+                                ?.flight_time_hour *
+                                60 +
+                                departureFlightData?.legs?.[0]?.time_info
+                                  ?.flight_time_minute,
                             )}
                           </div>
                         </div>

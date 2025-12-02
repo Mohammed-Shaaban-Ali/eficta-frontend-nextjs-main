@@ -67,11 +67,13 @@
     "@types/react-dom": "^19",
     "@types/react-modal-video": "^1.2.3",
     "@types/react-slick": "^0.23.13",
+    "autoprefixer": "^10.4.22",
     "eslint": "^9",
     "eslint-config-next": "^15.2.4",
     "husky": "^9.1.7",
+    "postcss": "^8.5.6",
     "prettier": "^3.5.3",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.1.17",
     "typescript": "^5"
   }
 }

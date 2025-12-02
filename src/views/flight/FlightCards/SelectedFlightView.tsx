@@ -119,16 +119,27 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
             <div className="card-body p-4">
               <div className="row align-items-center g-3">
                 {/* Airline */}
-                <div className="col-auto">
-                  <div
-                    className="badge bg-primary rounded-pill d-flex align-items-center justify-content-center text-white fw-bold"
-                    style={{ width: '60px', height: '60px', fontSize: '16px' }}
-                  >
+                <div className="col-auto d-flex flex-column max-w-20 ">
+                  <div className="">
+                    <img
+                      src={selectedDepartureData?.legs?.[0]?.airline_info?.logo}
+                      alt={
+                        selectedDepartureData?.legs?.[0]?.airline_info
+                          ?.carrier_code
+                      }
+                      width={50}
+                      height={50}
+                    />
+                  </div>
+                  <p className="text-truncate">
                     {
                       selectedDepartureData?.legs?.[0]?.airline_info
-                        ?.carrier_code
+                        ?.carrier_name
                     }
-                  </div>
+                  </p>
+                  <p className="">
+                    ({selectedDepartureData?.legs?.[0]?.flight_number})
+                  </p>
                 </div>
 
                 {/* Flight Route */}
@@ -142,7 +153,7 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
                         {departureInfo?.airport_code}
                       </div>
                       <div className="small text-muted">
-                        {departureInfo?.airport_name}
+                        {formatDate(departureInfo?.date || '')}{' '}
                       </div>
                     </div>
 
@@ -176,7 +187,7 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
                         {arrivalInfo?.airport_code}
                       </div>
                       <div className="small text-muted">
-                        {arrivalInfo?.airport_name}
+                        {formatDate(arrivalInfo?.date || '')}
                       </div>
                     </div>
                   </div>
@@ -184,9 +195,13 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
                   <div className="d-flex align-items-center justify-content-center mt-3 gap-3">
                     <span className="badge bg-success text-white rounded-pill d-flex align-items-center gap-1 p-2">
                       <FaClock size={12} />
+
                       {formatDuration(
                         selectedDepartureData?.legs?.[0]?.time_info
-                          ?.leg_duration_time_minute || 0,
+                          ?.flight_time_hour *
+                          60 +
+                          selectedDepartureData?.legs?.[0]?.time_info
+                            ?.flight_time_minute,
                       )}
                     </span>
                     {selectedDepartureData?.legs?.[0]?.time_info
@@ -224,10 +239,7 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
                         selectedDepartureData?.fares?.[0]?.fare_info
                           ?.fare_detail?.currency_code
                       }{' '}
-                      {
-                        selectedDepartureData?.fares?.[0]?.fare_info
-                          ?.fare_detail?.price_info?.total_fare
-                      }
+                      {selectedDepartureData?.minimum_package_price}
                     </div>
                     <div className="small opacity-75 mb-2">
                       <FaUsers size={12} className={isRTL ? 'ms-1' : 'me-1'} />
@@ -267,6 +279,7 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
                         onSelectFlight={handleSelectFlight}
                         formatTime={formatTime}
                         formatDuration={formatDuration}
+                        formatDate={formatDate}
                       />
                     </div>
                   ))}

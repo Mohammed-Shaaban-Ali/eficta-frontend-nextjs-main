@@ -132,7 +132,7 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
     <>
       {/* Backdrop */}
       <div
-        className={`position-fixed top-0 start-0 w-100 h-100 bg-dark transition-all ${
+        className={`position-fixed top-0 start-0 w-100 h-100 bg-dark transition-all  ${
           isOpen ? 'bg-opacity-50' : 'bg-opacity-0'
         }`}
         style={{
