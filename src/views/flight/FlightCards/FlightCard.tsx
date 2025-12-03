@@ -67,11 +67,15 @@ const FlightCard = memo<FlightCardProps>(
                   height={50}
                 />
               </div>
-              <p className="text-truncate">
+              <p className="text-truncate small">
                 {departureFlightData?.legs?.[0]?.airline_info?.carrier_name}
               </p>
-              <p className="">
+              <p className="small">
                 ({departureFlightData?.legs?.[0]?.flight_number})
+              </p>
+              {/* provider */}
+              <p className="small fw-bold">
+                {departureFlightData?.provider_key}
               </p>
             </div>
 

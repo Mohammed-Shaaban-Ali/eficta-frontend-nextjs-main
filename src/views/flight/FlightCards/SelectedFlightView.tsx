@@ -131,100 +131,136 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
                       height={50}
                     />
                   </div>
-                  <p className="text-truncate">
+                  <p className="text-truncate small">
                     {
                       selectedDepartureData?.legs?.[0]?.airline_info
                         ?.carrier_name
                     }
                   </p>
-                  <p className="">
+                  <p className="small">
                     ({selectedDepartureData?.legs?.[0]?.flight_number})
+                  </p>
+                  {/* provider */}
+                  <p className="small fw-bold">
+                    {selectedDepartureData?.provider_key}
                   </p>
                 </div>
 
                 {/* Flight Route */}
-                <div className="col">
-                  <div className="d-flex align-items-center">
+                <div className="col ">
+                  <div className="d-flex align-items-center position-relative">
                     <div className="text-center">
-                      <div className="h4 fw-bold text-dark mb-1">
-                        {formatTime(departureInfo?.date || '')}
+                      <div className="h5 fw-bold text-dark mb-1">
+                        {formatTime(
+                          selectedDepartureData?.legs?.[0]?.departure_info
+                            ?.date || '',
+                        )}
                       </div>
-                      <div className="fw-semibold text-muted">
-                        {departureInfo?.airport_code}
+                      <div className="small text-muted fw-semibold">
+                        {
+                          selectedDepartureData?.legs?.[0]?.departure_info
+                            ?.airport_code
+                        }
                       </div>
-                      <div className="small text-muted">
-                        {formatDate(departureInfo?.date || '')}{' '}
+                      <div className="small text-muted fw-semibold">
+                        {formatDate(
+                          selectedDepartureData?.legs?.[0]?.departure_info
+                            ?.date || '',
+                        )}
                       </div>
                     </div>
 
-                    <div className="flex-grow-1 mx-4 position-relative">
-                      <div className="d-flex align-items-center justify-content-center">
+                    <div className="flex-grow-1 mx-3 position-relative flight-route-line">
+                      <div
+                        className="bg-primary rounded-pill"
+                        style={{ height: '2px' }}
+                      ></div>
+                    </div>
+
+                    <div className="text-center">
+                      <div className="h5 fw-bold text-dark mb-1">
+                        {formatTime(
+                          selectedDepartureData?.legs?.[
+                            selectedDepartureData?.legs?.length - 1
+                          ]?.arrival_info?.date || '',
+                        )}
+                      </div>
+                      <div className="small text-muted fw-semibold">
+                        {
+                          selectedDepartureData?.legs?.[
+                            selectedDepartureData?.legs?.length - 1
+                          ]?.arrival_info?.airport_code
+                        }
+                      </div>
+                      <div className="small text-muted fw-semibold">
+                        {formatDate(
+                          selectedDepartureData?.legs?.[
+                            selectedDepartureData?.legs?.length - 1
+                          ]?.arrival_info?.date || '',
+                        )}
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '0',
+                        left: '0',
+                        right: '0',
+                      }}
+                      className="d-flex flex-row align-items-center justify-content-center mt-3 gap-3"
+                    >
+                      <div className="d-flex flex-row align-items-center justify-content-center gap-2 position-relative">
                         <div
-                          className="bg-success rounded-pill flex-grow-1"
-                          style={{ height: '3px' }}
-                        ></div>
-                        <div className="mx-3 text-center">
-                          <FaPlane className="text-success" size={20} />
-                          <div className="small text-muted mt-1">
+                          style={{
+                            position: 'absolute',
+                            top: '-20px',
+                            left: '0',
+                            right: '0',
+                            marginBottom: '20px',
+                            color: 'gray',
+                            whiteSpace: 'nowrap',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                          className="d-flex align-items-center gap-1 "
+                        >
+                          <span className="small bg-transparent text-center  d-flex align-items-center gap-1 ">
+                            {/* <FaClock size={10} /> */}
                             {formatDuration(
                               selectedDepartureData?.legs?.[0]?.time_info
-                                ?.leg_duration_time_minute || 0,
-                            )}
-                          </div>
-                        </div>
-                        <div
-                          className="bg-success rounded-pill flex-grow-1"
-                          style={{ height: '3px' }}
-                        ></div>
-                      </div>
-                    </div>
-
-                    <div className="text-center">
-                      <div className="h4 fw-bold text-dark mb-1">
-                        {formatTime(arrivalInfo?.date || '')}
-                      </div>
-                      <div className="fw-semibold text-muted">
-                        {arrivalInfo?.airport_code}
-                      </div>
-                      <div className="small text-muted">
-                        {formatDate(arrivalInfo?.date || '')}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="d-flex align-items-center justify-content-center mt-3 gap-3">
-                    <span className="badge bg-success text-white rounded-pill d-flex align-items-center gap-1 p-2">
-                      <FaClock size={12} />
-
-                      {formatDuration(
-                        selectedDepartureData?.legs?.[0]?.time_info
-                          ?.flight_time_hour *
-                          60 +
-                          selectedDepartureData?.legs?.[0]?.time_info
-                            ?.flight_time_minute,
-                      )}
-                    </span>
-                    {selectedDepartureData?.legs?.[0]?.time_info
-                      ?.number_of_stops === '0' ? (
-                      <span className="badge bg-info text-white rounded-pill p-2">
-                        {t('nonstop')}
-                      </span>
-                    ) : (
-                      <span className="badge bg-warning text-dark rounded-pill p-2">
-                        {
-                          selectedDepartureData?.legs?.[0]?.time_info
-                            ?.number_of_stops
-                        }{' '}
-                        {selectedDepartureData?.legs?.[0]?.time_info
-                          ?.number_of_stops === '1'
-                          ? t('stop', { count: 1 })
-                          : t('stops_plural', {
-                              count:
+                                ?.flight_time_hour *
+                                60 +
                                 selectedDepartureData?.legs?.[0]?.time_info
-                                  ?.number_of_stops,
-                            })}
-                      </span>
-                    )}
+                                  ?.flight_time_minute,
+                            )}
+                          </span>
+                        </div>
+                        {selectedDepartureData?.legs?.length === 1 ? (
+                          <div className="d-flex flex-row align-items-center justify-content-center gap-2 mt-2">
+                            <span className="badge bg-primary text-white rounded p-2">
+                              {t('nonstop')}
+                            </span>
+                          </div>
+                        ) : (
+                          selectedDepartureData?.legs?.map(
+                            (leg: any, i: number) => {
+                              if (i === 0) return null;
+                              return (
+                                <div
+                                  key={i}
+                                  className="d-flex flex-row align-items-center justify-content-center gap-2 mt-2"
+                                >
+                                  <span className="badge border border-dark text-dark rounded p-2 bg-white ">
+                                    {leg.departure_info?.airport_code}
+                                  </span>
+                                </div>
+                              );
+                            },
+                          )
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
 

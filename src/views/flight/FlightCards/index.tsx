@@ -303,7 +303,9 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
   // Show selected flight view when a departure is selected
   if (selectedDeparture && selectedDepartureData) {
     const packageKey = selectedDepartureData.package_info.package_key;
-    const matchingReturns = getMatchingReturnFlights(packageKey);
+    // provider key
+    const providerKey = selectedDepartureData.provider_key;
+    const matchingReturns = getMatchingReturnFlights(packageKey, providerKey);
 
     return (
       <SelectedFlightView
@@ -337,9 +339,13 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
         {paginatedFlights.map((departureFlightData: any, index: number) => {
           const actualIndex = (currentPage - 1) * flightsPerPage + index;
           const packageKey = departureFlightData.package_info.package_key;
+          const providerKey = departureFlightData.provider_key;
           const departureFareKey =
             departureFlightData.fares?.[0]?.fare_key || '';
-          const matchingReturns = getMatchingReturnFlights(packageKey);
+          const matchingReturns = getMatchingReturnFlights(
+            packageKey,
+            providerKey,
+          );
           const isSelected = selectedDeparture === departureFareKey;
 
           return (

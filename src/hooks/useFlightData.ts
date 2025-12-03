@@ -40,23 +40,28 @@ interface UseReturnFlightsMapProps {
 export const useReturnFlightsMap = ({
   returnFlights,
 }: UseReturnFlightsMapProps) => {
-  // Memoized return flights lookup (performance critical)
+  // Memoized return flights lookup using composite key (performance critical)
   const returnFlightsMap = useMemo(() => {
     const map = new Map();
     returnFlights?.forEach((returnFlight: any) => {
       const packageKey = returnFlight.package_info.package_key;
-      if (!map.has(packageKey)) {
-        map.set(packageKey, []);
+      const providerKey = returnFlight.provider_key;
+      // Create composite key combining both provider and package keys
+      const compositeKey = `${providerKey}:${packageKey}`;
+
+      if (!map.has(compositeKey)) {
+        map.set(compositeKey, []);
       }
-      map.get(packageKey).push(returnFlight);
+      map.get(compositeKey).push(returnFlight);
     });
     return map;
   }, [returnFlights]);
 
-  // Get matching return flights for a departure flight's package key
+  // Get matching return flights for a departure flight's package key and provider key
   const getMatchingReturnFlights = useCallback(
-    (packageKey: string) => {
-      return returnFlightsMap.get(packageKey) || [];
+    (packageKey: string, providerKey: string) => {
+      const compositeKey = `${providerKey}:${packageKey}`;
+      return returnFlightsMap.get(compositeKey) || [];
     },
     [returnFlightsMap],
   );

@@ -71,17 +71,23 @@ const ReturnFlightCard = memo<ReturnFlightCardProps>(
                   height={50}
                 />
               </div>
-              <p className="text-truncate">
+
+              <p className="text-truncate small">
                 {departureFlightData?.legs?.[0]?.airline_info?.carrier_name}
               </p>
-              <p className="">
+              <p className="small">
                 ({departureFlightData?.legs?.[0]?.flight_number})
+              </p>
+              {/* provider */}
+              <p className="small fw-bold">
+                {departureFlightData?.provider_key}
               </p>
             </div>
 
             {/* Flight Route - Opposite Direction */}
+
             <div className="col">
-              <div className="d-flex align-items-center">
+              <div className="d-flex align-items-center  position-relative">
                 {/* Arrival (destination) shown first for return flights */}
                 <div className="text-center">
                   <div className="h5 fw-bold text-dark mb-1">
@@ -95,13 +101,19 @@ const ReturnFlightCard = memo<ReturnFlightCardProps>(
                   </div>
                 </div>
 
+                {/* <div className="flex-grow-1 mx-3 position-relative flight-route-line">
+                  <div
+                    className="bg-primary rounded-pill"
+                    style={{ height: '2px' }}
+                  ></div>
+                </div> */}
                 <div className="flex-grow-1 mx-3 position-relative">
                   <div className="d-flex align-items-center justify-content-center">
                     <div
-                      className="bg-primary rounded-pill flex-grow-1"
-                      style={{ height: '2px' }}
+                      className="bg-primary rounded-pill "
+                      style={{ height: '2px', width: '0px' }}
                     ></div>
-                    <div className="mx-2 text-center">
+                    <div className="mx-1 mb-1 text-center">
                       <FaPlane
                         className="text-primary fa-flip-horizontal"
                         size={16}
@@ -127,26 +139,64 @@ const ReturnFlightCard = memo<ReturnFlightCardProps>(
                     {formatDate(arrivalInfo?.date || '')}
                   </div>
                 </div>
-              </div>
 
-              <div className="d-flex align-items-center justify-content-center mt-3 gap-3">
-                <span className="badge bg-success text-white rounded-pill d-flex align-items-center gap-1">
-                  <FaClock size={10} />
-
-                  {formatDuration(
-                    returnFlight?.legs?.[0]?.time_info?.flight_time_hour * 60 +
-                      returnFlight?.legs?.[0]?.time_info?.flight_time_minute,
-                  )}
-                </span>
-                {stops === '0' ? (
-                  <span className="badge bg-info text-white rounded-pill">
-                    {t('direct')}
-                  </span>
-                ) : (
-                  <span className="badge bg-warning text-dark rounded-pill">
-                    {stops} {parseInt(stops) === 1 ? t('stop') : t('stops')}
-                  </span>
-                )}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '0',
+                    left: '0',
+                    right: '0',
+                  }}
+                  className="d-flex flex-row align-items-center justify-content-center mt-3 gap-3"
+                >
+                  <div className="d-flex flex-row align-items-center justify-content-center gap-2 position-relative">
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '-20px',
+                        left: '0',
+                        right: '0',
+                        marginBottom: '20px',
+                        color: 'gray',
+                        whiteSpace: 'nowrap',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                      className="d-flex align-items-center gap-1 "
+                    >
+                      <span className="small bg-transparent text-center  d-flex align-items-center gap-1 ">
+                        {/* <FaClock size={10} /> */}
+                        {formatDuration(
+                          returnFlight?.legs?.[0]?.time_info?.flight_time_hour *
+                            60 +
+                            returnFlight?.legs?.[0]?.time_info
+                              ?.flight_time_minute,
+                        )}
+                      </span>
+                    </div>
+                    {returnFlight?.legs?.length === 1 ? (
+                      <div className="d-flex flex-row align-items-center justify-content-center gap-2 mt-2">
+                        <span className="badge bg-primary text-white rounded p-2">
+                          {t('direct')}
+                        </span>
+                      </div>
+                    ) : (
+                      returnFlight?.legs?.map((leg: any, i: number) => {
+                        if (i === 0) return null;
+                        return (
+                          <div
+                            key={i}
+                            className="d-flex flex-row align-items-center justify-content-center gap-2 mt-2"
+                          >
+                            <span className="badge border border-dark text-dark rounded p-2 bg-white ">
+                              {leg.departure_info?.airport_code}
+                            </span>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 

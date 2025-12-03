@@ -131,10 +131,10 @@ const OfferCard: React.FC<OfferCardProps> = ({
         {/* Header */}
         <div className="d-flex align-items-start justify-content-between mb-2">
           <div className="flex-grow-1 min-w-0">
-            <h6 className="fw-bold mb-1 text-truncate">
+            {/* <h6 className="fw-bold mb-1 text-truncate">
               {offer.offer_details[0]?.name}
-            </h6>
-            <p className="text-muted small mb-0 text-truncate">
+            </h6> */}
+            <p className="fw-bold mb-1 text-truncate">
               {offer.offer_details[0]?.descriptions[0]}
             </p>
           </div>
@@ -156,13 +156,13 @@ const OfferCard: React.FC<OfferCardProps> = ({
             >
               {formatPrice(offer.total_price)}
             </h5>
-            {priceDifference > 0 && (
+            {/* {priceDifference > 0 && (
               <span className="text-muted small">
                 +{formatPrice(priceDifference)}
               </span>
-            )}
+            )} */}
           </div>
-          <p className="text-muted small mb-0">{t('per_person')}</p>
+          {/* <p className="text-muted small mb-0">{t('per_person')}</p> */}
         </div>
 
         {/* Key Features */}

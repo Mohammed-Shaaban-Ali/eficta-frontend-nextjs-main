@@ -27,5 +27,5 @@ export interface FlightBookingRequest {
       notPakistanCitizen: boolean;
     };
   }[];
-  offers?: string[];
+  offers?: string;
 }
