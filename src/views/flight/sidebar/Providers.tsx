@@ -5,23 +5,27 @@ import { RootState } from '@/store/store';
 
 const Providers = ({
   providers = [],
+  flightType = 'departure',
 }: {
   providers?: {
     id: string;
     text: string;
     count: number;
   }[];
+  flightType?: 'departure' | 'return';
 }) => {
   const locale = useLocale();
   const isRTL = locale === 'ar';
 
   const dispatch = useDispatch();
-  const selectedProviders = useSelector(
-    (state: RootState) => state.flightFilter.providers,
+  const { departureFilters, returnFilters } = useSelector(
+    (state: RootState) => state.flightFilter,
   );
+  const filters = flightType === 'departure' ? departureFilters : returnFilters;
+  const selectedProviders = filters.providers;
 
   const handleStopToggle = (stopId: string) => {
-    dispatch(toggleProvider(stopId));
+    dispatch(toggleProvider({ provider: stopId, flightType }));
   };
 
   const providersToRender = providers.length > 0 ? providers : [];

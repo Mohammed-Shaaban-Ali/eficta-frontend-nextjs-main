@@ -9,14 +9,16 @@ interface StopItem {
   count: number;
 }
 
-const Stops = ({ stops = [] }: { stops?: StopItem[] }) => {
+const Stops = ({ stops = [], flightType = 'departure' }: { stops?: StopItem[]; flightType?: 'departure' | 'return' }) => {
   const locale = useLocale();
   const isRTL = locale === 'ar';
 
   const dispatch = useDispatch();
-  const selectedStops = useSelector(
-    (state: RootState) => state.flightFilter.stops,
+  const { departureFilters, returnFilters } = useSelector(
+    (state: RootState) => state.flightFilter,
   );
+  const filters = flightType === 'departure' ? departureFilters : returnFilters;
+  const selectedStops = filters.stops;
 
   // Map API stop IDs to Redux stop types
   // const stopTypeMapping: {
@@ -27,7 +29,7 @@ const Stops = ({ stops = [] }: { stops?: StopItem[] }) => {
   // };
 
   const handleStopToggle = (stopId: number) => {
-    dispatch(toggleStop(stopId));
+    dispatch(toggleStop({ stop: stopId, flightType }));
   };
 
   const stopsToRender = stops.length > 0 ? stops : [];

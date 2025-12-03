@@ -12,7 +12,8 @@ import {
 } from 'react-icons/fa';
 import { Link } from '@/i18n/navigation';
 import { resetFilters } from '@/store/flightFilterSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
 
 interface NoResultsPageProps {
   error?: any;
@@ -42,9 +43,16 @@ const NoResultsPage = memo<NoResultsPageProps>(
     const locale = useLocale();
     const isRTL = locale === 'ar';
     const dispatch = useDispatch();
+    const currentFilterType = useSelector(
+      (state: RootState) => state.flightFilter.currentFilterType,
+    );
 
     const handleRetry = () => {
       window.location.reload();
+    };
+
+    const handleResetFilters = () => {
+      dispatch(resetFilters({ flightType: currentFilterType }));
     };
 
     return (
@@ -198,7 +206,7 @@ const NoResultsPage = memo<NoResultsPageProps>(
           <div className="d-flex gap-3 justify-content-center mb-4">
             <button
               className="btn btn-primary d-flex align-items-center gap-2"
-              onClick={() => dispatch(resetFilters())}
+              onClick={handleResetFilters}
             >
               <FaRedo size={14} />
               {error ? t('actions.try_again') : t('actions.modify_search')}

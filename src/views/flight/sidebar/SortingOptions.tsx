@@ -5,22 +5,26 @@ import { RootState } from '@/store/store';
 
 const SortingOptions = ({
   sortingOptions = [],
+  flightType = 'departure',
 }: {
   sortingOptions?: {
     id: string;
     text: string;
   }[];
+  flightType?: 'departure' | 'return';
 }) => {
   const locale = useLocale();
   const isRTL = locale === 'ar';
 
   const dispatch = useDispatch();
-  const selectedSortBy = useSelector(
-    (state: RootState) => state.flightFilter.sortBy,
+  const { departureFilters, returnFilters } = useSelector(
+    (state: RootState) => state.flightFilter,
   );
+  const filters = flightType === 'departure' ? departureFilters : returnFilters;
+  const selectedSortBy = filters.sortBy;
 
   const handleStopToggle = (stopId: 'price' | 'duration') => {
-    dispatch(setSortBy(stopId));
+    dispatch(setSortBy({ sortBy: stopId, flightType }));
   };
 
   const sortingOptionsToRender =

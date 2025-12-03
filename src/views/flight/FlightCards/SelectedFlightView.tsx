@@ -1,7 +1,12 @@
 'use client';
-import { memo, useState, useCallback, lazy, Suspense } from 'react';
+import { memo, useState, useCallback, lazy, Suspense, useMemo } from 'react';
 import { FaClock, FaUsers, FaArrowLeft, FaPlane } from 'react-icons/fa';
+import { MdOutlineFilterAltOff } from 'react-icons/md';
 import { useTranslations, useLocale } from 'next-intl';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@/store/store';
+import type { FlightFilterState } from '@/store/flightFilterSlice';
+import { resetFilters } from '@/store/flightFilterSlice';
 import ReturnFlightCard from './ReturnFlightCard';
 
 // Lazy load FlightDetails
@@ -54,6 +59,122 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
     const [selectedReturnIndex, setSelectedReturnIndex] = useState<
       number | null
     >(null);
+
+    const dispatch = useDispatch();
+
+    // Get return flight filters from Redux
+    const { returnFilters, returnFlightsActualPriceRange } = useSelector(
+      (state: RootState) => state.flightFilter,
+    );
+    const filters = returnFilters as FlightFilterState['departureFilters'];
+
+    // Handle reset filters
+    const handleResetFilters = useCallback(() => {
+      dispatch(resetFilters({ flightType: 'return' }));
+    }, [dispatch]);
+
+    // Filter return flights based on returnFilters
+    const filteredReturnFlights = useMemo(() => {
+      if (!matchingReturns.length) return [];
+
+      let filtered = [...matchingReturns];
+
+      // Price filter - convert slider value to actual price
+      if (returnFlightsActualPriceRange) {
+        const actualMin = returnFlightsActualPriceRange.min;
+        const sliderMax = filters.priceRange.max; // This is (actualMax - actualMin)
+        const actualMax = actualMin + sliderMax;
+
+        // Convert slider values to actual prices
+        const minActualPrice = actualMin + filters.priceRange.min;
+        const maxActualPrice = actualMin + filters.priceRange.max;
+
+        // Only filter if not at default range
+        if (filters.priceRange.min >= 0 || filters.priceRange.max < sliderMax) {
+          filtered = filtered.filter((flight: any) => {
+            const price =
+              flight.fares?.[0]?.fare_info?.fare_detail?.price_info
+                ?.total_fare || 0;
+            return price >= minActualPrice && price <= maxActualPrice;
+          });
+        }
+      } else {
+        // Fallback to direct price comparison if actual range not available
+        const apiMin = 0;
+        const apiMax = 10000;
+        if (
+          filters.priceRange.min > apiMin ||
+          filters.priceRange.max < apiMax
+        ) {
+          filtered = filtered.filter((flight: any) => {
+            const price =
+              flight.fares?.[0]?.fare_info?.fare_detail?.price_info
+                ?.total_fare || 0;
+            return (
+              price >= filters.priceRange.min && price <= filters.priceRange.max
+            );
+          });
+        }
+      }
+
+      // Airlines filter
+      if (filters.selectedAirlines.length > 0) {
+        filtered = filtered.filter((flight: any) => {
+          const carrierCode = flight.legs?.[0]?.airline_info?.carrier_code;
+          return carrierCode && filters.selectedAirlines.includes(carrierCode);
+        });
+      }
+
+      // Stops filter
+      if (filters.stops.length > 0) {
+        filtered = filtered.filter((flight: any) => {
+          const legCount = flight.legs?.length - 1;
+          return filters.stops.includes(legCount);
+        });
+      }
+
+      // Providers filter
+      if (filters.providers.length > 0) {
+        filtered = filtered.filter((flight: any) => {
+          const provider_key = flight.provider_key;
+          return filters.providers.includes(provider_key);
+        });
+      }
+
+      // Sort by => price => lowest to highest || duration => shortest to longest
+      if (filters.sortBy) {
+        filtered.sort((a: any, b: any) => {
+          let aValue, bValue;
+
+          switch (filters.sortBy) {
+            case 'price':
+              aValue =
+                a.fares?.[0]?.fare_info?.fare_detail?.price_info?.total_fare ||
+                0;
+              bValue =
+                b.fares?.[0]?.fare_info?.fare_detail?.price_info?.total_fare ||
+                0;
+              break;
+            case 'duration':
+              aValue =
+                a.legs?.[0]?.time_info?.flight_time_hour * 60 +
+                  a.legs?.[0]?.time_info?.flight_time_minute || 0;
+              bValue =
+                b.legs?.[0]?.time_info?.flight_time_hour * 60 +
+                  b.legs?.[0]?.time_info?.flight_time_minute || 0;
+              break;
+
+            default:
+              return 0;
+          }
+
+          const multiplier = filters.sortOrder === 'desc' ? -1 : 1;
+          return (aValue - bValue) * multiplier;
+        });
+      }
+
+      return filtered;
+    }, [matchingReturns, filters]);
 
     const departureInfo = selectedDepartureData?.legs?.[0]?.departure_info;
     const arrivalInfo =
@@ -291,38 +412,70 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
           </div>
         </>
         {/* Return Flights Section */}
-        {matchingReturns.length > 0 ? (
+        {filteredReturnFlights.length > 0 ? (
           <>
             <div className="p-2 rounded-2 text-primary">
               <div className="d-flex align-items-center text-primary gap-2">
                 <FaPlane className="fa-flip-horizontal" />
                 <h5 className="mb-0">{tReturn('title')}</h5>
                 <span className="badge bg-white text-primary ms-auto">
-                  {tReturn('options', { count: matchingReturns.length })}
+                  {tReturn('options', { count: filteredReturnFlights.length })}
+                  {matchingReturns.length !== filteredReturnFlights.length && (
+                    <span className="ms-2 text-muted small">
+                      ({tReturn('options', { count: matchingReturns.length })}{' '}
+                      total)
+                    </span>
+                  )}
                 </span>
+                {filters.appliedFiltersCount > 0 && (
+                  <button
+                    onClick={handleResetFilters}
+                    className="btn btn-sm btn-outline-primary ms-2 d-flex align-items-center gap-1"
+                    style={{ fontSize: '12px' }}
+                  >
+                    <MdOutlineFilterAltOff size={14} />
+                    Reset Filters
+                  </button>
+                )}
               </div>
             </div>
             <div className="card shadow-sm border-0">
               <div className="card-body p-4">
                 <div className="row g-3">
-                  {matchingReturns.map((returnFlight: any, index: number) => (
-                    <div key={index} className="col-12">
-                      <ReturnFlightCard
-                        returnFlight={returnFlight}
-                        index={index}
-                        isSelected={selectedReturnIndex === index}
-                        departureFlightData={selectedDepartureData}
-                        onSelectFlight={handleSelectFlight}
-                        formatTime={formatTime}
-                        formatDuration={formatDuration}
-                        formatDate={formatDate}
-                      />
-                    </div>
-                  ))}
+                  {filteredReturnFlights.map(
+                    (returnFlight: any, index: number) => (
+                      <div key={index} className="col-12">
+                        <ReturnFlightCard
+                          returnFlight={returnFlight}
+                          index={index}
+                          isSelected={selectedReturnIndex === index}
+                          departureFlightData={selectedDepartureData}
+                          onSelectFlight={handleSelectFlight}
+                          formatTime={formatTime}
+                          formatDuration={formatDuration}
+                          formatDate={formatDate}
+                        />
+                      </div>
+                    ),
+                  )}
                 </div>
               </div>
             </div>
           </>
+        ) : matchingReturns.length > 0 ? (
+          <div className="card shadow-sm border-0">
+            <div className="card-body p-4 text-center">
+              <div className="mb-4">
+                <FaPlane className="text-muted" size={48} />
+                <h5 className="mt-3 mb-2">
+                  No return flights match your filters
+                </h5>
+                <p className="text-muted">
+                  Try adjusting your filters to see more options
+                </p>
+              </div>
+            </div>
+          </div>
         ) : (
           <div className="card shadow-sm border-0">
             <div className="card-body p-4 text-center">

@@ -27,18 +27,19 @@ const ResultsSummary = memo<ResultsSummaryProps>(
 
     const dispatch = useDispatch();
 
-    // Get applied filters count from Redux
-    const appliedFiltersCount = useSelector(
-      (state: RootState) =>
-        (state.flightFilter as FlightFilterState).appliedFiltersCount,
+    // Get applied filters count from Redux based on current filter type
+    const { currentFilterType, departureFilters, returnFilters } = useSelector(
+      (state: RootState) => state.flightFilter,
     );
+    const currentFilters = currentFilterType === 'departure' ? departureFilters : returnFilters;
+    const appliedFiltersCount = currentFilters.appliedFiltersCount;
 
     // Check if any filters are active
     const filtersActive = appliedFiltersCount > 0;
 
     // Handle reset filters
     const handleResetFilters = () => {
-      dispatch(resetFilters());
+      dispatch(resetFilters({ flightType: currentFilterType }));
     };
 
     // Calculate current range of flights being shown

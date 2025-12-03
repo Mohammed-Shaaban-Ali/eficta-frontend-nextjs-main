@@ -16,7 +16,7 @@ interface AirlineItem {
   count: number;
 }
 
-export interface FlightFilterState {
+interface FlightFilters {
   // Price filter
   priceRange: PriceRange;
 
@@ -36,12 +36,27 @@ export interface FlightFilterState {
 
   // Applied filters tracking
   appliedFiltersCount: number;
+}
+
+export interface FlightFilterState {
+  // Separate filters for departure and return flights
+  departureFilters: FlightFilters;
+  returnFilters: FlightFilters;
+
+  // Current filter context - which flight type are we filtering?
+  currentFilterType: 'departure' | 'return';
 
   // Available options (populated from API/props)
   availableAirlines: AirlineItem[];
+
+  // Matching return flights for current selected departure
+  matchingReturnFlights: any[];
+
+  // Actual price range for return flights (needed for filtering)
+  returnFlightsActualPriceRange: { min: number; max: number } | null;
 }
 
-const initialState: FlightFilterState = {
+const createInitialFilters = (): FlightFilters => ({
   priceRange: { min: 0, max: 5000 },
   selectedAirlines: [],
   providers: [],
@@ -49,81 +64,183 @@ const initialState: FlightFilterState = {
   sortBy: null,
   sortOrder: 'asc',
   appliedFiltersCount: 0,
+});
+
+const initialState: FlightFilterState = {
+  departureFilters: createInitialFilters(),
+  returnFilters: createInitialFilters(),
+  currentFilterType: 'departure',
   availableAirlines: [],
+  matchingReturnFlights: [],
+  returnFlightsActualPriceRange: null,
 };
 
 const flightFilterSlice = createSlice({
   name: 'flightFilter',
   initialState,
   reducers: {
-    // Price range actions
-    setPriceRange: (state, action: PayloadAction<PriceRange>) => {
-      state.priceRange = action.payload;
-      updateAppliedFiltersCount(state);
+    // Price range actions - for departure flights
+    setPriceRange: (
+      state,
+      action: PayloadAction<{
+        priceRange: PriceRange;
+        flightType?: 'departure' | 'return';
+      }>,
+    ) => {
+      const flightType = action.payload.flightType || 'departure';
+      const filters =
+        flightType === 'departure'
+          ? state.departureFilters
+          : state.returnFilters;
+      filters.priceRange = action.payload.priceRange;
+      updateAppliedFiltersCount(filters);
     },
 
-    // Airlines actions
-    toggleAirline: (state, action: PayloadAction<string>) => {
-      const airline = action.payload;
-      const index = state.selectedAirlines.indexOf(airline);
+    // Airlines actions - for departure flights
+    toggleAirline: (
+      state,
+      action: PayloadAction<{
+        airline: string;
+        flightType?: 'departure' | 'return';
+      }>,
+    ) => {
+      const flightType = action.payload.flightType || 'departure';
+      const filters =
+        flightType === 'departure'
+          ? state.departureFilters
+          : state.returnFilters;
+      const airline = action.payload.airline;
+      const index = filters.selectedAirlines.indexOf(airline);
       if (index > -1) {
-        state.selectedAirlines.splice(index, 1);
+        filters.selectedAirlines.splice(index, 1);
       } else {
-        state.selectedAirlines.push(airline);
+        filters.selectedAirlines.push(airline);
       }
-      updateAppliedFiltersCount(state);
+      updateAppliedFiltersCount(filters);
     },
 
-    setSelectedAirlines: (state, action: PayloadAction<string[]>) => {
-      state.selectedAirlines = action.payload;
-      updateAppliedFiltersCount(state);
+    setSelectedAirlines: (
+      state,
+      action: PayloadAction<{
+        airlines: string[];
+        flightType?: 'departure' | 'return';
+      }>,
+    ) => {
+      const flightType = action.payload.flightType || 'departure';
+      const filters =
+        flightType === 'departure'
+          ? state.departureFilters
+          : state.returnFilters;
+      filters.selectedAirlines = action.payload.airlines;
+      updateAppliedFiltersCount(filters);
     },
 
     // Providers actions
-    toggleProvider: (state, action: PayloadAction<string>) => {
-      const provider = action.payload;
-      const index = state.providers.indexOf(provider);
+    toggleProvider: (
+      state,
+      action: PayloadAction<{
+        provider: string;
+        flightType?: 'departure' | 'return';
+      }>,
+    ) => {
+      const flightType = action.payload.flightType || 'departure';
+      const filters =
+        flightType === 'departure'
+          ? state.departureFilters
+          : state.returnFilters;
+      const provider = action.payload.provider;
+      const index = filters.providers.indexOf(provider);
       if (index > -1) {
-        state.providers.splice(index, 1);
+        filters.providers.splice(index, 1);
       } else {
-        state.providers.push(provider);
+        filters.providers.push(provider);
       }
-      updateAppliedFiltersCount(state);
+      updateAppliedFiltersCount(filters);
     },
-    setProviders: (state, action: PayloadAction<string[]>) => {
-      state.providers = action.payload;
-      updateAppliedFiltersCount(state);
+    setProviders: (
+      state,
+      action: PayloadAction<{
+        providers: string[];
+        flightType?: 'departure' | 'return';
+      }>,
+    ) => {
+      const flightType = action.payload.flightType || 'departure';
+      const filters =
+        flightType === 'departure'
+          ? state.departureFilters
+          : state.returnFilters;
+      filters.providers = action.payload.providers;
+      updateAppliedFiltersCount(filters);
     },
 
     // Stops actions
-    toggleStop: (state, action: PayloadAction<number>) => {
-      // state.stops[stopType] = !state.stops[stopType];
-
-      const stopType = action.payload;
-      const index = state.stops.indexOf(stopType);
+    toggleStop: (
+      state,
+      action: PayloadAction<{
+        stop: number;
+        flightType?: 'departure' | 'return';
+      }>,
+    ) => {
+      const flightType = action.payload.flightType || 'departure';
+      const filters =
+        flightType === 'departure'
+          ? state.departureFilters
+          : state.returnFilters;
+      const stopType = action.payload.stop;
+      const index = filters.stops.indexOf(stopType);
       if (index > -1) {
-        state.stops.splice(index, 1);
+        filters.stops.splice(index, 1);
       } else {
-        state.stops.push(stopType);
+        filters.stops.push(stopType);
       }
-      updateAppliedFiltersCount(state);
+      updateAppliedFiltersCount(filters);
     },
 
-    setStops: (state, action: PayloadAction<number[]>) => {
-      state.stops = action.payload;
-      updateAppliedFiltersCount(state);
+    setStops: (
+      state,
+      action: PayloadAction<{
+        stops: number[];
+        flightType?: 'departure' | 'return';
+      }>,
+    ) => {
+      const flightType = action.payload.flightType || 'departure';
+      const filters =
+        flightType === 'departure'
+          ? state.departureFilters
+          : state.returnFilters;
+      filters.stops = action.payload.stops;
+      updateAppliedFiltersCount(filters);
     },
 
     // Sorting actions
-    setSortBy: (state, action: PayloadAction<FlightFilterState['sortBy']>) => {
-      state.sortBy = action.payload;
+    setSortBy: (
+      state,
+      action: PayloadAction<{
+        sortBy: 'price' | 'duration' | null;
+        flightType?: 'departure' | 'return';
+      }>,
+    ) => {
+      const flightType = action.payload.flightType || 'departure';
+      const filters =
+        flightType === 'departure'
+          ? state.departureFilters
+          : state.returnFilters;
+      filters.sortBy = action.payload.sortBy;
     },
 
     setSortOrder: (
       state,
-      action: PayloadAction<FlightFilterState['sortOrder']>,
+      action: PayloadAction<{
+        sortOrder: 'asc' | 'desc';
+        flightType?: 'departure' | 'return';
+      }>,
     ) => {
-      state.sortOrder = action.payload;
+      const flightType = action.payload.flightType || 'departure';
+      const filters =
+        flightType === 'departure'
+          ? state.departureFilters
+          : state.returnFilters;
+      filters.sortOrder = action.payload.sortOrder;
     },
 
     // Available options setters (to be called when data is fetched)
@@ -131,44 +248,98 @@ const flightFilterSlice = createSlice({
       state.availableAirlines = action.payload;
     },
 
+    // Set current filter type (departure or return)
+    setCurrentFilterType: (
+      state,
+      action: PayloadAction<'departure' | 'return'>,
+    ) => {
+      state.currentFilterType = action.payload;
+    },
+
+    // Set matching return flights
+    setMatchingReturnFlights: (state, action: PayloadAction<any[]>) => {
+      state.matchingReturnFlights = action.payload;
+    },
+
+    // Set actual price range for return flights
+    setReturnFlightsActualPriceRange: (
+      state,
+      action: PayloadAction<{ min: number; max: number } | null>,
+    ) => {
+      state.returnFlightsActualPriceRange = action.payload;
+    },
+
     // Reset actions
-    resetFilters: (state) => {
-      state.priceRange = { min: 0, max: 5000 };
-      state.selectedAirlines = [];
-      state.stops = [];
-      state.sortBy = null;
-      state.sortOrder = 'asc';
-      updateAppliedFiltersCount(state);
+    resetFilters: {
+      reducer: (
+        state,
+        action: PayloadAction<{ flightType?: 'departure' | 'return' }>,
+      ) => {
+        const flightType = action.payload?.flightType || 'departure';
+        const filters =
+          flightType === 'departure'
+            ? state.departureFilters
+            : state.returnFilters;
+        filters.priceRange = { min: 0, max: 5000 };
+        filters.selectedAirlines = [];
+        filters.providers = [];
+        filters.stops = [];
+        filters.sortBy = null;
+        filters.sortOrder = 'asc';
+        updateAppliedFiltersCount(filters);
+      },
+      prepare: (payload?: { flightType?: 'departure' | 'return' }) => ({
+        payload: payload || { flightType: 'departure' as const },
+      }),
     },
 
-    resetPriceFilter: (state) => {
-      state.priceRange = { min: 0, max: 5000 };
-      updateAppliedFiltersCount(state);
+    resetPriceFilter: (
+      state,
+      action?: PayloadAction<{ flightType?: 'departure' | 'return' }>,
+    ) => {
+      const flightType = action?.payload?.flightType || 'departure';
+      const filters =
+        flightType === 'departure'
+          ? state.departureFilters
+          : state.returnFilters;
+      filters.priceRange = { min: 0, max: 5000 };
+      updateAppliedFiltersCount(filters);
     },
 
-    resetStopsFilter: (state) => {
-      state.stops = initialState.stops;
-      updateAppliedFiltersCount(state);
+    resetStopsFilter: (
+      state,
+      action?: PayloadAction<{ flightType?: 'departure' | 'return' }>,
+    ) => {
+      const flightType = action?.payload?.flightType || 'departure';
+      const filters =
+        flightType === 'departure'
+          ? state.departureFilters
+          : state.returnFilters;
+      filters.stops = [];
+      updateAppliedFiltersCount(filters);
     },
   },
 });
 
 // Helper function to count applied filters
-const updateAppliedFiltersCount = (state: FlightFilterState) => {
+const updateAppliedFiltersCount = (filters: FlightFilters) => {
   let count = 0;
 
   // Count price filter - if price range is not at default values
   const isDefaultPriceRange =
-    state.priceRange.min === 0 && state.priceRange.max === 5000;
+    filters.priceRange.min === 0 && filters.priceRange.max === 5000;
   if (!isDefaultPriceRange) count++;
 
   // Count airlines filter
-  if (state.selectedAirlines.length > 0) count++;
+  if (filters.selectedAirlines.length > 0) count++;
+
+  // Count providers filter
+  if (filters.providers.length > 0) count++;
 
   // Count stops filter
-  if (state.stops.length > 0) count++;
+  if (filters.stops.length > 0) count++;
 
-  state.appliedFiltersCount = count;
+  filters.appliedFiltersCount = count;
 };
 
 export const {
@@ -182,6 +353,9 @@ export const {
   setSortBy,
   setSortOrder,
   setAvailableAirlines,
+  setCurrentFilterType,
+  setMatchingReturnFlights,
+  setReturnFlightsActualPriceRange,
   resetFilters,
   resetPriceFilter,
   resetStopsFilter,

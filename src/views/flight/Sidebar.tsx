@@ -19,6 +19,7 @@ interface SidebarProps {
   flightCount?: number;
   providers?: { id: string; text: string; count: number }[];
   sortingOptions?: { id: 'price' | 'duration'; text: string }[];
+  flightType?: 'departure' | 'return';
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -31,6 +32,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   flightCount = 0,
   providers = [],
   sortingOptions = [],
+  flightType = 'departure',
 }) => {
   const t = useTranslations('FlightSearch.filters');
   const dispatch = useDispatch();
@@ -46,19 +48,19 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="sidebar__item -no-border">
         <h5 className="text-18 fw-500 mb-10">Providers</h5>
         <div className="sidebar-checkbox">
-          <Providers providers={providers} />
+          <Providers providers={providers} flightType={flightType} />
         </div>
       </div>
       <div className="sidebar__item no-border">
         <h5 className="text-18 fw-500 mb-10">{t('stops')}</h5>
         <div className="sidebar-checkbox">
-          <Stops stops={stops} />
+          <Stops stops={stops} flightType={flightType} />
         </div>
       </div>
       <div className="sidebar__item no-border">
         <h5 className="text-18 fw-500 mb-10">Sort By</h5>
         <div className="sidebar-checkbox">
-          <SortingOptions sortingOptions={sortingOptions} />
+          <SortingOptions sortingOptions={sortingOptions} flightType={flightType} />
         </div>
       </div>
 
@@ -76,6 +78,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <PirceSlider
               minPrice={priceRange?.min}
               maxPrice={priceRange?.max}
+              flightType={flightType}
             />
           </div>
         </div>
@@ -84,7 +87,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="sidebar__item">
         <h5 className="text-18 fw-500 mb-10">{t('airlines')}</h5>
         <div className="sidebar-checkbox">
-          <Airlines />
+          <Airlines flightType={flightType} />
         </div>
       </div>
 

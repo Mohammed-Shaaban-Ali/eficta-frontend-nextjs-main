@@ -6,6 +6,7 @@ import {
   lazy,
   Suspense,
   useEffect,
+  useRef,
 } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslations, useLocale } from 'next-intl';
@@ -40,7 +41,11 @@ interface SelectedFlight {
 
 // Import FlightFilterState type
 import type { FlightFilterState } from '@/store/flightFilterSlice';
-import { resetFilters } from '@/store/flightFilterSlice';
+import {
+  resetFilters,
+  setCurrentFilterType,
+  setMatchingReturnFlights,
+} from '@/store/flightFilterSlice';
 
 interface FlightPropertiesProps {
   data?: any;
@@ -77,9 +82,12 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
   const locale = useLocale();
   const isRTL = locale === 'ar';
 
-  // Redux filters
-  const filters = useSelector((state: RootState) => state.flightFilter);
+  // Redux filters - use departure filters
+  const { departureFilters } = useSelector(
+    (state: RootState) => state.flightFilter,
+  );
   const dispatch = useDispatch();
+  const filters = departureFilters;
 
   // Custom hooks - using props data instead of making new API call
   const { flights } = useFlightData(data);
@@ -87,7 +95,7 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
 
   // Reset filters when component mounts
   useEffect(() => {
-    dispatch(resetFilters());
+    dispatch(resetFilters({ flightType: 'departure' }));
   }, [dispatch]);
 
   // State
@@ -120,61 +128,54 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
     // Price filter - check if price range has been modified from API values
     const apiMin = apiPriceRange?.min || 0;
     const apiMax = apiPriceRange?.max || 10000;
-    const typedFilters = filters as FlightFilterState;
-    if (
-      typedFilters.priceRange.min > apiMin ||
-      typedFilters.priceRange.max < apiMax
-    ) {
+
+    console.log(filters.priceRange.min, 'filters.priceRange.min');
+    console.log(filters.priceRange.max, 'filters.priceRange.max');
+
+    if (filters.priceRange.min > apiMin || filters.priceRange.max < apiMax) {
       const beforeCount = filtered.length;
       filtered = filtered.filter((flight: any) => {
-        const price =
-          flight.fares?.[0]?.fare_info?.fare_detail?.price_info?.total_fare ||
-          0;
+        const price = flight?.minimum_package_price;
+
         return (
-          price >= typedFilters.priceRange.min &&
-          price <= typedFilters.priceRange.max
+          price >= filters.priceRange.min && price <= filters.priceRange.max
         );
       });
-      console.log(
-        `Price filter: ${beforeCount} -> ${filtered.length} flights (range: ${typedFilters.priceRange.min}-${typedFilters.priceRange.max})`,
-      );
     }
 
     // Airlines filter - using carrier code (ID) which matches the filteringOptions.airline.id
-    if (typedFilters.selectedAirlines.length > 0) {
+    if (filters.selectedAirlines.length > 0) {
       const beforeCount = filtered.length;
       filtered = filtered.filter((flight: any) => {
         const carrierCode = flight.legs?.[0]?.airline_info?.carrier_code;
-        return (
-          carrierCode && typedFilters.selectedAirlines.includes(carrierCode)
-        );
+        return carrierCode && filters.selectedAirlines.includes(carrierCode);
       });
     }
 
     // Stops filter - using correct data structure and logic matching API
     // Note: API provides mutually exclusive categories, so "1 Stops or less" means exactly 1 stop
-    if (typedFilters.stops.length > 0) {
+    if (filters.stops.length > 0) {
       const beforeCount = filtered.length;
       filtered = filtered.filter((flight: any) => {
         const legCount = flight.legs?.length - 1;
-        return typedFilters.stops.includes(legCount);
+        return filters.stops.includes(legCount);
       });
     }
 
     // Providers filter
-    if (typedFilters.providers.length > 0) {
+    if (filters.providers.length > 0) {
       filtered = filtered.filter((flight: any) => {
         const provider_key = flight.provider_key;
-        return typedFilters.providers.includes(provider_key);
+        return filters.providers.includes(provider_key);
       });
     }
 
     // Sort by => price => lowest to highest || duration => shortest to longest
-    if (typedFilters.sortBy) {
+    if (filters.sortBy) {
       filtered.sort((a: any, b: any) => {
         let aValue, bValue;
 
-        switch (typedFilters.sortBy) {
+        switch (filters.sortBy) {
           case 'price':
             aValue = a.fares?.minimum_package_price || 0;
             bValue = b.fares?.minimum_package_price || 0;
@@ -192,7 +193,7 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
             return 0;
         }
 
-        const multiplier = typedFilters.sortOrder === 'desc' ? -1 : 1;
+        const multiplier = filters.sortOrder === 'desc' ? -1 : 1;
         return (aValue - bValue) * multiplier;
       });
     }
@@ -217,6 +218,37 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
     setSelectedDeparture(null);
     setSelectedDepartureData(null);
   }, [filters]);
+
+  // Track previous selected departure to prevent unnecessary updates
+  const prevSelectedDepartureRef = useRef<string | null>(null);
+
+  // Update filter type and matching returns based on whether departure is selected
+  useEffect(() => {
+    // Only update if departure actually changed
+    if (selectedDeparture !== prevSelectedDepartureRef.current) {
+      if (selectedDeparture && selectedDepartureData) {
+        const packageKey = selectedDepartureData.package_info.package_key;
+        const providerKey = selectedDepartureData.provider_key;
+        const matchingReturns = getMatchingReturnFlights(
+          packageKey,
+          providerKey,
+        );
+        // Reset return filters when selecting a new departure flight
+        dispatch(resetFilters({ flightType: 'return' }));
+        dispatch(setCurrentFilterType('return'));
+        dispatch(setMatchingReturnFlights(matchingReturns));
+      } else {
+        dispatch(setCurrentFilterType('departure'));
+        dispatch(setMatchingReturnFlights([]));
+      }
+      prevSelectedDepartureRef.current = selectedDeparture;
+    }
+  }, [
+    selectedDeparture,
+    selectedDepartureData,
+    dispatch,
+    getMatchingReturnFlights,
+  ]);
 
   // Event handlers
   const handleSelectDeparture = useCallback(

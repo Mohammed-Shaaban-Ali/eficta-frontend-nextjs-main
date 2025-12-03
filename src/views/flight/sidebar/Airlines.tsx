@@ -3,17 +3,19 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toggleAirline } from '@/store/flightFilterSlice';
 import { RootState } from '@/store/store';
 
-const Airlines = () => {
+const Airlines = ({ flightType = 'departure' }: { flightType?: 'departure' | 'return' }) => {
   const locale = useLocale();
   const isRTL = locale === 'ar';
 
   const dispatch = useDispatch();
-  const { selectedAirlines, availableAirlines } = useSelector(
+  const { departureFilters, returnFilters, availableAirlines } = useSelector(
     (state: RootState) => state.flightFilter,
   );
+  const filters = flightType === 'departure' ? departureFilters : returnFilters;
+  const selectedAirlines = filters.selectedAirlines;
 
   const handleAirlineToggle = (airlineName: string) => {
-    dispatch(toggleAirline(airlineName));
+    dispatch(toggleAirline({ airline: airlineName, flightType }));
   };
 
   return (

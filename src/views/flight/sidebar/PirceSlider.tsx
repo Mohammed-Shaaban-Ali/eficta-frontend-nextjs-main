@@ -12,17 +12,21 @@ import { RootState } from '@/store/store';
 const PirceSlider = ({
   minPrice = 0,
   maxPrice = 10000,
+  flightType = 'departure',
 }: {
   minPrice?: number;
   maxPrice?: number;
+  flightType?: 'departure' | 'return';
 }) => {
   const t = useTranslations('FlightSearch.filters');
   const { formatPrice } = useFlightUtils();
 
   const dispatch = useDispatch();
-  const priceRange = useSelector(
-    (state: RootState) => state.flightFilter.priceRange,
+  const { departureFilters, returnFilters } = useSelector(
+    (state: RootState) => state.flightFilter,
   );
+  const filters = flightType === 'departure' ? departureFilters : returnFilters;
+  const priceRange = filters.priceRange;
 
   // Local state to prevent excessive Redux updates
   const [localValue, setLocalValue] = useState({
@@ -42,8 +46,8 @@ const PirceSlider = ({
       if (priceRange.min === 0 && priceRange.max === 5000) {
         dispatch(
           setPriceRange({
-            min: minPrice,
-            max: maxPrice,
+            priceRange: { min: minPrice, max: maxPrice },
+            flightType,
           }),
         );
       }
@@ -72,8 +76,8 @@ const PirceSlider = ({
     if (value.min !== priceRange.min || value.max !== priceRange.max) {
       dispatch(
         setPriceRange({
-          min: value.min,
-          max: value.max,
+          priceRange: { min: value.min, max: value.max },
+          flightType,
         }),
       );
     }

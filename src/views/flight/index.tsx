@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -7,11 +7,21 @@ import { useSearchFlightsQuery } from '@/reactQuery/flight.api';
 import Sidebar from './Sidebar';
 import FlightProperties from './FlightCards';
 import LoadingScreen from '@/components/parts/LoadingScreen';
-import { setPriceRange } from '@/store/flightFilterSlice';
+import {
+  setPriceRange,
+  setReturnFlightsActualPriceRange,
+} from '@/store/flightFilterSlice';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { useMemo, useRef, useEffect } from 'react';
+import { calculateReturnFlightFilterOptions } from '@/utils/returnFlightFilterUtils';
 
 const FlightSerachResults = () => {
   const t = useTranslations('FlightSearch');
   const dispatch = useDispatch();
+  const currentFilterType = useSelector(
+    (state: RootState) => state.flightFilter.currentFilterType,
+  );
 
   // URL parameters for flight search
   const searchParams = useSearchParams();
@@ -38,20 +48,124 @@ const FlightSerachResults = () => {
   // Get filtering options directly from the API response
   const filteringOptions = data?.filteringOptions;
 
-  // Initialize price range from API when available
+  // Get matching return flights from Redux
+  const matchingReturnFlights = useSelector(
+    (state: RootState) => state.flightFilter.matchingReturnFlights,
+  );
+
+  // Calculate filtering options based on current filter type
+  const currentFilteringOptions = useMemo(() => {
+    if (currentFilterType === 'return' && matchingReturnFlights.length > 0) {
+      // Calculate from matching return flights
+      const returnOptions = calculateReturnFlightFilterOptions(
+        matchingReturnFlights,
+      );
+      // Convert airline format to match API format
+      return {
+        airline: returnOptions.airline.map((a) => ({
+          id: a.id,
+          text: a.text,
+          count: a.count.toString(),
+        })),
+        stops: returnOptions.stops,
+        provider: returnOptions.provider.map((p) => ({
+          id: p.id,
+          text: p.text,
+          count: p.count,
+        })),
+        minPrice: returnOptions.minPrice,
+        maxPrice: returnOptions.maxPrice,
+      };
+    } else {
+      // Use API filtering options for departure
+      return {
+        airline: filteringOptions?.airline || [],
+        stops: filteringOptions?.stops || [],
+        provider: filteringOptions?.provider || [],
+        minPrice: filteringOptions?.minPrice || 0,
+        maxPrice: filteringOptions?.maxPrice || 5000,
+      };
+    }
+  }, [currentFilterType, matchingReturnFlights, filteringOptions]);
+
+  // Initialize price range from API when available (only for departure)
   useEffect(() => {
     if (
+      currentFilterType === 'departure' &&
       filteringOptions?.minPrice !== undefined &&
       filteringOptions?.maxPrice !== undefined
     ) {
       dispatch(
         setPriceRange({
-          min: filteringOptions.minPrice,
-          max: filteringOptions.maxPrice,
+          priceRange: {
+            min: filteringOptions.minPrice,
+            max: filteringOptions.maxPrice,
+          },
+          flightType: 'departure',
         }),
       );
     }
-  }, [filteringOptions, dispatch]);
+  }, [filteringOptions, dispatch, currentFilterType]);
+
+  // Track previous matching return flights to prevent infinite loops
+  const prevMatchingReturnsRef = useRef<string>('');
+  const prevFilterTypeRef = useRef<'departure' | 'return'>('departure');
+
+  // Initialize price range for return flights when matching returns are available
+  useEffect(() => {
+    // Create a stable key from matching returns to detect actual changes
+    const matchingReturnsKey = JSON.stringify(
+      matchingReturnFlights.map((f: any) => f.fares?.[0]?.fare_key || ''),
+    );
+    const hasChanged =
+      matchingReturnsKey !== prevMatchingReturnsRef.current ||
+      currentFilterType !== prevFilterTypeRef.current;
+
+    if (
+      hasChanged &&
+      currentFilterType === 'return' &&
+      matchingReturnFlights.length > 0
+    ) {
+      const returnOptions = calculateReturnFlightFilterOptions(
+        matchingReturnFlights,
+      );
+      // Set slider range: min = 0, max = (actualMax - actualMin)
+      dispatch(
+        setPriceRange({
+          priceRange: {
+            min: returnOptions.minPrice,
+            max: returnOptions.maxPrice,
+          },
+          flightType: 'return',
+        }),
+      );
+      // Store actual price range for filtering
+      if (
+        returnOptions.actualMinPrice !== undefined &&
+        returnOptions.actualMaxPrice !== undefined
+      ) {
+        dispatch(
+          setReturnFlightsActualPriceRange({
+            min: returnOptions.actualMinPrice,
+            max: returnOptions.actualMaxPrice,
+          }),
+        );
+      }
+      // Update refs
+      prevMatchingReturnsRef.current = matchingReturnsKey;
+      prevFilterTypeRef.current = currentFilterType;
+    } else if (
+      currentFilterType !== 'return' ||
+      matchingReturnFlights.length === 0
+    ) {
+      // Clear actual price range when not filtering return flights
+      if (prevFilterTypeRef.current === 'return') {
+        dispatch(setReturnFlightsActualPriceRange(null));
+      }
+      prevFilterTypeRef.current = currentFilterType;
+      prevMatchingReturnsRef.current = '';
+    }
+  }, [currentFilterType, matchingReturnFlights, dispatch]);
 
   // Show loading state
   if (isFetching) {
@@ -59,12 +173,15 @@ const FlightSerachResults = () => {
   }
 
   // Calculate total flight count
-  const flightCount = data?.data?.departure_flights?.length || 0;
+  const flightCount =
+    currentFilterType === 'return'
+      ? matchingReturnFlights.length
+      : data?.data?.departure_flights?.length || 0;
 
   // Calculate price range
   const priceRange = {
-    min: filteringOptions?.minPrice || 0,
-    max: filteringOptions?.maxPrice || 5000,
+    min: currentFilteringOptions.minPrice,
+    max: currentFilteringOptions.maxPrice,
   };
   return (
     <>
@@ -75,12 +192,13 @@ const FlightSerachResults = () => {
               <aside className="sidebar py-20 px-20 lg:d-none bg-white">
                 <div className="row y-gap-40">
                   <Sidebar
-                    availableAirlines={data?.filteringOptions?.airline}
-                    stops={data?.filteringOptions?.stops}
-                    providers={data?.filteringOptions?.provider}
+                    availableAirlines={currentFilteringOptions.airline}
+                    stops={currentFilteringOptions.stops}
+                    providers={currentFilteringOptions.provider}
                     priceRange={priceRange}
                     flightCount={flightCount}
                     sortingOptions={data?.sortingOptions}
+                    flightType={currentFilterType}
                   />
                 </div>
               </aside>
@@ -102,12 +220,13 @@ const FlightSerachResults = () => {
                 <div className="offcanvas-body">
                   <aside className="sidebar y-gap-40 lg:d-block">
                     <Sidebar
-                      availableAirlines={data?.filteringOptions?.airline}
-                      stops={data?.filteringOptions?.stops}
+                      availableAirlines={currentFilteringOptions.airline}
+                      stops={currentFilteringOptions.stops}
                       priceRange={priceRange}
                       flightCount={flightCount}
-                      providers={data?.filteringOptions?.provider}
+                      providers={currentFilteringOptions.provider}
                       sortingOptions={data?.sortingOptions}
+                      flightType={currentFilterType}
                     />
                   </aside>
                 </div>
