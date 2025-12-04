@@ -63,25 +63,21 @@ const ReturnFlightCard = memo<ReturnFlightCardProps>(
             <div className="col-auto d-flex flex-column max-w-20 ">
               <div className="">
                 <img
-                  src={departureFlightData?.legs?.[0]?.airline_info?.logo}
-                  alt={
-                    departureFlightData?.legs?.[0]?.airline_info?.carrier_code
-                  }
+                  src={returnFlight?.legs?.[0]?.airline_info?.logo}
+                  alt={returnFlight?.legs?.[0]?.airline_info?.carrier_code}
                   width={50}
                   height={50}
                 />
               </div>
 
               <p className="text-truncate small">
-                {departureFlightData?.legs?.[0]?.airline_info?.carrier_name}
+                {returnFlight?.legs?.[0]?.airline_info?.carrier_name}
               </p>
               <p className="small">
-                ({departureFlightData?.legs?.[0]?.flight_number})
+                ({returnFlight?.legs?.[0]?.flight_number})
               </p>
               {/* provider */}
-              <p className="small fw-bold">
-                {departureFlightData?.provider_key}
-              </p>
+              <p className="small fw-bold">{returnFlight?.provider_key}</p>
             </div>
 
             {/* Flight Route - Opposite Direction */}

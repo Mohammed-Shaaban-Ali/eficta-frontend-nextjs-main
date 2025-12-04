@@ -127,7 +127,6 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
   };
 
   if (!isVisible) return null;
-
   return (
     <>
       {/* Backdrop */}

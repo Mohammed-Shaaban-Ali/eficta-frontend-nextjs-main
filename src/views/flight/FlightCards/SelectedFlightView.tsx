@@ -8,6 +8,7 @@ import { RootState } from '@/store/store';
 import type { FlightFilterState } from '@/store/flightFilterSlice';
 import { resetFilters } from '@/store/flightFilterSlice';
 import ReturnFlightCard from './ReturnFlightCard';
+import { Amaranth } from 'next/font/google';
 
 // Lazy load FlightDetails
 const FlightDetails = lazy(() => import('../flight-details'));
@@ -33,7 +34,6 @@ interface SelectedFlightViewProps {
   childrens: number;
   infants: number;
 }
-
 const SelectedFlightView = memo<SelectedFlightViewProps>(
   ({
     selectedDepartureData,
@@ -51,6 +51,7 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
     const tReturn = useTranslations('FlightSearch.return_flights');
     const locale = useLocale();
     const isRTL = locale === 'ar';
+    console.log(matchingReturns, 'matchingReturns inside');
 
     // Local state for FlightDetails
     const [selectedFlight, setSelectedFlight] = useState<SelectedFlight | null>(
@@ -75,7 +76,7 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
 
     // Filter return flights based on returnFilters
     const filteredReturnFlights = useMemo(() => {
-      if (!matchingReturns.length) return [];
+      if (matchingReturns.length === 0) return [];
 
       let filtered = [...matchingReturns];
 
@@ -83,18 +84,25 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
       if (returnFlightsActualPriceRange) {
         const actualMin = returnFlightsActualPriceRange.min;
         const sliderMax = filters.priceRange.max; // This is (actualMax - actualMin)
-        const actualMax = actualMin + sliderMax;
 
         // Convert slider values to actual prices
-        const minActualPrice = actualMin + filters.priceRange.min;
-        const maxActualPrice = actualMin + filters.priceRange.max;
+        const minActualPrice = Math.floor(actualMin + filters.priceRange.min);
+        const maxActualPrice = Math.ceil(actualMin + filters.priceRange.max);
 
-        // Only filter if not at default range
+        console.log(
+          minActualPrice,
+          maxActualPrice,
+          'minActualPrice, maxActualPrice',
+        );
+        // if (minActualPrice == maxActualPrice) return filtered;
+
         if (filters.priceRange.min >= 0 || filters.priceRange.max < sliderMax) {
+          // Only filter if not at default range
           filtered = filtered.filter((flight: any) => {
             const price =
               flight.fares?.[0]?.fare_info?.fare_detail?.price_info
                 ?.total_fare || 0;
+            console.log(price, 'price');
             return price >= minActualPrice && price <= maxActualPrice;
           });
         }
@@ -116,7 +124,6 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
           });
         }
       }
-
       // Airlines filter
       if (filters.selectedAirlines.length > 0) {
         filtered = filtered.filter((flight: any) => {
@@ -176,6 +183,7 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
       return filtered;
     }, [matchingReturns, filters]);
 
+    console.log(filteredReturnFlights, 'filteredReturnFlights');
     const departureInfo = selectedDepartureData?.legs?.[0]?.departure_info;
     const arrivalInfo =
       selectedDepartureData?.legs?.[selectedDepartureData?.legs?.length - 1]

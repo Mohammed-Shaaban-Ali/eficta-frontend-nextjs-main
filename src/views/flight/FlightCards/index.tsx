@@ -337,8 +337,14 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
     const packageKey = selectedDepartureData.package_info.package_key;
     // provider key
     const providerKey = selectedDepartureData.provider_key;
-    const matchingReturns = getMatchingReturnFlights(packageKey, providerKey);
+    console.log('returnFlights => ', returnFlights);
 
+    const matchingReturns = returnFlights.filter(
+      (returnFlight: any) =>
+        returnFlight.package_info.package_key === packageKey &&
+        returnFlight.provider_key === providerKey,
+    );
+    console.log(matchingReturns, 'matchingReturns');
     return (
       <SelectedFlightView
         selectedDepartureData={selectedDepartureData}
