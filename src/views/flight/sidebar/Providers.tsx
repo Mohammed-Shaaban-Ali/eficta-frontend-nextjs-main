@@ -51,7 +51,11 @@ const Providers = ({
                 <div className="form-checkbox__mark">
                   <div className="form-checkbox__icon icon-check" />
                 </div>
-                <div className={`text-15 ${isRTL ? 'mr-10' : 'ml-10'}`}>
+                <div
+                  // line-clamp-3
+
+                  className={`text-15 line-clamp-1 ${isRTL ? 'mr-10' : 'ml-10'}`}
+                >
                   {provider.text}
                 </div>
               </div>

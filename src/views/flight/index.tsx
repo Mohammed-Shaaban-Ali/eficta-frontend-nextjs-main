@@ -3,7 +3,10 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useSearchFlightsQuery } from '@/reactQuery/flight.api';
+import {
+  useSearchFlightsQuery,
+  useSearchFlightsSabreQuery,
+} from '@/reactQuery/flight.api';
 import Sidebar from './Sidebar';
 import FlightProperties from './FlightCards';
 import LoadingScreen from '@/components/parts/LoadingScreen';
@@ -15,6 +18,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { useMemo, useRef, useEffect } from 'react';
 import { calculateReturnFlightFilterOptions } from '@/utils/returnFlightFilterUtils';
+import { mergeFlightFilterOptions } from '@/utils/mergeFlightFilterOptions';
+import { mergeFlightData } from '@/utils/mergeFlightData';
 
 const FlightSerachResults = () => {
   const t = useTranslations('FlightSearch');
@@ -34,8 +39,12 @@ const FlightSerachResults = () => {
   const infants = parseInt(searchParams.get('infants') || '0', 10);
   const cabinClass = searchParams.get('cabinClass') || 'ECONOMY';
 
-  // API call
-  const { data, isFetching, error } = useSearchFlightsQuery({
+  // API calls - both endpoints
+  const {
+    data: iatiData,
+    isFetching: isIatiFetching,
+    error: iatiError,
+  } = useSearchFlightsQuery({
     adults,
     children,
     infants,
@@ -45,7 +54,49 @@ const FlightSerachResults = () => {
     departureDate,
     ...(returnDate && { returnDate }),
   });
-  // Get filtering options directly from the API response
+
+  const {
+    data: sabreData,
+    isFetching: isSabreFetching,
+    error: sabreError,
+  } = useSearchFlightsSabreQuery({
+    adults,
+    children,
+    infants,
+    cabinClass,
+    fromAirport,
+    toAirport,
+    departureDate,
+    ...(returnDate && { returnDate }),
+  });
+
+  // Merge data from both endpoints
+  const mergedData = useMemo(() => {
+    if (!iatiData && !sabreData) return undefined;
+
+    const mergedFlights = mergeFlightData(iatiData?.data, sabreData?.data);
+    const mergedFilteringOptions = mergeFlightFilterOptions(
+      iatiData?.filteringOptions,
+      sabreData?.filteringOptions,
+    );
+
+    return {
+      data: mergedFlights,
+      filteringOptions: mergedFilteringOptions,
+      sortingOptions:
+        iatiData?.sortingOptions || sabreData?.sortingOptions || [],
+      meta: iatiData?.meta || sabreData?.meta,
+    };
+  }, [iatiData, sabreData]);
+
+  // Determine loading and error states
+  const isFetching = isIatiFetching && isSabreFetching; // Both loading = show full loading
+  const isPartialLoading = isIatiFetching || isSabreFetching; // One still loading = show small indicator
+  const error = iatiError || sabreError;
+
+  // Use merged data
+  const data = mergedData;
+  // Get filtering options from merged data
   const filteringOptions = data?.filteringOptions;
 
   // Get matching return flights from Redux
@@ -167,8 +218,8 @@ const FlightSerachResults = () => {
     }
   }, [currentFilterType, matchingReturnFlights, dispatch]);
 
-  // Show loading state
-  if (isFetching) {
+  // Show full loading screen only if both are loading and no data yet
+  if (isFetching && !data) {
     return <LoadingScreen />;
   }
 
@@ -235,6 +286,22 @@ const FlightSerachResults = () => {
 
             <div className="col-xl-9">
               <div className="row">
+                {/* Small loading indicator when one endpoint is still loading */}
+                {isPartialLoading && data && (
+                  <div className="col-12 mb-3">
+                    <div className="d-flex align-items-center gap-2 p-3 bg-light rounded">
+                      <div
+                        className="spinner-border spinner-border-sm text-primary"
+                        role="status"
+                      >
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                      <span className="text-14 text-dark-1">
+                        Loading more results...
+                      </span>
+                    </div>
+                  </div>
+                )}
                 <FlightProperties
                   data={data}
                   isFetching={isFetching}
@@ -249,6 +316,7 @@ const FlightSerachResults = () => {
                   childrens={children}
                   infants={infants}
                   apiPriceRange={priceRange}
+                  isPartialLoading={isPartialLoading}
                 />
               </div>
             </div>

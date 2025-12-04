@@ -61,6 +61,7 @@ interface FlightPropertiesProps {
   childrenCount: number;
   cabinClass: string;
   apiPriceRange?: { min: number; max: number };
+  isPartialLoading?: boolean;
 }
 
 const FlightProperties: React.FC<FlightPropertiesProps> = ({
@@ -77,6 +78,7 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
   childrenCount,
   cabinClass,
   apiPriceRange,
+  isPartialLoading,
 }) => {
   const t = useTranslations('FlightSearch');
   const locale = useLocale();
@@ -296,8 +298,8 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  // Loading state
-  if (isFetching) return <LoadingScreen />;
+  // Loading state - only show full loading if both endpoints are loading and no data
+  if (isFetching && !data) return <LoadingScreen />;
 
   // Error or no results
   if (error || !departureFlights || departureFlights.length === 0) {

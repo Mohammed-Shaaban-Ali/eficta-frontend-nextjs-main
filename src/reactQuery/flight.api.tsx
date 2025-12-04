@@ -45,7 +45,22 @@ export function useSearchFlightsQuery(data: FlightSearchParams) {
         data,
       });
     },
-    queryKey: ['Flights', JSON.stringify(data)],
+    queryKey: ['Flights', 'iati', JSON.stringify(data)],
+    enabled: !!data,
+    staleTime: 0,
+  });
+}
+
+export function useSearchFlightsSabreQuery(data: FlightSearchParams) {
+  return useQuery({
+    queryFn: async () => {
+      return executeApiRequest<FlightSearchResponse>({
+        method: 'POST',
+        url: `${url}/api/sabre/search`,
+        data,
+      });
+    },
+    queryKey: ['Flights', 'sabre', JSON.stringify(data)],
     enabled: !!data,
     staleTime: 0,
   });
