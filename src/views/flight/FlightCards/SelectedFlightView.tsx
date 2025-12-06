@@ -20,6 +20,8 @@ interface SelectedFlight {
   adults: number;
   children: number;
   infants: number;
+  departureFlightData?: any;
+  returnFlightData?: any;
 }
 
 interface SelectedFlightViewProps {
@@ -202,6 +204,8 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
           adults,
           children: childrens,
           infants,
+          departureFlightData,
+          returnFlightData,
         });
         // Update selected return index
         if (returnIndex !== undefined) {
@@ -514,6 +518,8 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
               adults={selectedFlight.adults}
               childrens={selectedFlight.children}
               infants={selectedFlight.infants}
+              departureFlightData={selectedFlight.departureFlightData}
+              returnFlightData={selectedFlight.returnFlightData}
             />
           </Suspense>
         )}

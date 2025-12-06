@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useFlightFareQuery } from '@/reactQuery/flight.api';
 import {
@@ -23,6 +23,8 @@ interface FlightDetailsProps {
   adults: number;
   childrens: number;
   infants: number;
+  departureFlightData?: any;
+  returnFlightData?: any;
 }
 
 const FlightDetails: React.FC<FlightDetailsProps> = ({
@@ -33,6 +35,8 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
   adults,
   childrens,
   infants,
+  departureFlightData,
+  returnFlightData,
 }) => {
   const t = useTranslations('FlightSearch.details');
   const locale = useLocale();
@@ -44,12 +48,26 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
     undefined,
   );
 
+  // Determine provider from flight data endpoint immediately
+  const provider = useMemo((): 'iati' | 'sabre' => {
+    const endpoint =
+      departureFlightData?.endpoint || returnFlightData?.endpoint;
+    if (endpoint) {
+      const providerName = endpoint.toLowerCase();
+      if (providerName === 'sabre' || providerName === 'iati') {
+        return providerName as 'iati' | 'sabre';
+      }
+    }
+    return 'iati'; // Default to iati if endpoint not found
+  }, [departureFlightData?.endpoint, returnFlightData?.endpoint]);
+
   const { data, isFetching, error } = useFlightFareQuery({
     departureFareKey,
     ...(returnFareKey && { returnFareKey }),
     adults,
     children: childrens,
     infants,
+    provider,
   });
 
   useEffect(() => {
@@ -372,11 +390,22 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
           <div className="border-top bg-white p-4">
             <button
               className="btn btn-primary btn-lg w-100 rounded-3 d-flex align-items-center justify-content-between shadow-sm"
-              onClick={() =>
+              onClick={() => {
+                let offerKeyParam = '';
+                if (selectedOffer && selectedOffer.offer_details) {
+                  const departureName =
+                    selectedOffer.offer_details[0]?.name || '';
+                  const returnName = selectedOffer.offer_details[1]?.name || '';
+                  if (returnName) {
+                    offerKeyParam = `&offerKey=${departureName}|${returnName}`;
+                  } else {
+                    offerKeyParam = `&offerKey=${departureName}`;
+                  }
+                }
                 router.push(
-                  `/book-flight?departureFareKey=${departureFareKey}${returnFareKey ? `&returnFareKey=${returnFareKey}` : ''}${selectedOfferKey ? `&offerKey=${selectedOffer.offer_details[0].name}` : ''}&children=${childrens}&adults=${adults}&infants=${infants}`,
-                )
-              }
+                  `/book-flight?departureFareKey=${departureFareKey}${returnFareKey ? `&returnFareKey=${returnFareKey}` : ''}${offerKeyParam}&children=${childrens}&adults=${adults}&infants=${infants}`,
+                );
+              }}
               disabled={isFetching}
               style={{ height: '60px' }}
             >

@@ -34,6 +34,7 @@ interface FlightFairRequest {
   adults: number;
   children: number;
   infants: number;
+  provider?: 'iati' | 'sabre';
 }
 
 export function useSearchFlightsQuery(data: FlightSearchParams) {
@@ -67,15 +68,16 @@ export function useSearchFlightsSabreQuery(data: FlightSearchParams) {
 }
 
 export function useFlightFareQuery(data: FlightFairRequest) {
+  const provider = data.provider || 'iati';
   return useQuery({
     queryFn: async () => {
       return executeApiRequest<FlightFareResponse>({
         method: 'POST',
-        url: `${url}/api/iati/fare`,
+        url: `${url}/api/${provider}/fare`,
         data,
       });
     },
-    queryKey: ['Flights', JSON.stringify(data)],
+    queryKey: ['Flights', provider, JSON.stringify(data)],
     enabled: !!data,
   });
 }

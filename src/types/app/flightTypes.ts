@@ -105,6 +105,7 @@ interface Office {
 
 interface FlightDirection {
   provider_key: string;
+  endpoint?: string;
   package_info: PackageInfo;
   legs: Leg[];
   fares: Fare[];

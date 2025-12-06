@@ -26,6 +26,16 @@ const LoginForm = () => {
     formState: { errors },
   } = useForm<LoginFormInputs>({
     resolver: joiResolver(validationSchema),
+    defaultValues: {
+      email:
+        process.env.NEXT_PUBLIC_NODE_ENV === 'development'
+          ? 'test@test.com'
+          : '',
+      password:
+        process.env.NEXT_PUBLIC_NODE_ENV === 'development'
+          ? 'testpassword'
+          : '',
+    },
   });
 
   const onSubmit = async (data: LoginFormInputs) => {

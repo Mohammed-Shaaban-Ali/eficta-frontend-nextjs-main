@@ -37,6 +37,8 @@ interface SelectedFlight {
   adults: number;
   children: number;
   infants: number;
+  departureFlightData?: any;
+  returnFlightData?: any;
 }
 
 // Import FlightFilterState type
@@ -276,6 +278,8 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
         adults,
         children: childrens,
         infants,
+        departureFlightData,
+        returnFlightData,
       });
       setSelectedFlight(null);
     },
@@ -424,6 +428,8 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
               adults={selectedFlight.adults}
               childrens={selectedFlight.children}
               infants={selectedFlight.infants}
+              departureFlightData={selectedFlight.departureFlightData}
+              returnFlightData={selectedFlight.returnFlightData}
             />
           </Suspense>
         )}

@@ -2,43 +2,17 @@
 import React, { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { FaCheck, FaPlus, FaSuitcase, FaBriefcase } from 'react-icons/fa';
-
-interface Service {
-  service_id: string;
-  service_type: string;
-  description: string;
-  chargeable_type: string;
-  offer_legs: any[];
-  supplier_code: string;
-  service_name?: string;
-}
-
-interface OfferDetail {
-  name: string;
-  descriptions: string[];
-}
-
-interface Offer {
-  offer_key: string;
-  offer_details: OfferDetail[];
-  services: Service[];
-  total_price: number;
-  currency_code: string;
-  fare_type?: string;
-  non_refundable?: boolean;
-  can_book?: boolean;
-  can_rezerve?: boolean;
-  baggage_allowances?: any[];
-  cabin_baggage_allowances?: any[];
-}
+import { FlightOffer, Service } from '@/types/app/fareTypes';
 
 interface OfferCardProps {
-  offer: Offer;
+  offer: FlightOffer;
   isSelected: boolean;
   onSelect: () => void;
   priceDifference: number;
   currency: string;
   isPopular?: boolean;
+  displayPrice?: number;
+  isReturnPhase?: boolean;
 }
 
 const OfferCard: React.FC<OfferCardProps> = ({
@@ -48,6 +22,8 @@ const OfferCard: React.FC<OfferCardProps> = ({
   priceDifference,
   currency,
   isPopular = false,
+  displayPrice,
+  isReturnPhase = false,
 }) => {
   const t = useTranslations('FlightSearch.offers');
   const locale = useLocale();
@@ -78,16 +54,11 @@ const OfferCard: React.FC<OfferCardProps> = ({
   };
 
   const getBaggageInfo = () => {
-    const cabinBag = offer.cabin_baggage_allowances?.[0];
-    const checkedBag = offer.baggage_allowances?.[0];
-
+    const cabinBag = offer.cabin_baggages_text?.[0];
+    const checkedBag = offer.baggages_text?.[0];
     return {
-      cabin: cabinBag
-        ? `${cabinBag.max_weight_kg}${t('kg')}`
-        : t('not_included'),
-      checked: checkedBag
-        ? `${checkedBag.max_weight_kg}${t('kg')}`
-        : t('not_included'),
+      cabin: cabinBag,
+      checked: checkedBag,
     };
   };
 
@@ -95,7 +66,7 @@ const OfferCard: React.FC<OfferCardProps> = ({
 
   return (
     <div
-      className={`card h-100 border-2 position-relative transition-all offer-card ${
+      className={`card border-2 position-relative transition-all offer-card ${
         isSelected
           ? 'border-warning shadow-lg selected'
           : isPopular
@@ -131,12 +102,23 @@ const OfferCard: React.FC<OfferCardProps> = ({
         {/* Header */}
         <div className="d-flex align-items-start justify-content-between mb-2">
           <div className="flex-grow-1 min-w-0">
-            {/* <h6 className="fw-bold mb-1 text-truncate">
-              {offer.offer_details[0]?.name}
-            </h6> */}
-            <p className="fw-bold mb-1 text-truncate">
-              {offer.offer_details[0]?.descriptions[0]}
-            </p>
+            {isReturnPhase ? (
+              <div>
+                {/* Departure name on top */}
+                <p className="fw-bold mb-1 text-truncate small text-muted">
+                  {offer.offer_details[0]?.name || 'Departure'}
+                </p>
+                {/* Return name below */}
+                <p className="fw-bold mb-0 text-truncate">
+                  {offer.offer_details[1]?.name || 'Return'}
+                </p>
+              </div>
+            ) : (
+              <p className="fw-bold mb-1 text-truncate">
+                {offer.offer_details[0]?.descriptions[0] ||
+                  offer.offer_details[0]?.name}
+              </p>
+            )}
           </div>
           {isSelected && (
             <div
@@ -151,10 +133,16 @@ const OfferCard: React.FC<OfferCardProps> = ({
         {/* Price */}
         <div className="mb-3">
           <div className="d-flex align-items-baseline gap-1">
+            {' '}
+            {isReturnPhase && <span className="fw-bold text-muted">+</span>}
             <h5
               className={`fw-bold mb-0 ${isSelected ? 'text-warning' : 'text-secondary'}`}
             >
-              {formatPrice(offer.total_price)}
+              {formatPrice(
+                displayPrice !== undefined
+                  ? displayPrice
+                  : offer.minimum_offer_price,
+              )}
             </h5>
             {/* {priceDifference > 0 && (
               <span className="text-muted small">
@@ -197,7 +185,7 @@ const OfferCard: React.FC<OfferCardProps> = ({
           </div>
 
           {/* Services Preview */}
-          {offer.services && offer.services.length > 0 && (
+          {/* {offer.services && offer.services.length > 0 && (
             <div className="mt-3">
               <h6 className="fw-semibold mb-2 small">{t('services')}</h6>
               <div className="d-flex flex-column gap-1">
@@ -222,7 +210,7 @@ const OfferCard: React.FC<OfferCardProps> = ({
                 )}
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Select Button */}

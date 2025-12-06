@@ -1,4 +1,3 @@
-
 interface PriceInfo {
   total_fare: number;
   base_fare: number;
@@ -50,7 +49,7 @@ interface OfferLeg {
   marketing_airline_code: string;
 }
 
-interface Service {
+export interface Service {
   service_id: string;
   service_type: string;
   description: string;
@@ -73,7 +72,7 @@ interface BookingClass {
   class_code: string;
 }
 
-interface FlightOffer {
+export interface FlightOffer {
   offer_key: string;
   offer_details: OfferDetail[];
   fares: PaxFare[];
@@ -89,6 +88,9 @@ interface FlightOffer {
   offer_type: string;
   default_offer: boolean;
   booking_classes: BookingClass[];
+  baggages_text: string[];
+  cabin_baggages_text: string[];
+  minimum_offer_price: number;
 }
 
 interface FlightInfo {

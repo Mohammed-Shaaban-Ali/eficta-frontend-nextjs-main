@@ -80,6 +80,8 @@ const FlightSerachResults = () => {
       sabreData?.filteringOptions,
     );
 
+    console.log(iatiData?.meta, 'iatiData?.meta');
+    console.log(sabreData?.meta, 'sabreData?.meta');
     return {
       data: mergedFlights,
       filteringOptions: mergedFilteringOptions,
