@@ -157,6 +157,17 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
 
           switch (filters.sortBy) {
             case 'price':
+              // Prioritize Sabre flights over IATA flights when sorting by price
+              const aProvider = a.provider_key?.toLowerCase() || '';
+              const bProvider = b.provider_key?.toLowerCase() || '';
+              const aIsSabre = aProvider === 'sabre';
+              const bIsSabre = bProvider === 'sabre';
+              
+              // If one is Sabre and the other is not, prioritize Sabre
+              if (aIsSabre && !bIsSabre) return -1;
+              if (!aIsSabre && bIsSabre) return 1;
+              
+              // If both are same provider (or both unknown), sort by price
               aValue =
                 a.fares?.[0]?.fare_info?.fare_detail?.price_info?.total_fare ||
                 0;

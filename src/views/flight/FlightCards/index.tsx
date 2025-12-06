@@ -181,8 +181,19 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
 
         switch (filters.sortBy) {
           case 'price':
-            aValue = a.fares?.minimum_package_price || 0;
-            bValue = b.fares?.minimum_package_price || 0;
+            // Prioritize Sabre flights over IATA flights when sorting by price
+            const aProvider = a.provider_key?.toLowerCase() || '';
+            const bProvider = b.provider_key?.toLowerCase() || '';
+            const aIsSabre = aProvider === 'sabre';
+            const bIsSabre = bProvider === 'sabre';
+            
+            // If one is Sabre and the other is not, prioritize Sabre
+            if (aIsSabre && !bIsSabre) return -1;
+            if (!aIsSabre && bIsSabre) return 1;
+            
+            // If both are same provider (or both unknown), sort by price
+            aValue = a.minimum_package_price || 0;
+            bValue = b.minimum_package_price || 0;
             break;
           case 'duration':
             aValue =
