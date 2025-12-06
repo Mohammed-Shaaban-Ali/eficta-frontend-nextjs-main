@@ -47,6 +47,7 @@ import {
   resetFilters,
   setCurrentFilterType,
   setMatchingReturnFlights,
+  setSortBy,
 } from '@/store/flightFilterSlice';
 
 interface FlightPropertiesProps {
@@ -101,6 +102,13 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
   useEffect(() => {
     dispatch(resetFilters({ flightType: 'departure' }));
   }, [dispatch]);
+
+  // Set default sort to price when data arrives (if not already set by user)
+  useEffect(() => {
+    if (data?.data?.departure_flights?.length > 0 && !filters.sortBy) {
+      dispatch(setSortBy({ sortBy: 'price', flightType: 'departure' }));
+    }
+  }, [data?.data?.departure_flights?.length, filters.sortBy, dispatch]);
 
   // State
   const [currentPage, setCurrentPage] = useState(1);

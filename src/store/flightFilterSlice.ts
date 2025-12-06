@@ -61,7 +61,7 @@ const createInitialFilters = (): FlightFilters => ({
   selectedAirlines: [],
   providers: [],
   stops: [],
-  sortBy: null,
+  sortBy: 'price', // Default to lowest price
   sortOrder: 'asc',
   appliedFiltersCount: 0,
 });
@@ -284,7 +284,7 @@ const flightFilterSlice = createSlice({
         filters.selectedAirlines = [];
         filters.providers = [];
         filters.stops = [];
-        filters.sortBy = null;
+        filters.sortBy = 'price'; // Default to lowest price
         filters.sortOrder = 'asc';
         updateAppliedFiltersCount(filters);
       },

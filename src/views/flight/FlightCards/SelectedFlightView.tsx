@@ -1,12 +1,12 @@
 'use client';
-import { memo, useState, useCallback, lazy, Suspense, useMemo } from 'react';
+import { memo, useState, useCallback, lazy, Suspense, useMemo, useEffect } from 'react';
 import { FaClock, FaUsers, FaArrowLeft, FaPlane } from 'react-icons/fa';
 import { MdOutlineFilterAltOff } from 'react-icons/md';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
 import type { FlightFilterState } from '@/store/flightFilterSlice';
-import { resetFilters } from '@/store/flightFilterSlice';
+import { resetFilters, setSortBy } from '@/store/flightFilterSlice';
 import ReturnFlightCard from './ReturnFlightCard';
 import { Amaranth } from 'next/font/google';
 
@@ -75,6 +75,13 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
     const handleResetFilters = useCallback(() => {
       dispatch(resetFilters({ flightType: 'return' }));
     }, [dispatch]);
+
+    // Set default sort to price when matching returns arrive (if not already set by user)
+    useEffect(() => {
+      if (matchingReturns.length > 0 && !filters.sortBy) {
+        dispatch(setSortBy({ sortBy: 'price', flightType: 'return' }));
+      }
+    }, [matchingReturns.length, filters.sortBy, dispatch]);
 
     // Filter return flights based on returnFilters
     const filteredReturnFlights = useMemo(() => {
