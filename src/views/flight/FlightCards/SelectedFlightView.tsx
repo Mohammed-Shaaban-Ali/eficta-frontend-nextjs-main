@@ -8,6 +8,7 @@ import { RootState } from '@/store/store';
 import type { FlightFilterState } from '@/store/flightFilterSlice';
 import { resetFilters, setSortBy } from '@/store/flightFilterSlice';
 import ReturnFlightCard from './ReturnFlightCard';
+import RouteDisplay from './RouteDisplay';
 import { Amaranth } from 'next/font/google';
 
 // Lazy load FlightDetails
@@ -35,6 +36,10 @@ interface SelectedFlightViewProps {
   adults: number;
   childrens: number;
   infants: number;
+  fromAirport: string;
+  toAirport: string;
+  fromAirportCity?: string;
+  toAirportCity?: string;
 }
 const SelectedFlightView = memo<SelectedFlightViewProps>(
   ({
@@ -48,6 +53,10 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
     adults,
     childrens,
     infants,
+    fromAirport,
+    toAirport,
+    fromAirportCity,
+    toAirportCity,
   }) => {
     const t = useTranslations('FlightSearch.card');
     const tReturn = useTranslations('FlightSearch.return_flights');
@@ -256,6 +265,17 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
               <h5 className="mb-0">{t('departure_flight')}</h5>
             </div>
           </div>
+          {/* Route Display for Departure */}
+          <div className="mb-3">
+            <RouteDisplay
+              fromAirport={fromAirport}
+              toAirport={toAirport}
+              fromAirportCity={fromAirportCity}
+              toAirportCity={toAirportCity}
+              forceType="departure"
+              routeNumber="1"
+            />
+          </div>
           <div className="card shadow-sm mb-4">
             <div className="card-body p-4">
               <div className="row align-items-center g-3">
@@ -434,6 +454,17 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
         {/* Return Flights Section */}
         {filteredReturnFlights.length > 0 ? (
           <>
+            {/* Route Display for Return */}
+            <div className="mb-3">
+              <RouteDisplay
+                fromAirport={toAirport}
+                toAirport={fromAirport}
+                fromAirportCity={toAirportCity}
+                toAirportCity={fromAirportCity}
+                forceType="return"
+                routeNumber="2"
+              />
+            </div>
             <div className="p-2 rounded-2 text-primary">
               <div className="d-flex align-items-center text-primary gap-2">
                 <FaPlane className="fa-flip-horizontal" />

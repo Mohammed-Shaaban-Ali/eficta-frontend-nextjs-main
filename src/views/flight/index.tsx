@@ -10,6 +10,7 @@ import {
 import Sidebar from './Sidebar';
 import FlightProperties from './FlightCards';
 import LoadingScreen from '@/components/parts/LoadingScreen';
+import FlightSearchBox from '@/views/home/hero/flight-search-box';
 import {
   setPriceRange,
   setReturnFlightsActualPriceRange,
@@ -32,6 +33,8 @@ const FlightSerachResults = () => {
   const searchParams = useSearchParams();
   const fromAirport = searchParams.get('fromAirport') || '';
   const toAirport = searchParams.get('toAirport') || '';
+  const fromAirportCity = searchParams.get('fromAirportCity') || '';
+  const toAirportCity = searchParams.get('toAirportCity') || '';
   const departureDate = searchParams.get('departureDate') || '';
   const returnDate = searchParams.get('returnDate') as any;
   const adults = parseInt(searchParams.get('adults') || '1', 10);
@@ -238,8 +241,14 @@ const FlightSerachResults = () => {
   };
   return (
     <>
-      <section className="layout-pt-md layout-pb-md bg-light-2">
-        <div className="container">
+      <section className="layout-pt-sm layout-pb-sm bg-light-2">
+        <FlightSearchBox />
+        <div
+          style={{
+            paddingTop: '50px',
+          }}
+          className="container "
+        >
           <div className="row y-gap-30">
             <div className="col-xl-3">
               <aside className="sidebar py-20 px-20 lg:d-none bg-white">
@@ -314,6 +323,8 @@ const FlightSerachResults = () => {
                   returnDate={returnDate}
                   fromAirport={fromAirport}
                   toAirport={toAirport}
+                  fromAirportCity={fromAirportCity}
+                  toAirportCity={toAirportCity}
                   adults={adults}
                   childrens={children}
                   infants={infants}

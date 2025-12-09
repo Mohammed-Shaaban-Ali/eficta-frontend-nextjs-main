@@ -10,6 +10,7 @@ interface FlightSearchParams {
   toAirport: string;
   departureDate: string;
   returnDate?: string;
+  tripType: 'roundTrip' | 'oneWay';
   adults: number;
   children: number;
   infants: number;

@@ -3,7 +3,8 @@ import { airportTypes } from '@/types/app/airportTypes';
 import { metaTypes } from '@/types/glopal/metaTypes';
 import { executeApiRequest } from '@/utils/executeApiRequest';
 
-const url = process.env.NEXT_PUBLIC_APP_EFICTA;
+// const url = process.env.NEXT_PUBLIC_APP_EFICTA;
+const url = process.env.NEXT_PUBLIC_APP_AIRPORTS;
 
 interface AirportQueryParams {
   search: string;
@@ -11,9 +12,11 @@ interface AirportQueryParams {
 }
 
 interface AirportResponse {
-  data: airportTypes[];
-  meta: metaTypes;
-  status: string;
+  // data: airportTypes[];
+  // meta: metaTypes;
+  // status: string;
+  items: airportTypes[];
+  hasMore: boolean;
 }
 
 export function useGetAllAirportsQuery({ search, page }: AirportQueryParams) {
@@ -21,7 +24,8 @@ export function useGetAllAirportsQuery({ search, page }: AirportQueryParams) {
     queryFn: async () => {
       return executeApiRequest<AirportResponse>({
         method: 'GET',
-        url: `${url}/api/iati/airports?page=${page}&search=${search}`,
+        // url: `${url}/api/iati/airports?page=${page}&search=${search}`,//old url
+        url: `${url}/api/flights-core/select2/airports?page=${page}&search=${search}`, //new url
       });
     },
     queryKey: ['Airports', search, page],

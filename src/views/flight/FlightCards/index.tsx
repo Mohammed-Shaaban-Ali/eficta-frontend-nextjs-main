@@ -18,6 +18,7 @@ import Pagination from './Pagination';
 import NoResultsPage from './NoResultsPage';
 import ResultsSummary from './ResultsSummary';
 import SelectedFlightView from './SelectedFlightView';
+import RouteDisplay from './RouteDisplay';
 
 // Hooks
 import { useFlightUtils, useFlightData } from '@/hooks/useFlightUtils';
@@ -56,6 +57,8 @@ interface FlightPropertiesProps {
   error?: any;
   fromAirport: string;
   toAirport: string;
+  fromAirportCity?: string;
+  toAirportCity?: string;
   adults: number;
   childrens: number;
   infants: number;
@@ -73,6 +76,8 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
   error,
   fromAirport,
   toAirport,
+  fromAirportCity,
+  toAirportCity,
   adults,
   childrens,
   infants,
@@ -372,6 +377,10 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
         adults={adults}
         childrens={childrens}
         infants={infants}
+        fromAirport={fromAirport}
+        toAirport={toAirport}
+        fromAirportCity={fromAirportCity}
+        toAirportCity={toAirportCity}
       />
     );
   }
@@ -385,8 +394,14 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
         currentPage={currentPage}
         totalPages={totalPages}
         flightsPerPage={flightsPerPage}
+      />{' '}
+      {/* Route Display */}
+      <RouteDisplay
+        fromAirport={fromAirport}
+        toAirport={toAirport}
+        fromAirportCity={fromAirportCity}
+        toAirportCity={toAirportCity}
       />
-
       <div>
         {/* Flight cards */}
         {paginatedFlights.map((departureFlightData: any, index: number) => {

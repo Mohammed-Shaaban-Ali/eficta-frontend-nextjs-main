@@ -2,7 +2,13 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import { UseFormReturn } from 'react-hook-form';
-import { useState } from 'react';
+import {
+  useState,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import useDebounce from '@/hooks/useDebounce';
 import usePerfectScrollbar from '@/hooks/usePerfectScrollbar';
 import { useGetAllAirportsQuery } from '@/reactQuery/airports.api';
@@ -12,7 +18,14 @@ interface SearchBarProps {
   form: UseFormReturn<any>;
 }
 
-const ToAirport = ({ form }: SearchBarProps) => {
+export interface ToAirportRef {
+  setDisplayValue: (value: string) => void;
+  getDisplayValue: () => string;
+  getCity: () => string;
+  setCity: (value: string) => void;
+}
+
+const ToAirport = forwardRef<ToAirportRef, SearchBarProps>(({ form }, ref) => {
   const t = useTranslations('HomePage.hero_section.flight.location');
   const locale = useLocale();
   const isRTL = locale === 'ar';
@@ -22,17 +35,102 @@ const ToAirport = ({ form }: SearchBarProps) => {
   });
   const { setValue, watch } = form;
   const [displayValue, setDisplayValue] = useState('');
+  const [city, setCity] = useState<string>('');
+  const isInternalUpdateRef = useRef(false);
+  const isUserTypingRef = useRef(false);
+  const lastFormValueRef = useRef<string>('');
+  const [searchById, setSearchById] = useState('');
   const debouncedSearch = useDebounce(displayValue, 500);
+  const debouncedSearchById = useDebounce(searchById, 100);
+  const formToAirport = watch('toAirport');
+
+  // Search for airport by ID when form value exists but display value is empty (from localStorage)
+  useEffect(() => {
+    if (
+      formToAirport &&
+      !displayValue &&
+      !isUserTypingRef.current &&
+      !isInternalUpdateRef.current
+    ) {
+      setSearchById(formToAirport);
+    } else if (!formToAirport || displayValue) {
+      setSearchById('');
+    }
+  }, [formToAirport, displayValue]);
 
   const { data, isFetching } = useGetAllAirportsQuery({
-    search: debouncedSearch,
+    search: debouncedSearch || debouncedSearchById,
     page: '1',
   });
-  const { data: airports } = data || {};
+  const { items: airports } = data || {};
+
+  // Expose setDisplayValue, getDisplayValue, getCity, and setCity via ref
+  useImperativeHandle(ref, () => ({
+    setDisplayValue: (value: string) => {
+      isInternalUpdateRef.current = true;
+      setDisplayValue(value);
+      // Reset flag after state update
+      setTimeout(() => {
+        isInternalUpdateRef.current = false;
+      }, 0);
+    },
+    getDisplayValue: () => displayValue,
+    getCity: () => city,
+    setCity: (value: string) => {
+      setCity(value);
+    },
+  }));
+
+  // Sync displayValue with form value when changed externally (not from user typing)
+  useEffect(() => {
+    // Only sync if form value actually changed (not just airports array)
+    if (formToAirport === lastFormValueRef.current) {
+      return;
+    }
+
+    if (isInternalUpdateRef.current || isUserTypingRef.current) {
+      lastFormValueRef.current = formToAirport;
+      return;
+    }
+
+    // Update last form value
+    lastFormValueRef.current = formToAirport;
+
+    // Only sync when formToAirport changes externally
+    if (formToAirport) {
+      // Find the airport in the current list
+        const airport = airports?.find(
+          (a: airportTypes) => a.id === formToAirport,
+        );
+        if (airport) {
+          const newDisplayValue = `${airport.name} (${airport.id})`;
+          setDisplayValue((prev) =>
+            prev !== newDisplayValue ? newDisplayValue : prev,
+          );
+          if (airport.city) {
+            setCity(airport.city);
+          }
+        }
+      // If airport not found in current list, don't clear displayValue
+      // It might be from a previous search or the user is still typing
+    } else {
+      // Only clear if form value is empty and user is not typing
+      setDisplayValue((prev) => (prev && !formToAirport ? '' : prev));
+    }
+  }, [formToAirport, airports]);
 
   const handleOptionClick = (item: airportTypes) => {
-    setValue('toAirport', item.iata_code);
-    setDisplayValue(`${item.name} (${item.iata_code})`);
+    isInternalUpdateRef.current = true;
+    isUserTypingRef.current = false; // User selected, not typing
+    lastFormValueRef.current = item.id;
+    setValue('toAirport', item.id);
+    setDisplayValue(`${item.name} (${item.id})`);
+    if (item.city) {
+      setCity(item.city);
+    }
+    setTimeout(() => {
+      isInternalUpdateRef.current = false;
+    }, 0);
   };
 
   return (
@@ -43,7 +141,7 @@ const ToAirport = ({ form }: SearchBarProps) => {
           data-bs-auto-close="true"
           data-bs-offset="0,22"
         >
-          <div className="text-15 text-light-1 ls-2 lh-16">
+          <div className="text-15 text-light-1 ls-2 lh-16 position-relative">
             <input
               autoComplete="off"
               type="search"
@@ -51,12 +149,68 @@ const ToAirport = ({ form }: SearchBarProps) => {
               className="js-search js-dd-focus"
               value={displayValue}
               onChange={(e) => {
+                isUserTypingRef.current = true;
                 setDisplayValue(e.target.value);
                 if (!e.target.value) {
                   setValue('toAirport', '');
                 }
+                // Reset flag after a delay to allow sync if needed
+                setTimeout(() => {
+                  isUserTypingRef.current = false;
+                }, 600);
+              }}
+              style={{
+                paddingRight: displayValue ? '30px' : undefined,
               }}
             />
+            {displayValue && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  isInternalUpdateRef.current = true;
+                  isUserTypingRef.current = false;
+                  setDisplayValue('');
+                  setValue('toAirport', '');
+                  lastFormValueRef.current = '';
+                  setTimeout(() => {
+                    isInternalUpdateRef.current = false;
+                  }, 0);
+                }}
+                className="position-absolute"
+                style={{
+                  right: isRTL ? undefined : '8px',
+                  left: isRTL ? '8px' : undefined,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 10,
+                }}
+                aria-label={isRTL ? 'مسح' : 'Clear'}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 4L4 12M4 4L12 12"
+                    stroke="#666"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
         <div className="shadow-2 dropdown-menu min-width-400">
@@ -76,7 +230,7 @@ const ToAirport = ({ form }: SearchBarProps) => {
                   {airports?.map((item: airportTypes) => (
                     <li
                       className={`-link d-block col-12 ${isRTL ? 'text-right' : 'text-left'} rounded-4 px-20 py-15 js-search-option mb-1`}
-                      key={item.iata_code}
+                      key={item.id}
                       role="button"
                       onClick={() => handleOptionClick(item)}
                     >
@@ -84,7 +238,10 @@ const ToAirport = ({ form }: SearchBarProps) => {
                         <div className="icon-location-2 text-light-1 text-20 pt-4" />
                         <div className={isRTL ? 'mr-10' : 'ml-10'}>
                           <div className="text-15 lh-12 fw-500 js-search-option-target">
-                            {item.name} ({item.iata_code})
+                            {item.name} ({item.id}) <br />{' '}
+                            <span className="text-12 text-light-1">
+                              {item.city}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -98,6 +255,8 @@ const ToAirport = ({ form }: SearchBarProps) => {
       </div>
     </>
   );
-};
+});
+
+ToAirport.displayName = 'ToAirport';
 
 export default ToAirport;

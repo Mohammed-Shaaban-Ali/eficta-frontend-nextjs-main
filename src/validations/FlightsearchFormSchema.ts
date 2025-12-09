@@ -26,6 +26,13 @@ export const flightSearchFormSchema = Joi.object({
       'date.base': 'Please select a valid return date',
       'date.greater': 'Return date must be after departure date',
     }),
+  tripType: Joi.string()
+    .valid('roundTrip', 'oneWay')
+    .required()
+    .messages({
+      'any.only': 'Trip type must be either roundTrip or oneWay',
+      'any.required': 'Trip type is required',
+    }),
   adults: Joi.number().min(1).max(9).required().messages({
     'number.min': 'At least 1 adult is required',
     'number.max': 'Maximum 9 adults allowed',
@@ -43,22 +50,30 @@ export const flightSearchFormSchema = Joi.object({
     'any.only': 'Cabin class must be either ECONOMY or BUSINESS',
     'any.required': 'Cabin class is required',
   }),
-}).custom((value, helpers) => {
-  // Custom validation: total passengers should not exceed 9
-  const totalPassengers =
-    (value.adults || 0) + (value.children || 0) + (value.infants || 0);
-  if (totalPassengers > 9) {
-    return helpers.error('any.custom', {
-      message: 'Total passengers cannot exceed 9',
-    });
-  }
+})
+  .custom((value, helpers) => {
+    // Custom validation: total passengers should not exceed 9
+    const totalPassengers =
+      (value.adults || 0) + (value.children || 0) + (value.infants || 0);
+    if (totalPassengers > 9) {
+      return helpers.error('any.custom', {
+        message: 'Total passengers cannot exceed 9',
+      });
+    }
 
-  // Custom validation: infants cannot exceed adults
-  if ((value.infants || 0) > (value.adults || 0)) {
-    return helpers.error('any.custom', {
-      message: 'Number of infants cannot exceed number of adults',
-    });
-  }
+    // Custom validation: infants cannot exceed adults
+    if ((value.infants || 0) > (value.adults || 0)) {
+      return helpers.error('any.custom', {
+        message: 'Number of infants cannot exceed number of adults',
+      });
+    }
 
-  return value;
-});
+    // Custom validation: returnDate is required for roundTrip
+    if (value.tripType === 'roundTrip' && !value.returnDate) {
+      return helpers.error('any.custom', {
+        message: 'Return date is required for round trip',
+      });
+    }
+
+    return value;
+  });
