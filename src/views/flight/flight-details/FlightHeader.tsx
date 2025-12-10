@@ -50,7 +50,7 @@ const FlightHeader: React.FC<FlightHeaderProps> = ({
             </button>
           </div>
 
-          {hasData && (
+          {/* {hasData && (
             <div className="d-flex align-items-center gap-2 flex-wrap">
               <div className="bg-white bg-opacity-20 rounded-pill px-3 py-2 d-flex align-items-center">
                 <FaUsers className={isRTL ? 'ms-2' : 'me-2'} size={14} />
@@ -66,7 +66,7 @@ const FlightHeader: React.FC<FlightHeaderProps> = ({
                 </span>
               </div>
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>

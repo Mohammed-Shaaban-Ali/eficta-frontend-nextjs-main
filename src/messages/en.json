@@ -1295,6 +1295,8 @@
       "price_lock_desc": "This price is secured for the next 10 minutes while you complete your booking.",
       "enhance_journey": "✨ Enhance Your Journey",
       "continue_book": "Continue to Book",
+      "continue": "Continue",
+      "back_to_departure": "Back to Departure",
       "secure_booking": "Secure booking • Free cancellation within 24h • Best price guarantee",
       "economy_class": "Economy Class",
       "baggage_23kg": "23kg Baggage"

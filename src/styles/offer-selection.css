@@ -236,11 +236,6 @@
     display: none !important;
   }
 
-  .offer-selection-container .card {
-    min-height: 360px !important;
-    max-height: 360px !important;
-  }
-
   /* Show pagination on mobile when navigation is hidden */
   .swiper-pagination-custom {
     margin-top: 1.5rem !important;
@@ -252,11 +247,6 @@
   }
 }
 
-@media (min-width: 768px) {
-  .offer-selection-container .card {
-    min-height: 400px !important;
-  }
-}
 
 @media (min-width: 1200px) {
   /* On large screens, ensure proper spacing for 3 cards */
@@ -268,10 +258,6 @@
   /* Hide pagination when all 3 cards are visible on desktop */
   .offer-swiper[data-slides='3'] + div .swiper-pagination-custom {
     display: none !important;
-  }
-
-  .offer-selection-container .card {
-    min-height: 420px !important;
   }
 }
 

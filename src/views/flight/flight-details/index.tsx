@@ -47,6 +47,10 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
   const [selectedOfferKey, setSelectedOfferKey] = useState<string | undefined>(
     undefined,
   );
+  const [selectedDepartureOffer, setSelectedDepartureOffer] = useState<
+    string | null
+  >(null);
+  const [showReturnOffers, setShowReturnOffers] = useState(false);
 
   // Determine provider from flight data endpoint immediately
   const provider = useMemo((): 'iati' | 'sabre' => {
@@ -84,30 +88,35 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
     };
   }, [isOpen]);
 
-  // Set default selected offer when data loads
-  useEffect(() => {
-    if (
-      data?.data?.offers &&
-      data.data.offers.length > 0 &&
-      !selectedOfferKey
-    ) {
-      setSelectedOfferKey(data.data.offers[0].offer_key);
-      setSelectedOffer(data.data.offers[0]);
-    }
-  }, [data?.data?.offers, selectedOfferKey]);
+  // Don't set default selection - user must select manually
 
-  const formatPrice = (amount: number, currency: string) => {
-    if (isRTL) {
-      return `${amount.toFixed(2)} ${currency}`;
+  // Reset when drawer closes
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedDepartureOffer(null);
+      setShowReturnOffers(false);
+      setSelectedOfferKey(undefined);
+      setSelectedOffer(null);
     }
-    return `${currency} ${amount.toFixed(2)}`;
+  }, [isOpen]);
+
+  const formatPrice = (amount: number | undefined | null, currency: string) => {
+    const safeAmount = amount ?? 0;
+    if (isRTL) {
+      return `${safeAmount.toFixed(2)} ${currency}`;
+    }
+    return `${currency} ${safeAmount.toFixed(2)}`;
   };
 
   // Get the selected offer or default price
   const getDisplayPrice = () => {
-    if (selectedOfferKey && data?.data?.offers) {
+    // If return is selected, show total price
+    // Must search by both departure and return to get the correct offer
+    if (selectedOfferKey && selectedDepartureOffer && data?.data?.offers) {
       const selectedOffer = data.data.offers.find(
-        (offer) => offer.offer_key === selectedOfferKey,
+        (offer) =>
+          offer.offer_details?.[0]?.name === selectedDepartureOffer &&
+          offer.offer_details?.[1]?.name === selectedOfferKey,
       );
       if (selectedOffer) {
         return {
@@ -116,6 +125,21 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
         };
       }
     }
+
+    // If only departure is selected, show departure price only
+    if (selectedDepartureOffer && data?.data?.offers) {
+      const departureOffer = data.data.offers.find(
+        (offer) => offer.offer_details?.[0]?.name === selectedDepartureOffer,
+      );
+      if (departureOffer) {
+        return {
+          amount: departureOffer.minimum_offer_price,
+          currency: departureOffer.currency_code,
+        };
+      }
+    }
+
+    // Fallback to default fare
     return {
       amount: data?.data?.fare_detail.price_info.total_fare || 0,
       currency: data?.data?.fare_detail.currency_code || '',
@@ -124,18 +148,49 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
 
   // Get the selected offer's fare breakdown or default fare detail
   const getPriceBreakdown = () => {
-    if (selectedOfferKey && data?.data?.offers) {
-      const selectedOffer = data.data.offers.find(
-        (offer) => offer.offer_key === selectedOfferKey,
+    // If return offer is selected, use its breakdown
+    // Must search by both departure and return to get the correct offer
+    if (selectedOfferKey && selectedDepartureOffer && data?.data?.offers) {
+      const foundOffer = data.data.offers.find(
+        (offer) =>
+          offer.offer_details?.[0]?.name === selectedDepartureOffer &&
+          offer.offer_details?.[1]?.name === selectedOfferKey,
       );
-      if (selectedOffer && selectedOffer.fares) {
+      if (foundOffer && foundOffer.fares) {
         return {
-          pax_fares: selectedOffer.fares,
-          currency_code: selectedOffer.currency_code,
-          total_fare: selectedOffer.total_price,
+          pax_fares: foundOffer.fares,
+          currency_code: foundOffer.currency_code,
+          total_fare: foundOffer.total_price,
         };
       }
     }
+
+    // If only departure is selected, show departure breakdown
+    if (selectedDepartureOffer && !showReturnOffers && data?.data?.offers) {
+      const departureOffer = data.data.offers.find(
+        (offer) => offer.offer_details?.[0]?.name === selectedDepartureOffer,
+      );
+      if (departureOffer && departureOffer.fares) {
+        // Calculate departure-only price from fares
+        const departureFares = departureOffer.fares.filter(
+          (fare: any) => fare.pax_type !== 'RETURN',
+        );
+        const departureTotal = departureFares.reduce(
+          (sum: number, fare: any) =>
+            sum +
+            fare.price_info.base_fare +
+            fare.price_info.tax +
+            (fare.price_info.service_fee || 0),
+          0,
+        );
+        return {
+          pax_fares: departureFares,
+          currency_code: departureOffer.currency_code,
+          total_fare: departureOffer.minimum_offer_price,
+        };
+      }
+    }
+
     // Fall back to base fare detail
     return {
       pax_fares: data?.data?.fare_detail.pax_fares || [],
@@ -215,68 +270,50 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
             data?.data && (
               <div className="h-100 overflow-y-auto overflow-x-hidden">
                 <div className="p-3">
-                  {/* Flight Journey */}
-                  <FlightJourney
-                    departureFlights={
-                      data.data.departure_selected_flights || []
-                    }
-                    returnFlights={data.data.return_selected_flight}
-                    totalFare={data.data.fare_detail.price_info.total_fare}
-                    currencyCode={data.data.fare_detail.currency_code}
-                  />
-
-                  {/* Passengers & Services */}
-                  <div className="card border-0 shadow-sm mb-3">
-                    <div className="card-body p-4">
-                      <div className="d-flex align-items-center gap-2 mb-3">
-                        <FaUsers className="text-success" size={18} />
-                        <h5 className="mb-0 fw-bold">
-                          {t('passengers_services')}
-                        </h5>
-                      </div>
-
-                      {/* Passenger Count */}
-                      <div className="row g-2 mb-4">
-                        {adults > 0 && (
-                          <div className="col-auto">
-                            <div className="bg-success bg-opacity-10 text-success rounded-3 px-3 py-2 text-center">
-                              <div className="h5 fw-bold mb-0">{adults}</div>
-                              <div className="small">{t('adults')}</div>
-                            </div>
-                          </div>
-                        )}
-                        {childrens > 0 && (
-                          <div className="col-auto">
-                            <div className="bg-primary bg-opacity-10 text-primary rounded-3 px-3 py-2 text-center">
-                              <div className="h5 fw-bold mb-0">{childrens}</div>
-                              <div className="small">{t('children')}</div>
-                            </div>
-                          </div>
-                        )}
-                        {infants > 0 && (
-                          <div className="col-auto">
-                            <div className="bg-warning bg-opacity-10 text-warning rounded-3 px-3 py-2 text-center">
-                              <div className="h5 fw-bold mb-0">{infants}</div>
-                              <div className="small">{t('infants')}</div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
                   {/* Offer Selection */}
                   {data.data.offers && data.data.offers.length > 0 && (
                     <div className="card border-0 shadow-sm mb-3">
                       <div className="card-body p-4">
+                        {/* Back button to return to departure selection */}
+                        {showReturnOffers && returnFareKey && (
+                          <button
+                            className="btn btn-outline-secondary btn-sm mb-3 d-flex align-items-center gap-2"
+                            onClick={() => {
+                              setShowReturnOffers(false);
+                              setSelectedOfferKey(undefined);
+                              setSelectedOffer(null);
+                            }}
+                          >
+                            <FaArrowRight
+                              size={12}
+                              style={{
+                                transform: isRTL ? 'scaleX(1)' : 'scaleX(-1)',
+                              }}
+                            />
+                            {t('back_to_departure')}
+                          </button>
+                        )}
                         <OfferSelection
                           offers={data.data.offers}
                           selectedOfferKey={selectedOfferKey}
+                          selectedDepartureOffer={selectedDepartureOffer}
+                          showReturnOffers={showReturnOffers}
+                          showDepartureOffers={!showReturnOffers}
+                          onDepartureSelect={(departureName) => {
+                            setSelectedDepartureOffer(departureName);
+                            setShowReturnOffers(false);
+                            setSelectedOfferKey(undefined);
+                            setSelectedOffer(null);
+                          }}
                           onOfferSelect={(offerKey) => {
                             setSelectedOfferKey(offerKey);
+                            // Must search by both departure and return to get the correct offer
                             setSelectedOffer(
                               data.data.offers.find(
-                                (offer) => offer.offer_key === offerKey,
+                                (offer) =>
+                                  offer.offer_details?.[0]?.name ===
+                                    selectedDepartureOffer &&
+                                  offer.offer_details?.[1]?.name === offerKey,
                               ),
                             );
                           }}
@@ -287,7 +324,7 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
                   )}
 
                   {/* Price Breakdown */}
-                  <div className="card border-0 shadow-sm mb-3">
+                  {/* <div className="card border-0 shadow-sm mb-3">
                     <div className="card-body p-4">
                       <div className="d-flex align-items-center gap-2 mb-3">
                         <FaCreditCard className="text-warning" size={18} />
@@ -305,8 +342,9 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
                                 </span>
                                 <span className="h6 fw-bold mb-0">
                                   {formatPrice(
-                                    fare.price_info.base_fare,
-                                    fare.currency_code,
+                                    fare.price_info?.base_fare,
+                                    fare.currency_code ||
+                                      priceBreakdown.currency_code,
                                   )}
                                 </span>
                               </div>
@@ -320,21 +358,23 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
                                   </span>
                                   <span className="small fw-semibold">
                                     {formatPrice(
-                                      fare.price_info.tax,
-                                      fare.currency_code,
+                                      fare.price_info?.tax,
+                                      fare.currency_code ||
+                                        priceBreakdown.currency_code,
                                     )}
                                   </span>
                                 </div>
 
-                                {fare.price_info.service_fee > 0 && (
+                                {(fare.price_info?.service_fee || 0) > 0 && (
                                   <div className="d-flex justify-content-between align-items-center">
                                     <span className="small text-muted">
                                       {t('service_fee')}
                                     </span>
                                     <span className="small fw-semibold">
                                       {formatPrice(
-                                        fare.price_info.service_fee,
-                                        fare.currency_code,
+                                        fare.price_info?.service_fee,
+                                        fare.currency_code ||
+                                          priceBreakdown.currency_code,
                                       )}
                                     </span>
                                   </div>
@@ -362,7 +402,6 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
                         </div>
                       </div>
 
-                      {/* Price Guarantee */}
                       <div className="mt-3">
                         <div className="bg-info bg-opacity-10 rounded-3 p-3">
                           <div className="d-flex align-items-start gap-2">
@@ -378,7 +417,7 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             )
@@ -386,50 +425,77 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
         </div>
 
         {/* Footer CTA */}
-        {data?.data && !isFetching && (
-          <div className="border-top bg-white p-4">
-            <button
-              className="btn btn-primary btn-lg w-100 rounded-3 d-flex align-items-center justify-content-between shadow-sm"
-              onClick={() => {
-                let offerKeyParam = '';
-                if (selectedOffer && selectedOffer.offer_details) {
-                  const departureName =
-                    selectedOffer.offer_details[0]?.name || '';
-                  const returnName = selectedOffer.offer_details[1]?.name || '';
-                  if (returnName) {
-                    offerKeyParam = `&offerKey=${departureName}|${returnName}`;
-                  } else {
-                    offerKeyParam = `&offerKey=${departureName}`;
+        {data?.data &&
+          !isFetching &&
+          (selectedDepartureOffer || showReturnOffers) && (
+            <div className="border-top bg-white p-4">
+              <button
+                className="btn btn-primary btn-lg w-100 rounded-3 d-flex align-items-center justify-content-between shadow-sm"
+                onClick={() => {
+                  // If return offers are not shown yet, show them
+                  if (!showReturnOffers && returnFareKey) {
+                    setShowReturnOffers(true);
+                    // Reset return selection when showing return offers
+                    setSelectedOfferKey(undefined);
+                    setSelectedOffer(null);
+                    return;
                   }
+
+                  // If return is selected or no return flight, proceed to booking
+                  let offerKeyParam = '';
+                  if (selectedOffer && selectedOffer.offer_details) {
+                    const departureName =
+                      selectedOffer.offer_details[0]?.name || '';
+                    const returnName =
+                      selectedOffer.offer_details[1]?.name || '';
+                    if (returnName) {
+                      offerKeyParam = `&offerKey=${departureName}|${returnName}`;
+                    } else {
+                      offerKeyParam = `&offerKey=${departureName}`;
+                    }
+                  } else if (selectedDepartureOffer) {
+                    // Use selected departure offer if no return selected
+                    offerKeyParam = `&offerKey=${selectedDepartureOffer}`;
+                  }
+                  router.push(
+                    `/book-flight?departureFareKey=${departureFareKey}${returnFareKey ? `&returnFareKey=${returnFareKey}` : ''}${offerKeyParam}&children=${childrens}&adults=${adults}&infants=${infants}`,
+                  );
+                }}
+                disabled={
+                  isFetching ||
+                  (!!returnFareKey &&
+                    showReturnOffers &&
+                    selectedOfferKey === undefined)
                 }
-                router.push(
-                  `/book-flight?departureFareKey=${departureFareKey}${returnFareKey ? `&returnFareKey=${returnFareKey}` : ''}${offerKeyParam}&children=${childrens}&adults=${adults}&infants=${infants}`,
-                );
-              }}
-              disabled={isFetching}
-              style={{ height: '60px' }}
-            >
-              <div className="d-flex align-items-center gap-3">
-                <div className={`text-${isRTL ? 'end' : 'start'}`}>
-                  <div className="small opacity-90">{t('continue_book')}</div>
-                  <div className="fw-bold fs-5">
-                    {(() => {
-                      const displayPrice = getDisplayPrice();
-                      return formatPrice(
-                        displayPrice.amount,
-                        displayPrice.currency,
-                      );
-                    })()}
+                style={{ height: '60px' }}
+              >
+                <div className="d-flex align-items-center gap-3">
+                  <div className={`text-${isRTL ? 'end' : 'start'}`}>
+                    <div className="small opacity-90">
+                      {showReturnOffers && selectedOfferKey
+                        ? t('continue_book')
+                        : returnFareKey
+                          ? t('continue')
+                          : t('continue_book')}
+                    </div>
+                    <div className="fw-bold fs-5">
+                      {(() => {
+                        const displayPrice = getDisplayPrice();
+                        return formatPrice(
+                          displayPrice.amount,
+                          displayPrice.currency,
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <FaArrowRight
-                size={16}
-                style={{ transform: isRTL ? 'scaleX(-1)' : 'scaleX(1)' }}
-              />
-            </button>
-          </div>
-        )}
+                <FaArrowRight
+                  size={16}
+                  style={{ transform: isRTL ? 'scaleX(-1)' : 'scaleX(1)' }}
+                />
+              </button>
+            </div>
+          )}
       </div>
     </>
   );
