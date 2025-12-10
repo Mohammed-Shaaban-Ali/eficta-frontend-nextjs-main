@@ -162,14 +162,20 @@ const FlightSearchBox = () => {
     const fromDisplayValue = fromAirportRef.current?.getDisplayValue() || '';
     const toDisplayValue = toAirportRef.current?.getDisplayValue() || '';
 
+    // Get current city values
+    const fromCity = fromAirportRef.current?.getCity() || '';
+    const toCity = toAirportRef.current?.getCity() || '';
+
     // Swap form values
     form.setValue('fromAirport', toAirport, { shouldValidate: false });
     form.setValue('toAirport', fromAirport, { shouldValidate: false });
 
-    // Swap display values
+    // Swap display values and city values
     if (fromAirportRef.current && toAirportRef.current) {
       fromAirportRef.current.setDisplayValue(toDisplayValue);
       toAirportRef.current.setDisplayValue(fromDisplayValue);
+      fromAirportRef.current.setCity(toCity);
+      toAirportRef.current.setCity(fromCity);
     }
   }, [form]);
 
