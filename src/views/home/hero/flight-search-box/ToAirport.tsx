@@ -33,6 +33,7 @@ const ToAirport = forwardRef<ToAirportRef, SearchBarProps>(({ form }, ref) => {
     suppressScrollX: true,
     wheelPropagation: false,
   });
+  const dropdownToggleRef = useRef<HTMLDivElement>(null);
   const { setValue, watch } = form;
   const [displayValue, setDisplayValue] = useState('');
   const [city, setCity] = useState<string>('');
@@ -63,6 +64,54 @@ const ToAirport = forwardRef<ToAirportRef, SearchBarProps>(({ form }, ref) => {
     page: '1',
   });
   const { items: airports } = data || {};
+
+  // Auto-open dropdown when typing or when results are available
+  useEffect(() => {
+    if (typeof window !== 'undefined' && dropdownToggleRef.current) {
+      const toggleElement = dropdownToggleRef.current;
+      const hasResults = airports && airports.length > 0;
+      // Check if airport is already selected (displayValue contains airport code in parentheses)
+      const isAirportSelected =
+        formToAirport &&
+        displayValue.includes('(') &&
+        displayValue.includes(')');
+      const shouldShow =
+        (displayValue || debouncedSearch || debouncedSearchById) &&
+        (hasResults || isFetching) &&
+        !isAirportSelected;
+
+      if (shouldShow && !isInternalUpdateRef.current) {
+        // Use Bootstrap Dropdown API if available
+        const bootstrap = (window as any).bootstrap;
+        if (bootstrap) {
+          const dropdown = bootstrap.Dropdown.getInstance(toggleElement);
+          if (dropdown) {
+            dropdown.show();
+          } else {
+            const newDropdown = new bootstrap.Dropdown(toggleElement);
+            newDropdown.show();
+          }
+        } else {
+          // Fallback: manually add show class
+          const dropdownMenu = toggleElement.nextElementSibling as HTMLElement;
+          if (
+            dropdownMenu &&
+            dropdownMenu.classList.contains('dropdown-menu')
+          ) {
+            dropdownMenu.classList.add('show');
+            toggleElement.setAttribute('aria-expanded', 'true');
+          }
+        }
+      }
+    }
+  }, [
+    displayValue,
+    airports,
+    debouncedSearch,
+    debouncedSearchById,
+    isFetching,
+    formToAirport,
+  ]);
 
   // Expose setDisplayValue, getDisplayValue, getCity, and setCity via ref
   useImperativeHandle(ref, () => ({
@@ -99,18 +148,18 @@ const ToAirport = forwardRef<ToAirportRef, SearchBarProps>(({ form }, ref) => {
     // Only sync when formToAirport changes externally
     if (formToAirport) {
       // Find the airport in the current list
-        const airport = airports?.find(
-          (a: airportTypes) => a.id === formToAirport,
+      const airport = airports?.find(
+        (a: airportTypes) => a.id === formToAirport,
+      );
+      if (airport) {
+        const newDisplayValue = `${airport.name} (${airport.id})`;
+        setDisplayValue((prev) =>
+          prev !== newDisplayValue ? newDisplayValue : prev,
         );
-        if (airport) {
-          const newDisplayValue = `${airport.name} (${airport.id})`;
-          setDisplayValue((prev) =>
-            prev !== newDisplayValue ? newDisplayValue : prev,
-          );
-          if (airport.city) {
-            setCity(airport.city);
-          }
+        if (airport.city) {
+          setCity(airport.city);
         }
+      }
       // If airport not found in current list, don't clear displayValue
       // It might be from a previous search or the user is still typing
     } else {
@@ -137,6 +186,7 @@ const ToAirport = forwardRef<ToAirportRef, SearchBarProps>(({ form }, ref) => {
     <>
       <div className="searchMenu-date lg:py-20 js-form-dd js-calendar">
         <div
+          ref={dropdownToggleRef}
           data-bs-toggle="dropdown"
           data-bs-auto-close="true"
           data-bs-offset="0,22"
@@ -148,6 +198,50 @@ const ToAirport = forwardRef<ToAirportRef, SearchBarProps>(({ form }, ref) => {
               placeholder={t('to_placeholder')}
               className="js-search js-dd-focus"
               value={displayValue}
+              onFocus={() => {
+                if (
+                  typeof window !== 'undefined' &&
+                  dropdownToggleRef.current
+                ) {
+                  const toggleElement = dropdownToggleRef.current;
+                  const hasResults = airports && airports.length > 0;
+                  // Check if airport is already selected (displayValue contains airport code in parentheses)
+                  const isAirportSelected =
+                    formToAirport &&
+                    displayValue.includes('(') &&
+                    displayValue.includes(')');
+                  const shouldShow =
+                    (displayValue || debouncedSearch || debouncedSearchById) &&
+                    (hasResults || isFetching) &&
+                    !isAirportSelected;
+
+                  if (shouldShow) {
+                    const bootstrap = (window as any).bootstrap;
+                    if (bootstrap) {
+                      const dropdown =
+                        bootstrap.Dropdown.getInstance(toggleElement);
+                      if (dropdown) {
+                        dropdown.show();
+                      } else {
+                        const newDropdown = new bootstrap.Dropdown(
+                          toggleElement,
+                        );
+                        newDropdown.show();
+                      }
+                    } else {
+                      const dropdownMenu =
+                        toggleElement.nextElementSibling as HTMLElement;
+                      if (
+                        dropdownMenu &&
+                        dropdownMenu.classList.contains('dropdown-menu')
+                      ) {
+                        dropdownMenu.classList.add('show');
+                        toggleElement.setAttribute('aria-expanded', 'true');
+                      }
+                    }
+                  }
+                }
+              }}
               onChange={(e) => {
                 isUserTypingRef.current = true;
                 setDisplayValue(e.target.value);

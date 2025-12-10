@@ -34,6 +34,7 @@ const FromAirport = forwardRef<FromAirportRef, SearchBarProps>(
       suppressScrollX: true,
       wheelPropagation: false,
     });
+    const dropdownToggleRef = useRef<HTMLDivElement>(null);
     const { setValue, watch } = form;
     const [displayValue, setDisplayValue] = useState('');
     const [city, setCity] = useState<string>('');
@@ -64,6 +65,55 @@ const FromAirport = forwardRef<FromAirportRef, SearchBarProps>(
       page: '1',
     });
     const { items: airports } = data || {};
+
+    // Auto-open dropdown when typing or when results are available
+    useEffect(() => {
+      if (typeof window !== 'undefined' && dropdownToggleRef.current) {
+        const toggleElement = dropdownToggleRef.current;
+        const hasResults = airports && airports.length > 0;
+        // Check if airport is already selected (displayValue contains airport code in parentheses)
+        const isAirportSelected =
+          formFromAirport &&
+          displayValue.includes('(') &&
+          displayValue.includes(')');
+        const shouldShow =
+          (displayValue || debouncedSearch || debouncedSearchById) &&
+          (hasResults || isFetching) &&
+          !isAirportSelected;
+
+        if (shouldShow && !isInternalUpdateRef.current) {
+          // Use Bootstrap Dropdown API if available
+          const bootstrap = (window as any).bootstrap;
+          if (bootstrap) {
+            const dropdown = bootstrap.Dropdown.getInstance(toggleElement);
+            if (dropdown) {
+              dropdown.show();
+            } else {
+              const newDropdown = new bootstrap.Dropdown(toggleElement);
+              newDropdown.show();
+            }
+          } else {
+            // Fallback: manually add show class
+            const dropdownMenu =
+              toggleElement.nextElementSibling as HTMLElement;
+            if (
+              dropdownMenu &&
+              dropdownMenu.classList.contains('dropdown-menu')
+            ) {
+              dropdownMenu.classList.add('show');
+              toggleElement.setAttribute('aria-expanded', 'true');
+            }
+          }
+        }
+      }
+    }, [
+      displayValue,
+      airports,
+      debouncedSearch,
+      debouncedSearchById,
+      isFetching,
+      formFromAirport,
+    ]);
 
     // Expose setDisplayValue, getDisplayValue, getCity, and setCity via ref
     useImperativeHandle(ref, () => ({
@@ -138,6 +188,7 @@ const FromAirport = forwardRef<FromAirportRef, SearchBarProps>(
       <>
         <div className="searchMenu-date lg:py-20 js-form-dd js-calendar">
           <div
+            ref={dropdownToggleRef}
             data-bs-toggle="dropdown"
             data-bs-auto-close="true"
             data-bs-offset="0,22"
@@ -149,6 +200,52 @@ const FromAirport = forwardRef<FromAirportRef, SearchBarProps>(
                 placeholder={t('from_placeholder')}
                 className="js-search js-dd-focus"
                 value={displayValue}
+                onFocus={() => {
+                  if (
+                    typeof window !== 'undefined' &&
+                    dropdownToggleRef.current
+                  ) {
+                    const toggleElement = dropdownToggleRef.current;
+                    const hasResults = airports && airports.length > 0;
+                    // Check if airport is already selected (displayValue contains airport code in parentheses)
+                    const isAirportSelected =
+                      formFromAirport &&
+                      displayValue.includes('(') &&
+                      displayValue.includes(')');
+                    const shouldShow =
+                      (displayValue ||
+                        debouncedSearch ||
+                        debouncedSearchById) &&
+                      (hasResults || isFetching) &&
+                      !isAirportSelected;
+
+                    if (shouldShow) {
+                      const bootstrap = (window as any).bootstrap;
+                      if (bootstrap) {
+                        const dropdown =
+                          bootstrap.Dropdown.getInstance(toggleElement);
+                        if (dropdown) {
+                          dropdown.show();
+                        } else {
+                          const newDropdown = new bootstrap.Dropdown(
+                            toggleElement,
+                          );
+                          newDropdown.show();
+                        }
+                      } else {
+                        const dropdownMenu =
+                          toggleElement.nextElementSibling as HTMLElement;
+                        if (
+                          dropdownMenu &&
+                          dropdownMenu.classList.contains('dropdown-menu')
+                        ) {
+                          dropdownMenu.classList.add('show');
+                          toggleElement.setAttribute('aria-expanded', 'true');
+                        }
+                      }
+                    }
+                  }
+                }}
                 onChange={(e) => {
                   isUserTypingRef.current = true;
                   setDisplayValue(e.target.value);
