@@ -43,36 +43,36 @@ const ReturnDatePicker: React.FC<ReturnDatePickerProps> = ({ form }) => {
     if (!dateString || typeof dateString !== 'string') {
       return null;
     }
-    
+
     try {
       const parts = dateString.split('-');
       if (parts.length !== 3) {
         return null;
       }
-      
+
       const year = parseInt(parts[0], 10);
       const month = parseInt(parts[1], 10);
       const day = parseInt(parts[2], 10);
-      
+
       // Validate date values
       if (isNaN(year) || isNaN(month) || isNaN(day)) {
         return null;
       }
-      
+
       if (year < 1900 || year > 2100) {
         return null;
       }
-      
+
       if (month < 1 || month > 12) {
         return null;
       }
-      
+
       if (day < 1 || day > 31) {
         return null;
       }
-      
+
       const date = new Date(year, month - 1, day);
-      
+
       // Check if date is valid
       if (
         date.getFullYear() !== year ||
@@ -81,7 +81,7 @@ const ReturnDatePicker: React.FC<ReturnDatePickerProps> = ({ form }) => {
       ) {
         return null;
       }
-      
+
       return date;
     } catch (error) {
       console.error('Error parsing date:', error);
@@ -116,7 +116,7 @@ const ReturnDatePicker: React.FC<ReturnDatePickerProps> = ({ form }) => {
           locale={isRTL ? 'ar' : 'en'}
           calendarClassName={isRTL ? 'rtl-calendar' : ''}
         />
-        {currentValue && (
+        {/* {currentValue && (
           <button
             type="button"
             onClick={(e) => {
@@ -156,7 +156,7 @@ const ReturnDatePicker: React.FC<ReturnDatePickerProps> = ({ form }) => {
               />
             </svg>
           </button>
-        )}
+        )} */}
       </div>
     </div>
   );

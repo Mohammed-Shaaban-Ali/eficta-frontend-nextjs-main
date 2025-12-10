@@ -104,7 +104,7 @@ const DepartureDatePicker: React.FC<DepartureDatePickerProps> = ({ form }) => {
           locale={isRTL ? 'ar' : 'en'}
           calendarClassName={isRTL ? 'rtl-calendar' : ''}
         />
-        {currentValue && (
+        {/* {currentValue && (
           <button
             type="button"
             onClick={(e) => {
@@ -144,7 +144,7 @@ const DepartureDatePicker: React.FC<DepartureDatePickerProps> = ({ form }) => {
               />
             </svg>
           </button>
-        )}
+        )} */}
       </div>
     </div>
   );
