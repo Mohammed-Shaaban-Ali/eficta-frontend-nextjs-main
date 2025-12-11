@@ -218,6 +218,81 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
         <div className="mb-4">
           <h4 className="h6 fw-bold text-dark mb-3">Departure Flights</h4>
           <div className="position-relative mb-3">
+            {/* Departure Navigation Buttons - Top Right */}
+            <div
+              className="position-absolute top-45 end-0 d-flex gap-2"
+              style={{
+                zIndex: 10,
+
+                // i want make this style important
+                top: '-40px',
+              }}
+            >
+              <button
+                className={`swiper-button-prev-departure btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm ${
+                  isBeginning ? 'btn-secondary disabled' : 'btn-warning'
+                }`}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  pointerEvents: isBeginning ? 'none' : 'auto',
+                  opacity: isBeginning ? 0.5 : 1,
+                }}
+                disabled={isBeginning}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  if (!isBeginning && swiperRef.current) {
+                    swiperRef.current.swiper.slidePrev();
+                  }
+                }}
+              >
+                {isRTL ? (
+                  <FaChevronRight
+                    className={isBeginning ? 'text-light' : 'text-dark'}
+                    size={12}
+                  />
+                ) : (
+                  <FaChevronLeft
+                    className={isBeginning ? 'text-light' : 'text-dark'}
+                    size={12}
+                  />
+                )}
+              </button>
+
+              <button
+                className={`swiper-button-next-departure btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm ${
+                  isEnd ? 'btn-secondary disabled' : 'btn-warning'
+                }`}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  pointerEvents: isEnd ? 'none' : 'auto',
+                  opacity: isEnd ? 0.5 : 1,
+                }}
+                disabled={isEnd}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  if (!isEnd && swiperRef.current) {
+                    swiperRef.current.swiper.slideNext();
+                  }
+                }}
+              >
+                {isRTL ? (
+                  <FaChevronLeft
+                    className={isEnd ? 'text-light' : 'text-dark'}
+                    size={12}
+                  />
+                ) : (
+                  <FaChevronRight
+                    className={isEnd ? 'text-light' : 'text-dark'}
+                    size={12}
+                  />
+                )}
+              </button>
+            </div>
+
             <Swiper
               ref={swiperRef}
               modules={[Navigation, Pagination]}
@@ -263,24 +338,7 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
                 return (
                   <SwiperSlide key={offer.offer_key} className="h-auto d-flex">
                     <div className="position-relative h-100 w-100 d-flex flex-column">
-                      {badge && (
-                        <div
-                          className="position-absolute top-0 start-50 translate-middle-x"
-                          style={{ zIndex: 5, marginTop: '-0.5rem' }}
-                        >
-                          <div
-                            className={`badge ${badge.className} d-flex align-items-center gap-1 px-2 py-1 rounded-pill shadow-sm`}
-                            style={{ fontSize: '0.7rem' }}
-                          >
-                            {badge.icon}
-                            <span className="fw-semibold">{badge.text}</span>
-                          </div>
-                        </div>
-                      )}
-                      <div
-                        className="flex-grow-1 d-flex"
-                        style={{ marginTop: badge ? '1.5rem' : '0' }}
-                      >
+                      <div className="flex-grow-1 d-flex">
                         <OfferCard
                           offer={offer}
                           isSelected={isSelected}
@@ -296,6 +354,7 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
                           }
                           displayPrice={offer.minimum_offer_price}
                           isReturnPhase={false}
+                          badge={badge}
                         />
                       </div>
                     </div>
@@ -303,75 +362,6 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
                 );
               })}
             </Swiper>
-
-            {/* Departure Navigation Buttons */}
-            <button
-              className={`swiper-button-prev-departure btn btn-sm position-absolute top-50 start-0 translate-middle-y rounded-circle d-flex align-items-center justify-content-center shadow-sm ${
-                isBeginning ? 'btn-secondary disabled' : 'btn-warning'
-              }`}
-              style={{
-                width: '36px',
-                height: '36px',
-                zIndex: 10,
-                [isRTL ? 'right' : 'left']: '-18px',
-                pointerEvents: isBeginning ? 'none' : 'auto',
-                opacity: isBeginning ? 0.5 : 1,
-              }}
-              disabled={isBeginning}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                if (!isBeginning && swiperRef.current) {
-                  swiperRef.current.swiper.slidePrev();
-                }
-              }}
-            >
-              {isRTL ? (
-                <FaChevronRight
-                  className={isBeginning ? 'text-light' : 'text-dark'}
-                  size={12}
-                />
-              ) : (
-                <FaChevronLeft
-                  className={isBeginning ? 'text-light' : 'text-dark'}
-                  size={12}
-                />
-              )}
-            </button>
-
-            <button
-              className={`swiper-button-next-departure btn btn-sm position-absolute top-50 end-0 translate-middle-y rounded-circle d-flex align-items-center justify-content-center shadow-sm ${
-                isEnd ? 'btn-secondary disabled' : 'btn-warning'
-              }`}
-              style={{
-                width: '36px',
-                height: '36px',
-                zIndex: 10,
-                [isRTL ? 'left' : 'right']: '-18px',
-                pointerEvents: isEnd ? 'none' : 'auto',
-                opacity: isEnd ? 0.5 : 1,
-              }}
-              disabled={isEnd}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                if (!isEnd && swiperRef.current) {
-                  swiperRef.current.swiper.slideNext();
-                }
-              }}
-            >
-              {isRTL ? (
-                <FaChevronLeft
-                  className={isEnd ? 'text-light' : 'text-dark'}
-                  size={12}
-                />
-              ) : (
-                <FaChevronRight
-                  className={isEnd ? 'text-light' : 'text-dark'}
-                  size={12}
-                />
-              )}
-            </button>
           </div>
 
           {/* Departure Pagination */}
@@ -386,6 +376,76 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
         <div className="mb-4">
           <h4 className="h6 fw-bold text-dark mb-3">Return Flights</h4>
           <div className="position-relative mb-3">
+            {/* Return Navigation Buttons - Top Right */}
+            <div
+              className="position-absolute top-0 end-0 d-flex gap-2"
+              style={{ zIndex: 10 }}
+            >
+              <button
+                className={`swiper-button-prev-return btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm ${
+                  returnIsBeginning ? 'btn-secondary disabled' : 'btn-warning'
+                }`}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  pointerEvents: returnIsBeginning ? 'none' : 'auto',
+                  opacity: returnIsBeginning ? 0.5 : 1,
+                }}
+                disabled={returnIsBeginning}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  if (!returnIsBeginning && returnSwiperRef.current) {
+                    returnSwiperRef.current.swiper.slidePrev();
+                  }
+                }}
+              >
+                {isRTL ? (
+                  <FaChevronRight
+                    className={returnIsBeginning ? 'text-light' : 'text-dark'}
+                    size={12}
+                  />
+                ) : (
+                  <FaChevronLeft
+                    className={returnIsBeginning ? 'text-light' : 'text-dark'}
+                    size={12}
+                  />
+                )}
+              </button>
+
+              <button
+                className={`swiper-button-next-return btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm ${
+                  returnIsEnd ? 'btn-secondary disabled' : 'btn-warning'
+                }`}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  pointerEvents: returnIsEnd ? 'none' : 'auto',
+                  opacity: returnIsEnd ? 0.5 : 1,
+                }}
+                disabled={returnIsEnd}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  if (!returnIsEnd && returnSwiperRef.current) {
+                    returnSwiperRef.current.swiper.slideNext();
+                  }
+                }}
+              >
+                {isRTL ? (
+                  <FaChevronLeft
+                    className={returnIsEnd ? 'text-light' : 'text-dark'}
+                    size={12}
+                  />
+                ) : (
+                  <FaChevronRight
+                    className={returnIsEnd ? 'text-light' : 'text-dark'}
+                    size={12}
+                  />
+                )}
+              </button>
+            </div>
+
             <Swiper
               ref={returnSwiperRef}
               modules={[Navigation, Pagination]}
@@ -432,24 +492,7 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
                 return (
                   <SwiperSlide key={offer.offer_key} className="h-auto d-flex">
                     <div className="position-relative h-100 w-100 d-flex flex-column">
-                      {badge && (
-                        <div
-                          className="position-absolute top-0 start-50 translate-middle-x"
-                          style={{ zIndex: 5, marginTop: '-0.5rem' }}
-                        >
-                          <div
-                            className={`badge ${badge.className} d-flex align-items-center gap-1 px-2 py-1 rounded-pill shadow-sm`}
-                            style={{ fontSize: '0.7rem' }}
-                          >
-                            {badge.icon}
-                            <span className="fw-semibold">{badge.text}</span>
-                          </div>
-                        </div>
-                      )}
-                      <div
-                        className="flex-grow-1 d-flex"
-                        style={{ marginTop: badge ? '1.5rem' : '0' }}
-                      >
+                      <div className="flex-grow-1 d-flex">
                         <OfferCard
                           offer={offer}
                           isSelected={isSelected}
@@ -461,6 +504,7 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
                           isPopular={index === 1 && returnOffers.length === 3}
                           displayPrice={returnPrice}
                           isReturnPhase={true}
+                          badge={badge}
                         />
                       </div>
                     </div>
@@ -468,75 +512,6 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
                 );
               })}
             </Swiper>
-
-            {/* Return Navigation Buttons */}
-            <button
-              className={`swiper-button-prev-return btn btn-sm position-absolute top-50 start-0 translate-middle-y rounded-circle d-flex align-items-center justify-content-center shadow-sm ${
-                returnIsBeginning ? 'btn-secondary disabled' : 'btn-warning'
-              }`}
-              style={{
-                width: '36px',
-                height: '36px',
-                zIndex: 10,
-                [isRTL ? 'right' : 'left']: '-18px',
-                pointerEvents: returnIsBeginning ? 'none' : 'auto',
-                opacity: returnIsBeginning ? 0.5 : 1,
-              }}
-              disabled={returnIsBeginning}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                if (!returnIsBeginning && returnSwiperRef.current) {
-                  returnSwiperRef.current.swiper.slidePrev();
-                }
-              }}
-            >
-              {isRTL ? (
-                <FaChevronRight
-                  className={returnIsBeginning ? 'text-light' : 'text-dark'}
-                  size={12}
-                />
-              ) : (
-                <FaChevronLeft
-                  className={returnIsBeginning ? 'text-light' : 'text-dark'}
-                  size={12}
-                />
-              )}
-            </button>
-
-            <button
-              className={`swiper-button-next-return btn btn-sm position-absolute top-50 end-0 translate-middle-y rounded-circle d-flex align-items-center justify-content-center shadow-sm ${
-                returnIsEnd ? 'btn-secondary disabled' : 'btn-warning'
-              }`}
-              style={{
-                width: '36px',
-                height: '36px',
-                zIndex: 10,
-                [isRTL ? 'left' : 'right']: '-18px',
-                pointerEvents: returnIsEnd ? 'none' : 'auto',
-                opacity: returnIsEnd ? 0.5 : 1,
-              }}
-              disabled={returnIsEnd}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                if (!returnIsEnd && returnSwiperRef.current) {
-                  returnSwiperRef.current.swiper.slideNext();
-                }
-              }}
-            >
-              {isRTL ? (
-                <FaChevronLeft
-                  className={returnIsEnd ? 'text-light' : 'text-dark'}
-                  size={12}
-                />
-              ) : (
-                <FaChevronRight
-                  className={returnIsEnd ? 'text-light' : 'text-dark'}
-                  size={12}
-                />
-              )}
-            </button>
           </div>
 
           {/* Return Pagination */}

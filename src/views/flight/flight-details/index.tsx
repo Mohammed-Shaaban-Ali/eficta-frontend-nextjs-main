@@ -7,6 +7,7 @@ import {
   FaCreditCard,
   FaInfoCircle,
   FaArrowRight,
+  FaCheck,
 } from 'react-icons/fa';
 import { useRouter } from '@/i18n/navigation';
 import FlightHeader from './FlightHeader';
@@ -88,7 +89,21 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
     };
   }, [isOpen]);
 
-  // Don't set default selection - user must select manually
+  // Set default selection when offers are empty
+  useEffect(() => {
+    if (
+      data?.data &&
+      (!data.data.offers || data.data.offers.length === 0) &&
+      data.data.fare_detail
+    ) {
+      // Auto-select default offer when no offers available
+      setSelectedDepartureOffer('default');
+      if (returnFareKey) {
+        setShowReturnOffers(true);
+        setSelectedOfferKey('default');
+      }
+    }
+  }, [data?.data, returnFareKey]);
 
   // Reset when drawer closes
   useEffect(() => {
@@ -110,6 +125,18 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
 
   // Get the selected offer or default price
   const getDisplayPrice = () => {
+    // If default offer is selected (no offers available)
+    if (
+      selectedDepartureOffer === 'default' &&
+      (!data?.data?.offers || data?.data?.offers.length === 0) &&
+      data?.data?.fare_detail
+    ) {
+      return {
+        amount: data.data.fare_detail.price_info.total_fare || 0,
+        currency: data.data.fare_detail.currency_code || '',
+      };
+    }
+
     // If return is selected, show total price
     // Must search by both departure and return to get the correct offer
     if (selectedOfferKey && selectedDepartureOffer && data?.data?.offers) {
@@ -271,7 +298,7 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
               <div className="h-100 overflow-y-auto overflow-x-hidden">
                 <div className="p-3">
                   {/* Offer Selection */}
-                  {data.data.offers && data.data.offers.length > 0 && (
+                  {data.data.offers && data.data.offers.length > 0 ? (
                     <div className="card border-0 shadow-sm mb-3">
                       <div className="card-body p-4">
                         {/* Back button to return to departure selection */}
@@ -321,6 +348,315 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
                         />
                       </div>
                     </div>
+                  ) : (
+                    // Default Offer Display
+                    data.data.fare_detail && (
+                      <div className="card border-0 shadow-sm mb-3">
+                        <div className="card-body p-4">
+                          <div className="mb-4">
+                            <h3 className="h5 fw-bold text-dark mb-2">
+                              {t('title')}
+                            </h3>
+                            <p className="text-muted mb-0 small">
+                              Default offer available
+                            </p>
+                          </div>
+
+                          {/* Default Departure Offer */}
+                          {!showReturnOffers && (
+                            <div className="mb-3">
+                              <h4 className="h6 fw-bold text-dark mb-3">
+                                Departure Flight
+                              </h4>
+                              <div
+                                className={`card border position-relative offer-card border-warning shadow-sm`}
+                                style={{
+                                  backgroundColor: 'rgba(255, 193, 7, 0.03)',
+                                }}
+                              >
+                                <div className="card-body p-3 d-flex flex-column">
+                                  <div className="d-flex align-items-start justify-content-between mb-2">
+                                    <div className="flex-grow-1 min-w-0">
+                                      <p
+                                        className="fw-bold mb-0 text-truncate"
+                                        style={{ fontSize: '0.95rem' }}
+                                      >
+                                        Default Offer
+                                      </p>
+                                    </div>
+                                    <div
+                                      className="fw-bold text-warning"
+                                      style={{ fontSize: '1.1rem' }}
+                                    >
+                                      {formatPrice(
+                                        data.data.fare_detail.price_info
+                                          .total_fare,
+                                        data.data.fare_detail.currency_code,
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="d-flex flex-column gap-2 mb-3">
+                                    <div>
+                                      <div className="d-flex align-items-center gap-2 bg-light rounded p-2">
+                                        <FaInfoCircle
+                                          className="text-warning"
+                                          size={14}
+                                        />
+                                        <div>
+                                          <div
+                                            className="small fw-semibold"
+                                            style={{
+                                              fontSize: '0.75rem',
+                                              lineHeight: '1.2',
+                                            }}
+                                          >
+                                            {(data.data.fare_detail as any)
+                                              .cabin_baggages_text?.[0] ||
+                                              'N/A'}
+                                          </div>
+                                          <div
+                                            className="text-muted"
+                                            style={{ fontSize: '0.65rem' }}
+                                          >
+                                            Cabin Baggage
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <div className="d-flex align-items-center gap-2 bg-light rounded p-2">
+                                        <FaInfoCircle
+                                          className="text-warning"
+                                          size={14}
+                                        />
+                                        <div>
+                                          <div
+                                            className="small fw-semibold"
+                                            style={{
+                                              fontSize: '0.75rem',
+                                              lineHeight: '1.2',
+                                            }}
+                                          >
+                                            {(data.data.fare_detail as any)
+                                              .baggages_text?.[0] || 'N/A'}
+                                          </div>
+                                          <div
+                                            className="text-muted"
+                                            style={{ fontSize: '0.65rem' }}
+                                          >
+                                            Checked Baggage
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <button
+                                    className="btn w-100 fw-semibold btn-warning text-dark"
+                                    onClick={() => {
+                                      if (returnFareKey) {
+                                        setShowReturnOffers(true);
+                                        setSelectedOfferKey('default');
+                                      }
+                                    }}
+                                    style={{
+                                      fontSize: '0.85rem',
+                                      padding: '0.5rem',
+                                    }}
+                                  >
+                                    <FaCheck
+                                      size={11}
+                                      className={isRTL ? 'ms-1' : 'me-1'}
+                                    />
+                                    Selected
+                                  </button>
+                                </div>
+
+                                <div className="position-absolute top-0 end-0 bg-warning text-dark rounded-bottom-start d-flex align-items-center justify-content-center">
+                                  <FaCheck size={10} />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Default Return Offer */}
+                          {showReturnOffers && returnFareKey && (
+                            <div>
+                              <button
+                                className="btn btn-outline-secondary btn-sm mb-3 d-flex align-items-center gap-2"
+                                onClick={() => {
+                                  setShowReturnOffers(false);
+                                  setSelectedOfferKey(undefined);
+                                }}
+                              >
+                                <FaArrowRight
+                                  size={12}
+                                  style={{
+                                    transform: isRTL
+                                      ? 'scaleX(1)'
+                                      : 'scaleX(-1)',
+                                  }}
+                                />
+                                {t('back_to_departure')}
+                              </button>
+                              <h4 className="h6 fw-bold text-dark mb-3">
+                                Return Flight
+                              </h4>
+                              <div
+                                className={`card border position-relative offer-card ${
+                                  selectedOfferKey === 'default'
+                                    ? 'border-warning shadow-sm'
+                                    : 'border-secondary'
+                                }`}
+                                style={{
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s ease',
+                                  backgroundColor:
+                                    selectedOfferKey === 'default'
+                                      ? 'rgba(255, 193, 7, 0.03)'
+                                      : '#fff',
+                                }}
+                                onClick={() => {
+                                  setSelectedOfferKey('default');
+                                }}
+                              >
+                                <div className="card-body p-3 d-flex flex-column">
+                                  <div className="d-flex align-items-start justify-content-between mb-2">
+                                    <div className="flex-grow-1 min-w-0">
+                                      <p
+                                        className="text-muted small mb-0"
+                                        style={{ fontSize: '0.7rem' }}
+                                      >
+                                        Departure
+                                      </p>
+                                      <p
+                                        className="fw-bold mb-0 text-truncate"
+                                        style={{ fontSize: '0.9rem' }}
+                                      >
+                                        Default Offer
+                                      </p>
+                                    </div>
+                                    <div
+                                      className={`fw-bold ${
+                                        selectedOfferKey === 'default'
+                                          ? 'text-warning'
+                                          : 'text-dark'
+                                      }`}
+                                      style={{ fontSize: '1.1rem' }}
+                                    >
+                                      {formatPrice(
+                                        data.data.fare_detail.price_info
+                                          .total_fare,
+                                        data.data.fare_detail.currency_code,
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="d-flex flex-column gap-2 mb-3">
+                                    <div>
+                                      <div className="d-flex align-items-center gap-2 bg-light rounded p-2">
+                                        <FaInfoCircle
+                                          className={
+                                            selectedOfferKey === 'default'
+                                              ? 'text-warning'
+                                              : 'text-secondary'
+                                          }
+                                          size={14}
+                                        />
+                                        <div>
+                                          <div
+                                            className="small fw-semibold"
+                                            style={{
+                                              fontSize: '0.75rem',
+                                              lineHeight: '1.2',
+                                            }}
+                                          >
+                                            {(data.data.fare_detail as any)
+                                              .cabin_baggages_text?.[1] ||
+                                              'N/A'}
+                                          </div>
+                                          <div
+                                            className="text-muted"
+                                            style={{ fontSize: '0.65rem' }}
+                                          >
+                                            Cabin Baggage
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <div className="d-flex align-items-center gap-2 bg-light rounded p-2">
+                                        <FaInfoCircle
+                                          className={
+                                            selectedOfferKey === 'default'
+                                              ? 'text-warning'
+                                              : 'text-secondary'
+                                          }
+                                          size={14}
+                                        />
+                                        <div>
+                                          <div
+                                            className="small fw-semibold"
+                                            style={{
+                                              fontSize: '0.75rem',
+                                              lineHeight: '1.2',
+                                            }}
+                                          >
+                                            {(data.data.fare_detail as any)
+                                              .baggages_text?.[1] || 'N/A'}
+                                          </div>
+                                          <div
+                                            className="text-muted"
+                                            style={{ fontSize: '0.65rem' }}
+                                          >
+                                            Checked Baggage
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <button
+                                    className={`btn w-100 fw-semibold ${
+                                      selectedOfferKey === 'default'
+                                        ? 'btn-warning text-dark'
+                                        : 'btn-outline-secondary'
+                                    }`}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedOfferKey('default');
+                                    }}
+                                    style={{
+                                      fontSize: '0.85rem',
+                                      padding: '0.5rem',
+                                    }}
+                                  >
+                                    {selectedOfferKey === 'default' ? (
+                                      <>
+                                        <FaCheck
+                                          size={11}
+                                          className={isRTL ? 'ms-1' : 'me-1'}
+                                        />
+                                        Selected
+                                      </>
+                                    ) : (
+                                      'Select'
+                                    )}
+                                  </button>
+                                </div>
+
+                                {selectedOfferKey === 'default' && (
+                                  <div className="position-absolute top-0 end-0 bg-warning text-dark rounded-bottom-start d-flex align-items-center justify-content-center">
+                                    <FaCheck size={10} />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )
                   )}
 
                   {/* Price Breakdown */}
@@ -427,7 +763,10 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
         {/* Footer CTA */}
         {data?.data &&
           !isFetching &&
-          (selectedDepartureOffer || showReturnOffers) && (
+          (selectedDepartureOffer ||
+            showReturnOffers ||
+            !data.data.offers ||
+            data.data.offers.length === 0) && (
             <div className="border-top bg-white p-4">
               <button
                 className="btn btn-primary btn-lg w-100 rounded-3 d-flex align-items-center justify-content-between shadow-sm"
@@ -443,7 +782,17 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
 
                   // If return is selected or no return flight, proceed to booking
                   let offerKeyParam = '';
-                  if (selectedOffer && selectedOffer.offer_details) {
+                  // Handle default offer (no offers available)
+                  if (
+                    selectedDepartureOffer === 'default' &&
+                    (!data?.data?.offers || data?.data?.offers.length === 0)
+                  ) {
+                    if (selectedOfferKey === 'default' && returnFareKey) {
+                      offerKeyParam = '&offerKey=default|default';
+                    } else {
+                      offerKeyParam = '&offerKey=default';
+                    }
+                  } else if (selectedOffer && selectedOffer.offer_details) {
                     const departureName =
                       selectedOffer.offer_details[0]?.name || '';
                     const returnName =
@@ -465,14 +814,22 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
                   isFetching ||
                   (!!returnFareKey &&
                     showReturnOffers &&
-                    selectedOfferKey === undefined)
+                    selectedOfferKey === undefined &&
+                    !(
+                      selectedDepartureOffer === 'default' &&
+                      (!data?.data?.offers || data?.data?.offers.length === 0)
+                    ))
                 }
                 style={{ height: '60px' }}
               >
                 <div className="d-flex align-items-center gap-3">
                   <div className={`text-${isRTL ? 'end' : 'start'}`}>
                     <div className="small opacity-90">
-                      {showReturnOffers && selectedOfferKey
+                      {showReturnOffers &&
+                      (selectedOfferKey ||
+                        (selectedDepartureOffer === 'default' &&
+                          (!data?.data?.offers ||
+                            data?.data?.offers.length === 0)))
                         ? t('continue_book')
                         : returnFareKey
                           ? t('continue')

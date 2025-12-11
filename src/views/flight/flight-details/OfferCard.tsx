@@ -4,6 +4,12 @@ import { useTranslations, useLocale } from 'next-intl';
 import { FaCheck, FaSuitcase, FaBriefcase } from 'react-icons/fa';
 import { FlightOffer } from '@/types/app/fareTypes';
 
+interface BadgeProps {
+  text: string;
+  icon: React.ReactNode;
+  className: string;
+}
+
 interface OfferCardProps {
   offer: FlightOffer;
   isSelected: boolean;
@@ -13,6 +19,7 @@ interface OfferCardProps {
   isPopular?: boolean;
   displayPrice?: number;
   isReturnPhase?: boolean;
+  badge?: BadgeProps | null;
 }
 
 const OfferCard: React.FC<OfferCardProps> = ({
@@ -24,6 +31,7 @@ const OfferCard: React.FC<OfferCardProps> = ({
   isPopular = false,
   displayPrice,
   isReturnPhase = false,
+  badge,
 }) => {
   const t = useTranslations('FlightSearch.offers');
   const locale = useLocale();
@@ -63,6 +71,18 @@ const OfferCard: React.FC<OfferCardProps> = ({
       }}
     >
       <div className="card-body p-3 d-flex flex-column">
+        {/* Badge */}
+        {badge && (
+          <div className="d-flex justify-content-center mb-2">
+            <div
+              className={`badge ${badge.className} d-flex align-items-center gap-1 px-2 py-1 rounded-pill shadow-sm`}
+              style={{ fontSize: '0.7rem' }}
+            >
+              {badge.icon}
+              <span className="fw-semibold">{badge.text}</span>
+            </div>
+          </div>
+        )}
         {/* Header & Price Row */}
         <div className="d-flex align-items-start justify-content-between mb-2">
           <div className="flex-grow-1 min-w-0">
