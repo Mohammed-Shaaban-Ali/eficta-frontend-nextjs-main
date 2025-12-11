@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 const counters = [
-  { name: "Adults", defaultValue: 2 },
-  { name: "Children", defaultValue: 1 },
-  { name: "Rooms", defaultValue: 1 },
+  { name: 'Adults', defaultValue: 2 },
+  { name: 'Children', defaultValue: 1 },
+  { name: 'Rooms', defaultValue: 1 },
 ];
 
 const Counter = ({ name, defaultValue, onCounterChange }: any) => {
@@ -25,7 +25,7 @@ const Counter = ({ name, defaultValue, onCounterChange }: any) => {
       <div className="row y-gap-10 justify-between items-center">
         <div className="col-auto">
           <div className="text-15 lh-12 fw-500">{name}</div>
-          {name === "Children" && (
+          {name === 'Children' && (
             <div className="text-14 lh-12 text-light-1 mt-5">Ages 0 - 17</div>
           )}
         </div>
@@ -70,7 +70,7 @@ const GuestSearch = () => {
     setGuestCounts((prevState) => ({ ...prevState, [name]: value }));
   };
   return (
-    <div className="searchMenu-guests px-20 py-10  lg:py-20 lg:px-0 js-form-dd bg-white position-relative">
+    <div className="searchMenu-guests px-20 py-10  lg:py-4 lg:px-0 js-form-dd bg-white position-relative">
       <div
         data-bs-toggle="dropdown"
         data-bs-auto-close="outside"
@@ -79,9 +79,9 @@ const GuestSearch = () => {
       >
         <h4 className="text-15 fw-500 ls-2 lh-16">Guest</h4>
         <div className="text-15 text-light-1 ls-2 lh-16">
-          <span className="js-count-adult">{guestCounts.Adults}</span> adults -{" "}
-          <span className="js-count-child">{guestCounts.Children}</span>{" "}
-          childeren - <span className="js-count-room">{guestCounts.Rooms}</span>{" "}
+          <span className="js-count-adult">{guestCounts.Adults}</span> adults -{' '}
+          <span className="js-count-child">{guestCounts.Children}</span>{' '}
+          childeren - <span className="js-count-room">{guestCounts.Rooms}</span>{' '}
           room
         </div>
       </div>

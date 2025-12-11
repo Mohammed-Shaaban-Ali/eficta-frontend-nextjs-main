@@ -74,7 +74,7 @@ const DateSearch: React.FC<DateSearchProps> = ({ form }) => {
   const displayFormat = isRTL ? 'YYYY/MM/DD' : 'YYYY-MM-DD';
 
   return (
-    <div className="searchMenu-date px-30 lg:py-20 lg:px-0 js-form-dd js-calendar">
+    <div className="searchMenu-date px-30 lg:py-4 lg:px-0 js-form-dd js-calendar">
       <div className="text-15 text-light-1 ls-2 lh-16 custom_dual_datepicker">
         <DatePicker
           inputClass="custom_input-picker"

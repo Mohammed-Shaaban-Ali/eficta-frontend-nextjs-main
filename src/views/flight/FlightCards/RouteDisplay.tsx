@@ -55,15 +55,15 @@ const RouteDisplay: React.FC<RouteDisplayProps> = ({
 
   return (
     <div className="route-display mb-20">
-      <div className="d-flex items-center gap-2">
+      <div className="flex items-center gap-2">
         <span className="text-22 fw-600 ">{displayRoute.number}.</span>
-        <span className="text-22 fw-500 text-dark-1">
+        <div className="text-22 fw-500 text-dark-1 flex items-center gap-2">
           {displayRoute.from}
 
           <FaArrowRightLong className="mx-2  " />
 
           {displayRoute.to}
-        </span>
+        </div>
       </div>
     </div>
   );

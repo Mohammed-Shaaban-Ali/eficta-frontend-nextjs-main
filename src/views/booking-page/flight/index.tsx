@@ -35,6 +35,7 @@ const FlightBooking: React.FC = () => {
   const cabinClass = searchqueries.get('cabinClass') || 'ECONOMY';
   const returnDate = searchqueries.get('returnDate') || '';
   const offerKey = searchqueries.get('offerKey') || null;
+  const provider = searchqueries.get('provider') || 'iati';
 
   // State for selected offer
   const [selectedOfferName, setSelectedOfferName] = useState<string | null>(
@@ -58,6 +59,7 @@ const FlightBooking: React.FC = () => {
     children,
     departureFareKey,
     infants,
+    provider: provider as 'iati' | 'sabre',
     ...(returnFareKey && { returnFareKey }),
   });
 
@@ -138,7 +140,7 @@ const FlightBooking: React.FC = () => {
               isPending={isPending}
             />
           </div>
-          <div className="col-xl-5 col-lg-4 mt-30">
+          <div className="col-xl-5 col-lg-4 mt-30 ">
             <div className="booking-sidebar">
               <FareDetails
                 flightData={flightFareData as FlightFareResponse}

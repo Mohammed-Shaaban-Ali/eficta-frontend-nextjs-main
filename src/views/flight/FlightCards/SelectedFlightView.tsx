@@ -200,7 +200,7 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
       }
 
       return filtered;
-    }, [matchingReturns, filters]);
+    }, [matchingReturns, filters, returnFlightsActualPriceRange]);
 
     console.log(filteredReturnFlights, 'filteredReturnFlights');
     const departureInfo = selectedDepartureData?.legs?.[0]?.departure_info;

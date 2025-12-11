@@ -1,36 +1,36 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
 const LocationSearch = () => {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const [selectedItem, setSelectedItem] = useState<any>(null);
 
   const locationSearchContent = [
     {
       id: 1,
-      name: "London",
-      address: "Greater London, United Kingdom",
+      name: 'London',
+      address: 'Greater London, United Kingdom',
     },
     {
       id: 2,
-      name: "New York",
-      address: "New York State, United States",
+      name: 'New York',
+      address: 'New York State, United States',
     },
     {
       id: 3,
-      name: "Paris",
-      address: "France",
+      name: 'Paris',
+      address: 'France',
     },
     {
       id: 4,
-      name: "Madrid",
-      address: "Spain",
+      name: 'Madrid',
+      address: 'Spain',
     },
     {
       id: 5,
-      name: "Santorini",
-      address: "Greece",
+      name: 'Santorini',
+      address: 'Greece',
     },
   ];
 
@@ -41,7 +41,7 @@ const LocationSearch = () => {
 
   return (
     <>
-      <div className="searchMenu-loc lg:py-20 js-form-dd js-liverSearch">
+      <div className="searchMenu-loc lg:py-4 js-form-dd js-liverSearch">
         <div
           data-bs-toggle="dropdown"
           data-bs-auto-close="true"
@@ -67,7 +67,7 @@ const LocationSearch = () => {
               {locationSearchContent.map((item) => (
                 <li
                   className={`-link d-block col-12 text-left rounded-4 px-20 py-15 js-search-option mb-1 ${
-                    selectedItem && selectedItem.id === item.id ? "active" : ""
+                    selectedItem && selectedItem.id === item.id ? 'active' : ''
                   }`}
                   key={item.id}
                   role="button"

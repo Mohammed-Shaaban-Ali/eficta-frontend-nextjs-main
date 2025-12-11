@@ -39,7 +39,7 @@ const FareDetails: React.FC<FareDetailsProps> = ({
     if (isRTL) {
       return `${amount.toLocaleString()} ${currency}`;
     }
-    return `${currency} ${amount.toLocaleString()}`;
+    return `${currency} ${amount?.toLocaleString() || 0}`;
   };
 
   // Extract flight data from the response structure
@@ -122,10 +122,10 @@ const FareDetails: React.FC<FareDetailsProps> = ({
 
   return (
     <div
-      className="px-30 py-30 border-light rounded-4"
+      className="w-full p-3  border-light rounded-lg"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className="text-20 fw-500 mb-30">{t('flight_booking_details')}</div>
+      {/* <div className="text-20 fw-500 mb-30">{t('flight_booking_details')}</div> */}
 
       {/* Flight Route */}
       {flightData?.data && (
@@ -136,32 +136,32 @@ const FareDetails: React.FC<FareDetailsProps> = ({
         />
       )}
 
-      <div className="border-top-light mt-30 mb-20" />
+      {/* <div className="border-top-light mt-30 mb-20" /> */}
 
       {/* Passenger Details */}
-      <PassengerDetails members={members} />
+      {/* <PassengerDetails members={members} /> */}
 
-      <div className="border-top-light mt-30 mb-20" />
+      {/* <div className="border-top-light mt-30 mb-20" /> */}
 
       {/* Flight Info */}
-      <FlightInfo cabinClass={cabinClass} hasReturnFlight={hasReturnFlight} />
+      {/* <FlightInfo cabinClass={cabinClass} hasReturnFlight={hasReturnFlight} /> */}
 
       {/* Offer Selection */}
-      <OfferSelection
+      {/* <OfferSelection
         offers={offers}
         selectedOffer={selectedOffer}
         onOfferSelect={handleOfferSelect}
-        formatPrice={formatPrice}
-      />
+        formatPrice={formatPrice} 
+      />*/}
 
       {/* Total Price */}
-      {(fareDetail?.price_info || offers.length > 0) && (
+      {/* {(fareDetail?.price_info || offers.length > 0) && (
         <TotalPrice
           displayPrice={getDisplayPrice()}
           formatPrice={formatPrice}
           priceBreakdown={getPriceBreakdown() || undefined}
         />
-      )}
+      )} */}
     </div>
   );
 };

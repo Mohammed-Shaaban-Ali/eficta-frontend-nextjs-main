@@ -40,11 +40,8 @@ const CustomerInfo = ({
 
   return (
     <>
-      <div
-        className="col-xl-7 col-lg-8 mt-30 select-none"
-        style={{ width: '100%' }}
-      >
-        <div className="py-15 px-20 rounded-4 text-15 bg-blue-1-05 shadow-sm border-l-4 border-blue-1">
+      <div className="col-xl-7 col-lg-8  select-none" style={{ width: '100%' }}>
+        <div className="py-15 px-5 rounded-4 text-15 bg-blue-1-05  border-l-4 border-blue-1">
           {t('sign_in_notice')}
         </div>
         {/* End register notify */}
@@ -53,11 +50,11 @@ const CustomerInfo = ({
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="row x-gap-20 y-gap-20 pt-20"
+          className="row x-gap-5 y-gap-5 pt-5"
         >
-          <div className="col-12 mt-20">
-            <h3 className="text-18 fw-500 mb-10">{t('contact_information')}</h3>
-            <div className="row x-gap-20 y-gap-20 p-20 bg-white shadow-sm rounded-4">
+          <div className="col-12 mt-5">
+            <h3 className="text-18 fw-500 mb-5">{t('contact_information')}</h3>
+            <div className="row x-gap-20 y-gap-20 py-5 bg-white  mb-5 rounded-4">
               <div className="col-md-12">
                 <div className="form-input">
                   <input
@@ -91,7 +88,7 @@ const CustomerInfo = ({
                   <span className="text-red-1">{t('first_name_required')}</span>
                 )}
               </div>
-                     <div className="col-md-6">
+              <div className="col-md-6">
                 <div className="form-input">
                   <input
                     type="text"
@@ -164,7 +161,7 @@ const CustomerInfo = ({
           {members.map((member, index) => (
             <React.Fragment key={index}>
               <div
-                className="col-12 mt-10 d-flex justify-between items-center cursor-pointer border-light rounded-4 px-20 py-20 transition-all duration-300 hover:bg-blue-1/5"
+                className="col-12 mt-10 d-flex justify-between items-center cursor-pointer border-light rounded-4 px-5 py-5 transition-all duration-300 hover:bg-blue-1/5"
                 onClick={() => {
                   setOpenForms((prev) =>
                     prev.includes(index)
@@ -188,7 +185,7 @@ const CustomerInfo = ({
               </div>
               {openForms.includes(index) && (
                 <div className="col-12 animate-slideDown">
-                  <div className="row x-gap-20 y-gap-20 p-20 bg-white shadow-sm rounded-4 mt-10">
+                  <div className="row x-gap-5 y-gap-5 p-5 bg-white shadow-sm rounded-4 mt-10">
                     <div className="col-md-12">
                       <div className="form-input">
                         <select
@@ -476,8 +473,8 @@ const CustomerInfo = ({
             </React.Fragment>
           ))}
 
-          <div className="col-12 mt-20">
-            <div className="row y-gap-20 items-center justify-between">
+          <div className="col-12 mt-5">
+            <div className="row y-gap-5 items-center justify-between">
               <div className="col-auto">
                 <div className="text-14 text-light-1">
                   {t('terms_agreement')}

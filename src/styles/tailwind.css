@@ -1,0 +1,13 @@
+/* 
+  Tailwind CSS v4 Configuration
+  
+  IMPORTANT: Bootstrap CSS is imported BEFORE this file in layout.tsx
+  This ensures Bootstrap's base styles are preserved while allowing
+  Tailwind utility classes to be used throughout the project.
+  
+  Bootstrap components and base styles will work as before.
+  Tailwind utilities (like flex, grid, p-4, text-center, etc.) can be used alongside Bootstrap.
+*/
+
+@import "tailwindcss";
+

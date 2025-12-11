@@ -74,8 +74,10 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
 
           return (
             <div
-              key={offer.offer_details?.[0]?.name || offer.offer_key}
               className="col-12"
+              key={
+                `${offer.offer_details?.[0]?.name}-${index}` || `offer-${index}`
+              }
             >
               <div
                 className={`card border-2 cursor-pointer transition-all ${

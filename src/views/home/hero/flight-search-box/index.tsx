@@ -300,7 +300,7 @@ const FlightSearchBox = () => {
             <button
               type="button"
               onClick={() => handleTripTypeChange('roundTrip')}
-              className="flex-1"
+              className="flex-1 text-nowrap"
               style={{
                 backgroundColor:
                   tripType === 'roundTrip' ? '#007bff' : 'transparent',

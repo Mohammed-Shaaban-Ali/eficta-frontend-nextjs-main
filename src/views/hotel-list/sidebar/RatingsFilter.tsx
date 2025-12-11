@@ -4,8 +4,9 @@ import { useHotelFilterRedux } from '@/hooks/useHotelFilterRedux';
 import { AiFillStar } from 'react-icons/ai';
 import { useEffect, useState } from 'react';
 
+const ratings = [5, 4, 3, 2, 1];
+
 const RatingsFilter = () => {
-  const ratings = [5, 4, 3, 2, 1];
   const { hotels, selectedRating, setSelectedRating } = useHotelFilterRedux();
   const [ratingCounts, setRatingCounts] = useState<Record<number, number>>({});
 

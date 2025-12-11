@@ -1,6 +1,12 @@
 'use client';
 import moment from 'moment';
 import { useTranslations, useLocale } from 'next-intl';
+import {
+  IoIosArrowDown,
+  IoIosCheckmarkCircle,
+  IoIosCloseCircle,
+} from 'react-icons/io';
+import TestDesign from './TestDesign';
 
 interface FlightRouteProps {
   departureFlights: any[];
@@ -28,7 +34,7 @@ const FlightRoute: React.FC<FlightRouteProps> = ({
   return (
     <div className="row x-gap-15 y-gap-20">
       {/* Outbound Flight */}
-      {departureFlights.length > 0 && (
+      {/* {departureFlights.length > 0 && (
         <div className="col-12">
           <div className="flight-route-card border rounded-4 p-20 bg-blue-1-05 p-3">
             <div className="d-flex align-items-center justify-content-between mb-15">
@@ -100,10 +106,9 @@ const FlightRoute: React.FC<FlightRouteProps> = ({
             </div>
           </div>
         </div>
-      )}
-
+      )} */}
       {/* Return Flight */}
-      {hasReturnFlight && returnFlights.length > 0 && (
+      {/* {hasReturnFlight && returnFlights.length > 0 && (
         <div className="col-12">
           <div className="flight-route-card border rounded-4 p-20 bg-light-2 p-3">
             <div className="d-flex align-items-center justify-content-between mb-15">
@@ -181,7 +186,9 @@ const FlightRoute: React.FC<FlightRouteProps> = ({
             </div>
           </div>
         </div>
-      )}
+      )} */}
+      {/* test design */}
+      <TestDesign />
     </div>
   );
 };

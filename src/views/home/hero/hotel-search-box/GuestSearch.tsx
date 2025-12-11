@@ -199,7 +199,7 @@ const GuestSearch = ({ form }: GuestSearchProps) => {
   };
 
   return (
-    <div className="searchMenu-guests px-30 lg:py-20 lg:px-0 js-form-dd js-form-counters position-relative">
+    <div className="searchMenu-guests px-30 lg:py-4 lg:px-0 js-form-dd js-form-counters position-relative">
       <div
         data-bs-toggle="dropdown"
         data-bs-auto-close="outside"

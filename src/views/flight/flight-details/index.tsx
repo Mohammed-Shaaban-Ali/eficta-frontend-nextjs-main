@@ -143,7 +143,8 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
       const selectedOffer = data.data.offers.find(
         (offer) =>
           offer.offer_details?.[0]?.name === selectedDepartureOffer &&
-          offer.offer_details?.[1]?.name === selectedOfferKey,
+          offer.offer_details?.[offer.offer_details.length - 1]?.name ===
+            selectedOfferKey,
       );
       if (selectedOffer) {
         return {
@@ -181,7 +182,8 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
       const foundOffer = data.data.offers.find(
         (offer) =>
           offer.offer_details?.[0]?.name === selectedDepartureOffer &&
-          offer.offer_details?.[1]?.name === selectedOfferKey,
+          offer.offer_details?.[offer.offer_details.length - 1]?.name ===
+            selectedOfferKey,
       );
       if (foundOffer && foundOffer.fares) {
         return {
@@ -267,7 +269,7 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
         />
 
         {/* Content Area */}
-        <div className="flex-grow-1 overflow-hidden bg-light">
+        <div className="grow overflow-hidden bg-light">
           {isFetching ? (
             <div className="d-flex flex-column align-items-center justify-content-center p-5">
               <div className="mb-4">
@@ -340,7 +342,9 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
                                 (offer) =>
                                   offer.offer_details?.[0]?.name ===
                                     selectedDepartureOffer &&
-                                  offer.offer_details?.[1]?.name === offerKey,
+                                  offer.offer_details?.[
+                                    offer.offer_details.length - 1
+                                  ]?.name === offerKey,
                               ),
                             );
                           }}
@@ -573,8 +577,10 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
                                             }}
                                           >
                                             {(data.data.fare_detail as any)
-                                              .cabin_baggages_text?.[1] ||
-                                              'N/A'}
+                                              .cabin_baggages_text?.[
+                                              (data.data.fare_detail as any)
+                                                .cabin_baggages_text.length - 1
+                                            ] || 'N/A'}
                                           </div>
                                           <div
                                             className="text-muted"
@@ -604,7 +610,10 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
                                             }}
                                           >
                                             {(data.data.fare_detail as any)
-                                              .baggages_text?.[1] || 'N/A'}
+                                              .baggages_text?.[
+                                              (data.data.fare_detail as any)
+                                                .baggages_text.length - 1
+                                            ] || 'N/A'}
                                           </div>
                                           <div
                                             className="text-muted"
@@ -796,7 +805,9 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
                     const departureName =
                       selectedOffer.offer_details[0]?.name || '';
                     const returnName =
-                      selectedOffer.offer_details[1]?.name || '';
+                      selectedOffer.offer_details[
+                        selectedOffer.offer_details.length - 1
+                      ]?.name || '';
                     if (returnName) {
                       offerKeyParam = `&offerKey=${departureName}|${returnName}`;
                     } else {
@@ -807,7 +818,7 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
                     offerKeyParam = `&offerKey=${selectedDepartureOffer}`;
                   }
                   router.push(
-                    `/book-flight?departureFareKey=${departureFareKey}${returnFareKey ? `&returnFareKey=${returnFareKey}` : ''}${offerKeyParam}&children=${childrens}&adults=${adults}&infants=${infants}`,
+                    `/book-flight?departureFareKey=${departureFareKey}${returnFareKey ? `&returnFareKey=${returnFareKey}` : ''}${offerKeyParam}&children=${childrens}&adults=${adults}&infants=${infants}&provider=${provider}`,
                   );
                 }}
                 disabled={

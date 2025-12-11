@@ -40,7 +40,7 @@ const SearchBar = ({ form }: SearchBarProps) => {
 
   return (
     <>
-      <div className="searchMenu-date lg:py-20 js-form-dd js-calendar">
+      <div className="searchMenu-date lg:py-4 js-form-dd js-calendar">
         <div
           data-bs-toggle="dropdown"
           data-bs-auto-close="true"

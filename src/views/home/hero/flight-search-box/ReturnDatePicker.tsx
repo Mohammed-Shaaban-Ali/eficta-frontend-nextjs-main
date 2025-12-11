@@ -100,7 +100,7 @@ const ReturnDatePicker: React.FC<ReturnDatePickerProps> = ({ form }) => {
   }, [departureDate]);
 
   return (
-    <div className="searchMenu-date px-30 lg:py-20 lg:px-0 js-form-dd js-calendar">
+    <div className="searchMenu-date px-30 lg:py-4 lg:px-0 js-form-dd js-calendar">
       <div className="text-15 text-light-1 ls-2 lh-16 position-relative">
         <DatePicker
           selected={selectedDate}

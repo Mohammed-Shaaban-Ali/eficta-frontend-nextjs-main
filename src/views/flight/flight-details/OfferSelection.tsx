@@ -204,7 +204,7 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
     }
     return `${currency} ${amount.toFixed(2)}`;
   };
-
+  console.log(departureOffers, 'externalShowDepartureOffers');
   return (
     <div className="offer-selection-container">
       {/* Header */}
@@ -378,7 +378,7 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
           <div className="position-relative mb-3">
             {/* Return Navigation Buttons - Top Right */}
             <div
-              className="position-absolute top-0 end-0 d-flex gap-2"
+              className="position-absolute top-[-40px]! end-0 d-flex gap-2"
               style={{ zIndex: 10 }}
             >
               <button

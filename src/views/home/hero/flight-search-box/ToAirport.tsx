@@ -184,7 +184,7 @@ const ToAirport = forwardRef<ToAirportRef, SearchBarProps>(({ form }, ref) => {
 
   return (
     <>
-      <div className="searchMenu-date lg:py-20 js-form-dd js-calendar">
+      <div className="searchMenu-date lg:py-4 js-form-dd js-calendar">
         <div
           ref={dropdownToggleRef}
           data-bs-toggle="dropdown"

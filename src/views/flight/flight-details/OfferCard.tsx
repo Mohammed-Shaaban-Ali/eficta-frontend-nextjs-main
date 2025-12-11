@@ -98,7 +98,8 @@ const OfferCard: React.FC<OfferCardProps> = ({
                   className="fw-bold mb-0 text-truncate"
                   style={{ fontSize: '0.9rem' }}
                 >
-                  {offer.offer_details[1]?.descriptions || 'Return'}
+                  {offer.offer_details[offer.offer_details.length - 1]
+                    ?.descriptions || 'Return'}
                 </p>
               </div>
             ) : (
@@ -168,7 +169,7 @@ const OfferCard: React.FC<OfferCardProps> = ({
 
         {/* Select Button */}
         <button
-          className={`btn w-100 fw-semibold ${
+          className={`btn w-100 fw-semibold flex items-center justify-center mt-auto ${
             isSelected ? 'btn-warning text-dark' : 'btn-outline-secondary'
           }`}
           onClick={(e) => {
@@ -178,10 +179,10 @@ const OfferCard: React.FC<OfferCardProps> = ({
           style={{ fontSize: '0.85rem', padding: '0.5rem' }}
         >
           {isSelected ? (
-            <>
+            <div className="flex items-center justify-center">
               <FaCheck size={11} className={isRTL ? 'ms-1' : 'me-1'} />
               {t('selected')}
-            </>
+            </div>
           ) : (
             t('select')
           )}

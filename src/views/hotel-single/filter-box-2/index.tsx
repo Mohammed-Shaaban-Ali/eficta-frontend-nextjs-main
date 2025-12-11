@@ -1,6 +1,6 @@
-import DateSearch from "./DateSearch";
-import GuestSearch from "./GuestSearch";
-import LocationSearch from "./LocationSearch";
+import DateSearch from './DateSearch';
+import GuestSearch from './GuestSearch';
+import LocationSearch from './LocationSearch';
 
 const MainFilterSearchBox = () => {
   return (
@@ -10,7 +10,7 @@ const MainFilterSearchBox = () => {
           <LocationSearch />
           {/* End Location */}
 
-          <div className="searchMenu-date px-30 lg:py-20  sm:px-20 js-form-dd js-calendar">
+          <div className="searchMenu-date px-30 lg:py-4  sm:px-20 js-form-dd js-calendar">
             <div>
               <h4 className="text-15 fw-500 ls-2 lh-16">
                 Check in - Check out

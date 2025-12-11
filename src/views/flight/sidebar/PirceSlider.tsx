@@ -52,7 +52,14 @@ const PirceSlider = ({
         );
       }
     }
-  }, [minPrice, maxPrice, dispatch, priceRange.min, priceRange.max]);
+  }, [
+    minPrice,
+    maxPrice,
+    dispatch,
+    priceRange.min,
+    priceRange.max,
+    flightType,
+  ]);
 
   // Update local state when Redux state changes
   useEffect(() => {

@@ -11,7 +11,7 @@ const FlyingFromLocation = ({
 
   return (
     <>
-      <div className="searchMenu-loc px-24 lg:py-20 lg:px-0 js-form-dd js-liverSearch">
+      <div className="searchMenu-loc px-24 lg:py-4 lg:px-0 js-form-dd js-liverSearch">
         <div
           data-bs-toggle="dropdown"
           data-bs-auto-close="true"

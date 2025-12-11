@@ -17,6 +17,8 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import Toast from '@/libs/Toast';
 import '../../styles/global.css';
+// Tailwind CSS - imported after Bootstrap to allow utilities without breaking Bootstrap styles
+import '../../styles/tailwind.css';
 import ClientLayoutWraper from './(app)/ClientLayoutWraper';
 import ScrollToTop from '@/views/common/ScrollTop';
 import SetToken from '../../components/layout/SetToken';
