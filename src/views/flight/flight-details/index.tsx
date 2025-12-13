@@ -222,7 +222,7 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
 
     // Fall back to base fare detail
     return {
-      pax_fares: data?.data?.fare_detail.pax_fares || [],
+      pax_fares: [],
       currency_code: data?.data?.fare_detail.currency_code || '',
       total_fare: data?.data?.fare_detail.price_info.total_fare || 0,
     };
