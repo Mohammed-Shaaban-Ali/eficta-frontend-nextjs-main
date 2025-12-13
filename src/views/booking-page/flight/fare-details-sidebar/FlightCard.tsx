@@ -123,10 +123,8 @@ function FlightCard({ flightData }: { flightData: FlightPackage }) {
                   </div>
                   <span className="text-[12px]! text-gray-500 ">
                     {(() => {
-                      const totalMinutes = moment(leg?.arrival_info?.date).diff(
-                        moment(leg?.departure_info?.date),
-                        'minutes',
-                      );
+                      const totalMinutes =
+                        leg?.time_info?.leg_duration_time_minute;
                       const hours = Math.floor(totalMinutes / 60);
                       const minutes = totalMinutes % 60;
                       return `${hours}h${minutes > 0 ? ` ${minutes}m` : ''}`;
@@ -200,9 +198,8 @@ function FlightCard({ flightData }: { flightData: FlightPackage }) {
                   <span className="text-[12px]! text-gray-500">
                     Airport stopover· Duration:{' '}
                     {(() => {
-                      const totalMinutes = moment(
-                        flightData?.legs[index + 1]?.departure_info?.date,
-                      ).diff(moment(leg?.arrival_info?.date), 'minutes');
+                      const totalMinutes =
+                        leg?.time_info?.wait_time_in_minute_before_next_leg;
                       const hours = Math.floor(totalMinutes / 60);
                       const minutes = totalMinutes % 60;
                       return `${hours}h${minutes > 0 ? ` ${minutes}m` : ''}`;
