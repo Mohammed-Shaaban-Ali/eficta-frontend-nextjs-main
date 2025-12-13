@@ -81,8 +81,16 @@ function FlightCard({ flightData }: { flightData: FlightPackage }) {
             onClick={toggleAccordion}
           >
             <span>
-              {flightData?.legs[0]?.time_info?.flight_time_hour}h{' '}
-              {flightData?.legs[0]?.time_info?.flight_time_minute}m
+              {(() => {
+                const totalMinutes =
+                  (flightData?.legs[0]?.time_info?.flight_time_minute || 0) +
+                  (flightData?.legs[0]?.time_info?.flight_time_hour || 0) * 60 +
+                  (flightData?.legs[0]?.time_info?.layover_time_in_minutes ||
+                    0);
+                const hours = Math.floor(totalMinutes / 60);
+                const minutes = totalMinutes % 60;
+                return `${hours}h${minutes > 0 ? ` ${minutes}m` : ''}`;
+              })()}
             </span>
             <IoIosArrowDown
               className={`text-gray-500! text-sm! cursor-pointer transition-transform duration-500! ${
