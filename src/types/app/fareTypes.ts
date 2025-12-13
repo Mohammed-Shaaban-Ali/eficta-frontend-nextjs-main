@@ -107,36 +107,100 @@ interface FlightInfo {
 
 interface SelectedFlight {
   flight: FlightInfo;
-  change_rules: ChangeRule[];
 }
 
-interface ProviderWarning {
-  description: string;
+interface SimplifiedPriceInfo {
+  total_fare: number;
 }
 
-interface FlightInformation {
+interface SimplifiedFareDetail {
+  currency_code: string;
+  price_info: SimplifiedPriceInfo;
+}
+
+interface PackageInfo {
+  packaged: boolean;
+  package_key: string;
+  is_return: boolean;
+}
+
+interface AirportInfo {
+  airport_code: string;
+  date: string;
+  airport_name: string;
+  city_name: string;
+}
+
+interface TimeInfo {
+  leg_duration_time_minute: number;
+  wait_time_in_minute_before_next_leg: number;
+  flight_time_hour: number;
+  flight_time_minute: number;
+  layover_time_in_minutes: number;
+  day_cross: boolean;
+}
+
+interface AirlineInfo {
+  carrier_code: string;
+  carrier_name: string;
+  operator_code: string;
+  operator_name: string;
+  validating_carrier_code: string;
+  operating_airline_code: string;
+  logo: string;
+}
+
+interface FlightLeg {
+  flight_number: string;
+  departure_info: AirportInfo;
+  arrival_info: AirportInfo;
+  time_info: TimeInfo;
+  airline_info: AirlineInfo;
+}
+
+interface FareInfo {
+  class_codes: string[];
+  cabin_types: string[];
+  fare_detail: SimplifiedFareDetail;
+  free_seats: number;
+}
+
+interface Fare {
+  fare_key: string;
+  fare_info: FareInfo;
+}
+
+export interface FlightPackage {
+  endpoint: string;
   provider_key: string;
-  provider_warnings: ProviderWarning[];
-  permitted_actions: string[];
-  pnr_requirements: string[];
+  package_info: PackageInfo;
+  legs: FlightLeg[];
+  fares: Fare[];
+  minimum_package_price: number;
+  cabin_baggages_available: boolean;
+  cabin_baggages_text: string;
+  baggages_available: boolean;
+  baggages_text: string;
+  minimum_package_points: number;
+  points: number;
 }
 
-interface Office {
-  office_id: number;
-  office_name: string;
+interface ResponseFareDetail {
+  currency_code: string;
+  price_info: SimplifiedPriceInfo;
+  baggages_text: string[];
+  cabin_baggages_text: string[];
 }
 
 export interface FlightFareResponse {
   success: boolean;
   message: string;
   data: {
-    fare_detail_key: string;
-    fare_detail: FareDetail;
+    fare_detail: ResponseFareDetail;
     offers: FlightOffer[];
     departure_selected_flights: SelectedFlight[];
+    departure_flight: FlightPackage;
     return_selected_flight: SelectedFlight[];
-    flight_informations: FlightInformation[];
-    office: Office;
-    multiprovider: boolean;
+    return_flight: FlightPackage;
   };
 }

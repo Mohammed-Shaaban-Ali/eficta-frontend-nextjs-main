@@ -43,14 +43,14 @@ const FareDetails: React.FC<FareDetailsProps> = ({
   };
 
   // Extract flight data from the response structure
-  const departureFlights = flightData?.data?.departure_selected_flights || [];
-  const returnFlights = flightData?.data?.return_selected_flight || [];
+  const departureFlights = flightData?.data?.departure_flight || [];
+  const returnFlights = flightData?.data?.return_flight || [];
   const fareDetail = flightData?.data?.fare_detail;
   const offers = useMemo(
     () => flightData?.data?.offers || [],
     [flightData?.data?.offers],
   );
-  const hasReturnFlight = returnFlights.length > 0;
+  const hasReturnFlight = flightData?.data?.return_selected_flight?.length > 0;
 
   // Set default selected offer when component mounts (only once)
   useEffect(() => {
@@ -101,13 +101,13 @@ const FareDetails: React.FC<FareDetailsProps> = ({
       };
     }
     // Fall back to base fare detail
-    if (fareDetail?.pax_fares) {
-      return {
-        pax_fares: fareDetail.pax_fares,
-        currency_code: fareDetail.currency_code || 'SAR',
-        total_fare: fareDetail.price_info?.total_fare || 0,
-      };
-    }
+    // if (fareDetail?.pax_fares) {
+    //   return {
+    //     pax_fares: fareDetail.pax_fares,
+    //     currency_code: fareDetail.currency_code || 'SAR',
+    //     total_fare: fareDetail.price_info?.total_fare || 0,
+    //   };
+    // }
     return null;
   };
 
