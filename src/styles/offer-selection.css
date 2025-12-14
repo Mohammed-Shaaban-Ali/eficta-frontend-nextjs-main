@@ -247,7 +247,6 @@
   }
 }
 
-
 @media (min-width: 1200px) {
   /* On large screens, ensure proper spacing for 3 cards */
   .offer-swiper[data-slides='3'] {

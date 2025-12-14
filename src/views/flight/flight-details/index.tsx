@@ -229,6 +229,7 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
   };
 
   if (!isVisible) return null;
+  console.log(data?.data?.departure_flight, 'departure_flight');
   return (
     <>
       {/* Backdrop */}
@@ -298,11 +299,70 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
           ) : (
             data?.data && (
               <div className="h-100 overflow-y-auto overflow-x-hidden">
-                <div className="p-3">
+                <div className="p-2!">
                   {/* Offer Selection */}
                   {data.data.offers && data.data.offers.length > 0 ? (
                     <div className="card border-0 shadow-sm mb-3">
-                      <div className="card-body p-4">
+                      <div className="card-body p-2!">
+                        {/* Selected Outbound Flight Banner */}
+                        {showReturnOffers &&
+                          returnFareKey &&
+                          selectedDepartureOffer &&
+                          departureFlightData && (
+                            <div className="mb-3 px-2! rounded-xl bg-success text-white py-2 d-flex align-items-center justify-content-between">
+                              <div className="d-flex align-items-center gap-2">
+                                {/* Checkmark Icon */}
+                                <div
+                                  className="rounded-circle d-flex align-items-center justify-content-center"
+                                  style={{
+                                    width: '18px',
+                                    height: '18px',
+                                    border: '2px solid white',
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  <FaCheck size={9} color="white" />
+                                </div>
+                                {/* Flight Info */}
+                                <div className="d-flex align-items-center gap-2">
+                                  <span
+                                    className=""
+                                    style={{ fontSize: '0.95rem' }}
+                                  >
+                                    {departureFlightData?.legs?.[0]
+                                      ?.airline_info?.carrier_name || 'N/A'}
+                                  </span>
+                                  <span>•</span>
+                                  <span
+                                    className="fw-bold"
+                                    style={{ fontSize: '0.95rem' }}
+                                  >
+                                    {
+                                      departureFlightData?.legs?.[0]
+                                        ?.departure_info?.airport_code
+                                    }
+                                  </span>
+                                  <span>
+                                    <FaArrowRight size={12} />
+                                  </span>
+                                  <span
+                                    className="fw-bold"
+                                    style={{ fontSize: '0.95rem' }}
+                                  >
+                                    {
+                                      departureFlightData?.legs?.[
+                                        departureFlightData?.legs?.length - 1
+                                      ]?.arrival_info?.airport_code
+                                    }
+                                  </span>
+                                </div>
+                              </div>
+                              {/* Offer Name */}
+                              <div className="" style={{ fontSize: '0.95rem' }}>
+                                {selectedDepartureOffer}
+                              </div>
+                            </div>
+                          )}
                         {/* Back button to return to departure selection */}
                         {showReturnOffers && returnFareKey && (
                           <button
@@ -487,6 +547,72 @@ const FlightDetails: React.FC<FlightDetailsProps> = ({
                           {/* Default Return Offer */}
                           {showReturnOffers && returnFareKey && (
                             <div>
+                              {/* Selected Outbound Flight Banner */}
+                              {selectedDepartureOffer === 'default' &&
+                                departureFlightData && (
+                                  <div
+                                    className="mb-3 rounded-pill px-4 py-3 d-flex align-items-center justify-content-between"
+                                    style={{
+                                      backgroundColor: '#3CB371',
+                                      color: 'white',
+                                    }}
+                                  >
+                                    <div className="d-flex align-items-center gap-3">
+                                      {/* Checkmark Icon */}
+                                      <div
+                                        className="rounded-circle d-flex align-items-center justify-content-center"
+                                        style={{
+                                          width: '24px',
+                                          height: '24px',
+                                          border: '2px solid white',
+                                          flexShrink: 0,
+                                        }}
+                                      >
+                                        <FaCheck size={12} color="white" />
+                                      </div>
+                                      {/* Flight Info */}
+                                      <div className="d-flex align-items-center gap-2">
+                                        <span
+                                          className="fw-bold"
+                                          style={{ fontSize: '0.95rem' }}
+                                        >
+                                          {departureFlightData?.legs?.[0]
+                                            ?.airline_info?.carrier_name ||
+                                            'N/A'}
+                                        </span>
+                                        <span>•</span>
+                                        <span
+                                          className="fw-bold"
+                                          style={{ fontSize: '0.95rem' }}
+                                        >
+                                          {
+                                            departureFlightData?.legs?.[0]
+                                              ?.departure_info?.airport_code
+                                          }
+                                        </span>
+                                        <span>→</span>
+                                        <span
+                                          className="fw-bold"
+                                          style={{ fontSize: '0.95rem' }}
+                                        >
+                                          {
+                                            departureFlightData?.legs?.[
+                                              departureFlightData?.legs
+                                                ?.length - 1
+                                            ]?.arrival_info?.airport_code
+                                          }
+                                        </span>
+                                      </div>
+                                    </div>
+                                    {/* Offer Name */}
+                                    <div
+                                      className="fw-bold"
+                                      style={{ fontSize: '0.95rem' }}
+                                    >
+                                      Default Offer
+                                    </div>
+                                  </div>
+                                )}
                               <button
                                 className="btn btn-outline-secondary btn-sm mb-3 d-flex align-items-center gap-2"
                                 onClick={() => {
