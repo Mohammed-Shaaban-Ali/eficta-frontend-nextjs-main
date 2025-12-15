@@ -209,24 +209,12 @@ const AvailableRooms = ({
                   {/* Actions */}
                   <div className="mt-auto border-top pt-3">
                     <div className="d-flex gap-2">
-                      {!isPreview && (
-                        <Link
-                          href={`${pathname}/book/${pkg?.packageId}/${pkg?.rooms?.[0]?.id}`}
-                          onClick={() => onReserveNow(pkg)}
-                          className="flex-fill"
-                        >
-                          <button className="btn btn-primary rounded-pill w-100">
-                            {t('reserve_now')}{' '}
-                            <i className="icon-arrow-top-right ms-1 small"></i>
-                          </button>
-                        </Link>
-                      )}
-                      {group.packages.length > 1 && (
+                      {group.packages.length >= 1 && (
                         <button
                           className="btn btn-outline-primary rounded-pill flex-fill"
                           onClick={() => handleCustomizeRoom(group.key)}
                         >
-                          {t('customize_room')}
+                          Room Options
                         </button>
                       )}
                     </div>
@@ -309,7 +297,7 @@ const AvailableRooms = ({
               style={{ borderRadius: '1rem' }}
             >
               <div className="modal-header bg-primary text-white d-flex align-items-center justify-content-between">
-                <h5 className="modal-title fw-bold">{t('customize_room')}</h5>
+                <h5 className="modal-title fw-bold">Room Options</h5>
                 <button
                   type="button"
                   className="btn-close btn-close-white m-0"
