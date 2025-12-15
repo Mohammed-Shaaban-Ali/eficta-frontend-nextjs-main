@@ -59,7 +59,7 @@ const ViewMap = ({ viewState, hotels, onHotelSelect }: Props) => {
             onClick={() => onHotelSelect?.(hotel)}
           >
             <div className="hotel-marker">
-              <div className="price-tag">${hotel.price}</div>
+              <div className="price-tag">${hotel?.price}</div>
             </div>
           </Marker>
         ))}

@@ -28,7 +28,7 @@ const ViewPrice = ({
         />
       </div>
       {includes_taxes && (
-        <p className="small text-muted">{t('includes_taxes')}</p>
+        <p className="small text-black/60!">{t('includes_taxes')}</p>
       )}
     </div>
   );

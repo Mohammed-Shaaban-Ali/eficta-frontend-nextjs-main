@@ -42,7 +42,6 @@
         },
         "search": "بحث"
       },
-
       "flight": {
         "location": {
           "from_placeholder": "من أين؟",
@@ -257,6 +256,7 @@
     "room_features": "ميزات الغرفة",
     "show_more": "إظهار المزيد",
     "reserve_now": "احجز الآن",
+    "customize_room": "تخصيص غرفة",
     "refundable": "قابل للاسترداد",
     "not_refundable": "غير قابل للاسترداد",
     "privacy_policy": "سياسة الخصوصية",

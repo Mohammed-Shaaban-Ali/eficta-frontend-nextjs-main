@@ -46,7 +46,7 @@ const StickyHeader = ({ hotel }: any) => {
             {/* End .col */}
 
             <div className="col-auto">
-              <ViewPrice finalPrice={hotel.price} />
+              <ViewPrice finalPrice={hotel?.price} />
             </div>
           </div>
         </div>

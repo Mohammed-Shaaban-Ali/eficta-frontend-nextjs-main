@@ -4,7 +4,7 @@ import { FaStar } from 'react-icons/fa';
 
 const ViewRating = ({ selectedHotel }: { selectedHotel: hotelSeachTypes }) => {
   return (
-    <div className="col-auto">
+    <div className="col-auto flex items-center">
       {selectedHotel?.starRating && Number(selectedHotel?.starRating) > 0
         ? [
             ...Array(

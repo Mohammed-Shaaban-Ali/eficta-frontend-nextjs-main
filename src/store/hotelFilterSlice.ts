@@ -166,7 +166,7 @@ const applyFiltersToState = (state: HotelFilterState) => {
     }
 
     // Filter by price range
-    const hotelPrice = Number(hotel.price);
+    const hotelPrice = Number(hotel?.price);
     if (
       !isNaN(hotelPrice) &&
       (hotelPrice < state.priceRange.min || hotelPrice > state.priceRange.max)

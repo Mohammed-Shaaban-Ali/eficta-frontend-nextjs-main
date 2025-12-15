@@ -40,12 +40,18 @@ const HotelCard = ({ hotel, Uuid }: any) => {
               />
 
               <button
-                className="btn btn-light rounded-circle position-absolute top-0 end-0 m-3 w-20 shadow-sm"
+                className="
+                bg-white rounded-full flex items-center justify-center absolute top-2 right-2 w-8! h-8! shadow-sm"
                 onClick={handleFavoriteClick}
                 aria-label="Add to favorites"
               >
                 <FaHeart
-                  className={isFavorite ? 'text-danger' : 'text-secondary'}
+                  size={18}
+                  className={
+                    isFavorite
+                      ? 'text-danger w-5! h-5!'
+                      : 'text-secondary w-5! h-5!'
+                  }
                 />
               </button>
 
@@ -65,7 +71,11 @@ const HotelCard = ({ hotel, Uuid }: any) => {
                   <h5 className="card-title fw-bold text-truncate mb-1">
                     {hotel?.displayName}
                   </h5>
-                  <div className="">
+                  <div
+                    className="
+                  d-flex align-items-center
+                  "
+                  >
                     {hotel?.starRating && Number(hotel?.starRating) > 0
                       ? [
                           ...Array(
