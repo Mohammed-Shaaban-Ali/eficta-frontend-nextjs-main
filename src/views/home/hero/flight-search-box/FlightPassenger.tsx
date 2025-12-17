@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import usePerfectScrollbar from '@/hooks/usePerfectScrollbar';
 import { UseFormReturn } from 'react-hook-form';
 import { useTranslations, useLocale } from 'next-intl';
@@ -25,6 +25,7 @@ const FlightPassenger = ({ form }: GuestSearchProps) => {
   const t = useTranslations('HomePage.hero_section.flight.passenger');
   const locale = useLocale();
   const isRTL = locale === 'ar';
+  const [isOpen, setIsOpen] = useState(false);
   const scrollRef = usePerfectScrollbar({
     suppressScrollX: true,
     wheelPropagation: false,
@@ -56,161 +57,207 @@ const FlightPassenger = ({ form }: GuestSearchProps) => {
     return adults + children + infants;
   };
 
+  const [isCabinOpen, setIsCabinOpen] = useState(false);
+
+  const getPassengersText = () => {
+    return `${getTotalPassengers()} ${t('passengers')}`;
+  };
+
+  const getCabinText = () => {
+    return cabinClass === 'ECONOMY' ? t('economy') : t('business');
+  };
+
   return (
-    <div className="searchMenu-guests px-30 lg:py-4 lg:px-0 js-form-dd js-form-counters position-relative">
-      <div
-        data-bs-toggle="dropdown"
-        data-bs-auto-close="outside"
-        aria-expanded="false"
-        data-bs-offset="0,22"
-      >
-        <div className="text-15 text-light-1 ls-2 lh-16">
-          {getTotalPassengers()} {t('passengers')} - {cabinClass}
+    <div className="flex items-center gap-4">
+      {/* Passengers Dropdown */}
+      <div className="searchMenu-guests js-form-dd js-form-counters position-relative">
+        <div
+          className="flex items-center gap-1 cursor-pointer text-gray-700 hover:text-gray-900"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span className="text-sm">{getPassengersText()}</span>
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
         </div>
+
+        {isOpen && (
+          <div
+            className="absolute z-50 mt-1 w-full min-w-[320px] bg-white rounded-lg shadow-lg border border-gray-200"
+            style={{ top: '100%', left: 0 }}
+          >
+            <div
+              className="p-4"
+              style={{
+                maxHeight: '400px',
+                position: 'relative',
+                overflow: 'auto',
+              }}
+              ref={scrollRef}
+            >
+              {/* Adults */}
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <div className="text-sm font-medium">{t('adults')}</div>
+                  <div className="text-xs text-gray-500">
+                    {t('adults_description')}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+                    onClick={() => handleAdultChange(adults - 1)}
+                  >
+                    <span className="text-lg">-</span>
+                  </button>
+                  <span className="w-6 text-center">{adults}</span>
+                  <button
+                    type="button"
+                    className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+                    onClick={() => handleAdultChange(adults + 1)}
+                  >
+                    <span className="text-lg">+</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Children */}
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <div className="text-sm font-medium">{t('children')}</div>
+                  <div className="text-xs text-gray-500">
+                    {t('children_description')}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+                    onClick={() => handleChildrenChange(children - 1)}
+                  >
+                    <span className="text-lg">-</span>
+                  </button>
+                  <span className="w-6 text-center">{children}</span>
+                  <button
+                    type="button"
+                    className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+                    onClick={() => handleChildrenChange(children + 1)}
+                  >
+                    <span className="text-lg">+</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Infants */}
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <div className="text-sm font-medium">{t('infants')}</div>
+                  <div className="text-xs text-gray-500">
+                    {t('infants_description')}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+                    onClick={() => handleInfantsChange(infants - 1)}
+                  >
+                    <span className="text-lg">-</span>
+                  </button>
+                  <span className="w-6 text-center">{infants}</span>
+                  <button
+                    type="button"
+                    className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+                    onClick={() => handleInfantsChange(infants + 1)}
+                  >
+                    <span className="text-lg">+</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Done button */}
+              <button
+                type="button"
+                className="w-full mt-4 py-2 bg-primary text-white rounded-lg text-sm font-medium"
+                onClick={() => setIsOpen(false)}
+              >
+                {isRTL ? 'تم' : 'Done'}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      <div className="shadow-2 dropdown-menu min-width-400">
+      {/* Cabin Class Dropdown */}
+      <div className="position-relative">
         <div
-          className="bg-white px-30 py-30 rounded-4 counter-box"
-          style={{
-            maxHeight: '500px',
-            position: 'relative',
-            overflow: 'hidden',
-          }}
-          ref={scrollRef}
+          className="flex items-center gap-1 cursor-pointer text-gray-700 hover:text-gray-900"
+          onClick={() => setIsCabinOpen(!isCabinOpen)}
         >
-          {/* Adults */}
-          <div className="row y-gap-10 justify-between items-center mb-3">
-            <div className="col-auto">
-              <div className="text-15 lh-12 fw-500">{t('adults')}</div>
-              <div className="text-14 lh-12 text-light-1 mt-5">
-                {t('adults_description')}
-              </div>
-            </div>
-            <div className="col-auto">
-              <div className="d-flex items-center js-counter">
-                <button
-                  type="button"
-                  className="button -outline-blue-1 text-blue-1 size-38 rounded-4"
-                  onClick={() => handleAdultChange(adults - 1)}
-                >
-                  <i className="icon-minus text-12" />
-                </button>
-                <div
-                  className={`flex-center size-20 ${isRTL ? 'mr-15 ml-15' : 'ml-15 mr-15'}`}
-                >
-                  <div className="text-15">{adults}</div>
-                </div>
-                <button
-                  type="button"
-                  className="button -outline-blue-1 text-blue-1 size-38 rounded-4"
-                  onClick={() => handleAdultChange(adults + 1)}
-                >
-                  <i className="icon-plus text-12" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Children */}
-          <div className="row y-gap-10 justify-between items-center mb-3">
-            <div className="col-auto">
-              <div className="text-15 lh-12 fw-500">{t('children')}</div>
-              <div className="text-14 lh-12 text-light-1 mt-5">
-                {t('children_description')}
-              </div>
-            </div>
-            <div className="col-auto">
-              <div className="d-flex items-center js-counter">
-                <button
-                  type="button"
-                  className="button -outline-blue-1 text-blue-1 size-38 rounded-4"
-                  onClick={() => handleChildrenChange(children - 1)}
-                >
-                  <i className="icon-minus text-12" />
-                </button>
-                <div
-                  className={`flex-center size-20 ${isRTL ? 'mr-15 ml-15' : 'ml-15 mr-15'}`}
-                >
-                  <div className="text-15">{children}</div>
-                </div>
-                <button
-                  type="button"
-                  className="button -outline-blue-1 text-blue-1 size-38 rounded-4"
-                  onClick={() => handleChildrenChange(children + 1)}
-                >
-                  <i className="icon-plus text-12" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Infants */}
-          <div className="row y-gap-10 justify-between items-center mb-3">
-            <div className="col-auto">
-              <div className="text-15 lh-12 fw-500">{t('infants')}</div>
-              <div className="text-14 lh-12 text-light-1 mt-5">
-                {t('infants_description')}
-              </div>
-            </div>
-            <div className="col-auto">
-              <div className="d-flex items-center js-counter">
-                <button
-                  type="button"
-                  className="button -outline-blue-1 text-blue-1 size-38 rounded-4"
-                  onClick={() => handleInfantsChange(infants - 1)}
-                >
-                  <i className="icon-minus text-12" />
-                </button>
-                <div
-                  className={`flex-center size-20 ${isRTL ? 'mr-15 ml-15' : 'ml-15 mr-15'}`}
-                >
-                  <div className="text-15">{infants}</div>
-                </div>
-                <button
-                  type="button"
-                  className="button -outline-blue-1 text-blue-1 size-38 rounded-4"
-                  onClick={() => handleInfantsChange(infants + 1)}
-                >
-                  <i className="icon-plus text-12" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Cabin Class */}
-          <div className="border-top-light pt-3">
-            <div className="text-15 lh-12 fw-500 mb-3">{t('cabin_class')}</div>
-            <div className="row">
-              <div className="col-6">
-                <button
-                  type="button"
-                  className={`btn w-100 ${
-                    cabinClass === 'ECONOMY'
-                      ? 'btn-primary'
-                      : 'btn-outline-primary'
-                  }`}
-                  onClick={() => handleCabinClassChange('ECONOMY')}
-                >
-                  {t('economy')}
-                </button>
-              </div>
-              <div className="col-6">
-                <button
-                  type="button"
-                  className={`btn w-100 ${
-                    cabinClass === 'BUSINESS'
-                      ? 'btn-primary'
-                      : 'btn-outline-primary'
-                  }`}
-                  onClick={() => handleCabinClassChange('BUSINESS')}
-                >
-                  {t('business')}
-                </button>
-              </div>
-            </div>
-          </div>
+          <span className="text-sm">{getCabinText()}</span>
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
         </div>
+
+        {isCabinOpen && (
+          <div
+            className="absolute z-50 mt-1 min-w-[150px] bg-white rounded-lg shadow-lg border border-gray-200"
+            style={{ top: '100%', left: 0 }}
+          >
+            <div className="py-2">
+              <button
+                type="button"
+                className={`w-full px-4 py-2 text-sm text-left hover:bg-gray-50 ${
+                  cabinClass === 'ECONOMY'
+                    ? 'text-primary font-medium'
+                    : 'text-gray-700'
+                }`}
+                onClick={() => {
+                  handleCabinClassChange('ECONOMY');
+                  setIsCabinOpen(false);
+                }}
+              >
+                {t('economy')}
+              </button>
+              <button
+                type="button"
+                className={`w-full px-4 py-2 text-sm text-left hover:bg-gray-50 ${
+                  cabinClass === 'BUSINESS'
+                    ? 'text-primary font-medium'
+                    : 'text-gray-700'
+                }`}
+                onClick={() => {
+                  handleCabinClassChange('BUSINESS');
+                  setIsCabinOpen(false);
+                }}
+              >
+                {t('business')}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

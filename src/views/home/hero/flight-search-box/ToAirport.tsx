@@ -36,6 +36,7 @@ const ToAirport = forwardRef<ToAirportRef, SearchBarProps>(({ form }, ref) => {
   const dropdownToggleRef = useRef<HTMLDivElement>(null);
   const { setValue, watch } = form;
   const [displayValue, setDisplayValue] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
   const [city, setCity] = useState<string>('');
   const isInternalUpdateRef = useRef(false);
   const isUserTypingRef = useRef(false);
@@ -182,30 +183,48 @@ const ToAirport = forwardRef<ToAirportRef, SearchBarProps>(({ form }, ref) => {
     }, 0);
   };
 
+  const hasValue = displayValue && displayValue.length > 0;
+  const isActive = isFocused || hasValue;
+
   return (
     <>
-      <div className="searchMenu-date lg:py-4 js-form-dd js-calendar">
+      <div className="searchMenu-date w-full! js-form-dd js-calendar">
         <div
           ref={dropdownToggleRef}
           data-bs-toggle="dropdown"
           data-bs-auto-close="true"
           data-bs-offset="0,22"
         >
-          <div className="text-15 text-light-1 ls-2 lh-16 position-relative">
+          <div
+            className="relative flex items-center px-4! h-[64px]! bg-white! 
+            rounded-lg! border! border-gray-300! hover:border-gray-500! transition-all duration-300"
+          >
+            <label
+              htmlFor="toAirport"
+              className={`absolute transition-all duration-200 pointer-events-none ${
+                isActive
+                  ? 'top-2! text-[11px]! text-gray-500!'
+                  : 'top-1/2! -translate-y-1/2! text-[15px]! text-gray-400!'
+              }`}
+            >
+              {t('to_placeholder')}
+            </label>
             <input
+              id="toAirport"
               autoComplete="off"
               type="search"
-              placeholder={t('to_placeholder')}
-              className="js-search js-dd-focus"
+              className={`js-search js-dd-focus w-full! text-[15px]! font-medium! text-gray-900! bg-transparent! border-none! outline-none! p-0! ${
+                isActive ? 'mt-4!' : ''
+              }`}
               value={displayValue}
               onFocus={() => {
+                setIsFocused(true);
                 if (
                   typeof window !== 'undefined' &&
                   dropdownToggleRef.current
                 ) {
                   const toggleElement = dropdownToggleRef.current;
                   const hasResults = airports && airports.length > 0;
-                  // Check if airport is already selected (displayValue contains airport code in parentheses)
                   const isAirportSelected =
                     formToAirport &&
                     displayValue.includes('(') &&
@@ -242,22 +261,22 @@ const ToAirport = forwardRef<ToAirportRef, SearchBarProps>(({ form }, ref) => {
                   }
                 }
               }}
+              onBlur={() => setIsFocused(false)}
               onChange={(e) => {
                 isUserTypingRef.current = true;
                 setDisplayValue(e.target.value);
                 if (!e.target.value) {
                   setValue('toAirport', '');
                 }
-                // Reset flag after a delay to allow sync if needed
                 setTimeout(() => {
                   isUserTypingRef.current = false;
                 }, 600);
               }}
-              style={{
-                paddingRight: displayValue ? '30px' : undefined,
-              }}
+              // style={{
+              //   paddingRight: displayValue ? '30px' : undefined,
+              // }}
             />
-            {displayValue && (
+            {/* {displayValue && (
               <button
                 type="button"
                 onClick={(e) => {
@@ -304,7 +323,7 @@ const ToAirport = forwardRef<ToAirportRef, SearchBarProps>(({ form }, ref) => {
                   />
                 </svg>
               </button>
-            )}
+            )} */}
           </div>
         </div>
         <div className="shadow-2 dropdown-menu min-width-400">

@@ -50,7 +50,7 @@
         },
         "date": {
           "departure_date": "Departure Date",
-          "return_date": "Return Date (Optional)",
+          "return_date": "Return Date ",
           "one_way_clear_return": "One Way (Clear Return)"
         },
         "passenger": {
@@ -676,7 +676,7 @@
       "emergency_phone": "Contact Phone",
       "special_requests": "Special Requests",
       "special_requests_placeholder": "Any special meal preferences, mobility assistance, etc.",
-      "special_requests_optional": "Special Requests (Optional)",
+      "special_requests_optional": "Special Requests ",
       "passenger": "Passenger",
       "adult": "Adult",
       "child": "Child",

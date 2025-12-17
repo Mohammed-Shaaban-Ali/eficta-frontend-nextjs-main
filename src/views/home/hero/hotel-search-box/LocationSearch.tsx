@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGetAllCitiesQuery } from '@/reactQuery/cities.api';
 import { cityTypes } from '@/types/app/cityTypes';
@@ -15,6 +16,7 @@ const SearchBar = ({ form }: SearchBarProps) => {
   const t = useTranslations('HomePage.hero_section.hotel.location');
   const locale = useLocale();
   const isRTL = locale === 'ar';
+  const [isFocused, setIsFocused] = useState(false);
   const scrollRef = usePerfectScrollbar({
     suppressScrollX: true,
     wheelPropagation: false,
@@ -38,26 +40,47 @@ const SearchBar = ({ form }: SearchBarProps) => {
     });
   };
 
+  const hasValue = searchValue && searchValue.length > 0;
+  const isActive = isFocused || hasValue;
+
   return (
     <>
-      <div className="searchMenu-date lg:py-4 js-form-dd js-calendar">
+      <div className="searchMenu-date  col-span-2 js-form-dd js-calendar">
         <div
           data-bs-toggle="dropdown"
           data-bs-auto-close="true"
           data-bs-offset="0,22"
         >
-          <div className="text-15 text-light-1 ls-2 lh-16">
+          {/* label */}
+          <div
+            className="relative flex items-center border! border-gray-300! rounded-lg! px-4! h-[64px] bg-white!
+           hover:border-gray-500! transition-all duration-300"
+          >
+            <label
+              htmlFor="searchValue"
+              className={`absolute transition-all duration-200 pointer-events-none ${
+                isActive
+                  ? 'top-2! text-[11px]! text-gray-500!'
+                  : 'top-1/2! -translate-y-1/2! text-[15px]! text-gray-400!'
+              }`}
+            >
+              {/* {t('placeholder')} */}
+              Destination
+            </label>
             <input
               autoComplete="off"
               type="search"
-              placeholder={t('placeholder')}
-              className="js-search js-dd-focus"
+              className={`js-search js-dd-focus w-full! text-[15px]! font-medium! text-gray-900! bg-transparent! border-none! outline-none! p-0! ${
+                isActive ? 'mt-4!' : ''
+              }`}
               {...register('searchValue')}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
             />
           </div>
         </div>
         <div className="shadow-2 dropdown-menu min-width-400">
-          <div className="bg-white sm:px-0 sm:py-15 rounded-4">
+          <div className="bg-white sm:px-0 rounded-4">
             <div
               ref={scrollRef}
               style={{ position: 'relative', maxHeight: '400px' }}

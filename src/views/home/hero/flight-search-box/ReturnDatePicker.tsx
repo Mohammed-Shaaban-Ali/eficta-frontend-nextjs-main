@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { UseFormReturn } from 'react-hook-form';
 import { useTranslations, useLocale } from 'next-intl';
@@ -21,6 +21,7 @@ const ReturnDatePicker: React.FC<ReturnDatePickerProps> = ({ form }) => {
   const locale = useLocale();
   const isRTL = locale === 'ar';
   const { setValue, watch } = form;
+  const [isFocused, setIsFocused] = useState(false);
 
   const departureDate = watch('departureDate');
   const currentValue = watch('returnDate');
@@ -99,64 +100,43 @@ const ReturnDatePicker: React.FC<ReturnDatePickerProps> = ({ form }) => {
     return parsed || new Date();
   }, [departureDate]);
 
+  const isActive = isFocused || !!currentValue;
+
   return (
-    <div className="searchMenu-date px-30 lg:py-4 lg:px-0 js-form-dd js-calendar">
-      <div className="text-15 text-light-1 ls-2 lh-16 position-relative">
+    <div className="searchMenu-date js-form-dd js-calendar">
+      <div
+        className="relative flex items-center px-4! h-[64px]! 
+         bg-white!   rounded-r-lg! border! border-transparent!  
+        hover:border hover:border-gray-500! transition-all! duration-300"
+      >
+        <label
+          htmlFor="returnDate"
+          className={`absolute transition-all duration-200 pointer-events-none ${
+            isActive
+              ? 'top-2! text-[11px]! text-gray-500!'
+              : 'top-1/2! -translate-y-1/2! text-[15px]! text-gray-400!'
+          }`}
+        >
+          {t('return_date')}
+        </label>
         <DatePicker
+          id="returnDate"
           selected={selectedDate}
           onChange={handleReturnDateChange}
-          placeholderText={t('return_date')}
           dateFormat="yyyy-MM-dd"
           minDate={minDate}
-          className="custom_input-picker w-100"
+          className={`w-full! text-[15px]! font-medium! text-gray-900! bg-transparent! border-none! outline-none! p-0! ${
+            isActive ? 'mt-4!' : ''
+          }`}
           autoComplete="off"
           showPopperArrow={false}
           popperPlacement={isRTL ? 'bottom-end' : 'bottom-start'}
           isClearable={true}
           locale={isRTL ? 'ar' : 'en'}
           calendarClassName={isRTL ? 'rtl-calendar' : ''}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
         />
-        {/* {currentValue && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setValue('returnDate', '', { shouldValidate: true });
-            }}
-            className="position-absolute"
-            style={{
-              right: isRTL ? undefined : '8px',
-              left: isRTL ? '8px' : undefined,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 10,
-            }}
-            aria-label={isRTL ? 'مسح' : 'Clear'}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M12 4L4 12M4 4L12 12"
-                stroke="#666"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        )} */}
       </div>
     </div>
   );

@@ -286,128 +286,101 @@ const FlightSearchBox = () => {
 
   return (
     <>
-      <div className="position-relative mt-30 md:mt-20 js-tabs-content">
-        <div className="container">
+      <div className="relative mt-4!">
+        <div
+          className="container bg-white p-4! rounded-2xl!"
+          style={{ width: '100%' }}
+        >
           {/* Trip Type Selector */}
-          <div
-            className="w-fit rounded-top p-2 mb-0 d-flex gap-2"
-            style={{
-              backgroundColor: '#ffffff',
-              borderRadius: '12px 12px 0 0',
-              width: 'fit-content',
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => handleTripTypeChange('roundTrip')}
-              className="flex-1 text-nowrap"
-              style={{
-                backgroundColor:
-                  tripType === 'roundTrip' ? '#007bff' : 'transparent',
-                border: 'none',
-                borderRadius: '8px',
-                fontWeight: '500',
-                transition: 'all 0.3s ease',
-                padding: '8px 16px',
-                color: tripType === 'roundTrip' ? '#ffffff' : '#000000',
-                cursor: 'pointer',
-              }}
-            >
-              {isRTL ? 'ذهاب وعودة' : 'Round Trip'}
-            </button>
-            <button
-              type="button"
-              onClick={() => handleTripTypeChange('oneWay')}
-              className="flex-1"
-              style={{
-                backgroundColor:
-                  tripType === 'oneWay' ? '#007bff' : 'transparent',
-                border: 'none',
-                borderRadius: '8px',
-                fontWeight: '500',
-                transition: 'all 0.3s ease',
-                padding: '8px 16px',
-                color: tripType === 'oneWay' ? '#ffffff' : '#000000',
-                cursor: 'pointer',
-              }}
-            >
-              {isRTL ? 'ذهاب فقط' : 'One Way'}
-            </button>
+          <div className="w-fit flex gap-2 mb-4!">
+            {[
+              {
+                label: isRTL ? 'ذهاب وعودة' : 'Round Trip',
+                value: 'roundTrip',
+              },
+              {
+                label: isRTL ? 'ذهاب فقط' : 'One Way',
+                value: 'oneWay',
+              },
+            ].map((item) => (
+              <button
+                key={item.value}
+                type="button"
+                onClick={() =>
+                  handleTripTypeChange(item.value as 'roundTrip' | 'oneWay')
+                }
+                className={`flex-1 text-nowrap rounded-[30px]! px-4! py-2! transition-all duration-300
+                  ${
+                    tripType === item.value
+                      ? 'bg-primary text-white'
+                      : 'bg-gray-100! text-gray-700! hover:bg-gray-200!'
+                  }`}
+              >
+                {item.label}
+              </button>
+            ))}
           </div>
 
-          <div
-            className="bg-white  search-container"
-            style={{
-              borderRadius: '0 12px 12px 12px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
+          <form
+            onSubmit={form.handleSubmit(onSubmit, onError)}
+            className="grid grid-cols-1 md:grid-cols-4 gap-2.5 w-full!"
+            style={{ width: '100%' }}
           >
-            <form
-              onSubmit={form.handleSubmit(onSubmit, onError)}
-              className="row h-100 align-items-center"
-              style={{ width: '100%' }}
+            <div
+              className={` flex items-center relative ${tripType === 'oneWay' ? 'md:col-span-3' : 'md:col-span-2'}`}
             >
-              <div className="col-md search-column">
+              <div className="flex items-center relative gap-1 w-full">
                 <FromAirport form={form} ref={fromAirportRef} />
-              </div>
-              <div className="col-md-auto d-flex align-items-center justify-content-center px-2">
                 <button
                   type="button"
                   onClick={handleSwapAirports}
-                  className="d-flex align-items-center justify-content-center"
-                  style={{
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '8px',
-                    backgroundColor: isSwapHovered ? '#007bff' : '#f0f0f0',
-                    border: 'none',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    padding: '0',
-                  }}
+                  className="  flex items-center justify-center w-10 h-10 rounded-full bg-white border border-gray-200 cursor-pointer transition-all duration-300 p-0 shrink-0 hover:bg-gray-50"
                   onMouseEnter={() => setIsSwapHovered(true)}
                   onMouseLeave={() => setIsSwapHovered(false)}
                   aria-label={isRTL ? 'تبديل المطارات' : 'Swap airports'}
                 >
                   <svg
-                    width="24"
-                    height="24"
+                    width="18"
+                    height="18"
                     viewBox="0 0 24 24"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                      d="M8 7L16 7M16 7L13 4M16 7L13 10M16 17L8 17M8 17L11 20M8 17L11 14"
-                      stroke={isSwapHovered ? '#ffffff' : '#007bff'}
+                      d="M8 7L16 7M16 7L12 3M16 7L12 11M16 17L8 17M8 17L12 13M8 17L12 21"
+                      stroke="#9ca3af"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      style={{ transition: 'stroke 0.3s ease' }}
                     />
                   </svg>
                 </button>
-              </div>
-              <div className="col-md search-column">
                 <ToAirport form={form} ref={toAirportRef} />
               </div>
-              <div className="col-md search-column">
+            </div>
+            <div
+              className={`flex items-center gap-0  border! border-gray-300 rounded-lg! ${tripType === 'oneWay' ? 'col-span-1' : 'col-span-2'}`}
+            >
+              <div className="flex-1">
                 <DepartureDatePicker form={form} />
               </div>
               {tripType === 'roundTrip' && (
-                <div className="col-md search-column">
+                <div className="flex-1">
                   <ReturnDatePicker form={form} />
                 </div>
               )}
-              <div className="col-md search-column">
-                <FlightPassenger form={form} />
-              </div>
-              <div className="col-md-auto d-flex items-content-center p-2">
-                <button type="submit" className="btn btn-primary w-100">
-                  {t('search')}
-                </button>
-              </div>
-            </form>
-          </div>
+            </div>
+            <div className="flex justify-end! items-center gap-6 col-span-5 mt-2">
+              <FlightPassenger form={form} />
+              <button
+                type="submit"
+                className="btn btn-primary w-[140px]! rounded-[30px]! h-11"
+                style={{ fontSize: '16px' }}
+              >
+                {t('search')}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </>

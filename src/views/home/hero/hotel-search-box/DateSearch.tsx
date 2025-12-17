@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import DatePicker from 'react-multi-date-picker';
+import React, { useRef, useEffect } from 'react';
+import DatePicker, { DatePickerRef } from 'react-multi-date-picker';
 import type { Value } from 'react-multi-date-picker';
 import DateObject from 'react-date-object';
 import { UseFormReturn } from 'react-hook-form';
@@ -23,6 +23,34 @@ const DateSearch: React.FC<DateSearchProps> = ({ form }) => {
   const locale = useLocale();
   const isRTL = locale === 'ar';
   const { setValue, watch } = form;
+  const datePickerRef = useRef<DatePickerRef>(null);
+
+  // Set default dates on mount: check-in = today, check-out = tomorrow
+  useEffect(() => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const formatDate = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    if (!form.getValues('checkIn')) {
+      setValue('checkIn', formatDate(today));
+    }
+    if (!form.getValues('checkOut')) {
+      setValue('checkOut', formatDate(tomorrow));
+    }
+  }, [setValue, form]);
+
+  // Minimum date is today
+  const minDate = new DateObject();
+
+  const checkIn = watch('checkIn');
+  const checkOut = watch('checkOut');
 
   // Configure calendar based on locale - always use Gregorian calendar but display according to locale
   const calendarConfig = {
@@ -70,28 +98,66 @@ const DateSearch: React.FC<DateSearchProps> = ({ form }) => {
     }
   };
 
-  // Display format should use locale
-  const displayFormat = isRTL ? 'YYYY/MM/DD' : 'YYYY-MM-DD';
+  // Format date for display like "Wed, 17 Dec 2025"
+  const formatDisplayDate = (dateStr: string) => {
+    if (!dateStr) return t('placeholder');
+    const date = new Date(dateStr);
+    return date.toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
+  const openDatePicker = () => {
+    datePickerRef.current?.openCalendar();
+  };
 
   return (
-    <div className="searchMenu-date px-30 lg:py-4 lg:px-0 js-form-dd js-calendar">
-      <div className="text-15 text-light-1 ls-2 lh-16 custom_dual_datepicker">
-        <DatePicker
-          inputClass="custom_input-picker"
-          containerClassName="custom_container-picker"
-          placeholder={t('placeholder')}
-          numberOfMonths={2}
-          offsetY={10}
-          range
-          rangeHover
-          format={displayFormat}
-          value={[watch('checkIn'), watch('checkOut')]}
-          onChange={handleDateChange}
-          calendar={calendarConfig.calendar}
-          locale={calendarConfig.locale}
-          calendarPosition={isRTL ? 'bottom-right' : 'bottom-left'}
-        />
+    <div className="searchMenu-date col-span-2 js-form-dd js-calendar">
+      <div
+        className="flex items-center border!  border-gray-300! rounded-lg! h-[64px]! bg-white! hover:border-gray-500!
+         transition-all duration-300 cursor-pointer"
+        onClick={openDatePicker}
+      >
+        {/* Check In */}
+        <div className="flex-1 px-3! py-2! flex flex-col justify-center">
+          <div className="text-[11px]! text-gray-500! mb-0!">Check In</div>
+          <div className="text-[15px]! font-medium! text-gray-900! -mt-1!">
+            {formatDisplayDate(checkIn)}
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="w-px h-[64px] bg-gray-300" />
+
+        {/* Check Out */}
+        <div className="flex-1 px-3! py-2 flex flex-col justify-center">
+          <div className="text-[11px]! text-gray-500!">Check Out</div>
+          <div className="text-[15px]! font-medium! text-gray-900! -mt-1!">
+            {formatDisplayDate(checkOut)}
+          </div>
+        </div>
       </div>
+
+      {/* Hidden DatePicker */}
+      <DatePicker
+        ref={datePickerRef}
+        containerClassName="custom_container-picker"
+        numberOfMonths={2}
+        offsetY={10}
+        range
+        rangeHover
+        format="YYYY-MM-DD"
+        value={[checkIn, checkOut]}
+        onChange={handleDateChange}
+        calendar={calendarConfig.calendar}
+        locale={calendarConfig.locale}
+        calendarPosition={isRTL ? 'bottom-right' : 'bottom-left'}
+        minDate={minDate}
+        render={<></>}
+      />
     </div>
   );
 };

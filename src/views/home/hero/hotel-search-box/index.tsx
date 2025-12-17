@@ -74,30 +74,27 @@ const HotelSearchBox = () => {
 
   return (
     <>
-      <div className="position-relative mt-30 md:mt-20 js-tabs-content">
+      <div className="relative mt-4!  ">
         <div
-          className="container bg-white rounded search-container"
-          style={{ maxWidth: '960px' }}
+          className="container bg-white p-4! rounded-2xl! "
+          style={{ width: '100%' }}
         >
+          <h4 className="text-[17px]! font-normal! text-gray-700! mb-4!">
+            Where do you want to stay?
+          </h4>
           <form
             onSubmit={form.handleSubmit(onSubmit, onError)}
-            className={`row h-100 align-items-center`}
+            className={`grid grid-cols-1 md:grid-cols-5 gap-2.5 `}
             style={{ width: '100%' }}
           >
-            <div className="col-md search-column">
-              <LocationSearch form={form} />
-            </div>
-            <div className="col-md search-column">
-              <DateSearch form={form as any} />
-            </div>
-            <div className="col-md search-column">
-              <GuestSearch form={form} />
-            </div>
-            <div className="col-md-auto d-flex items-content-center p-2">
+            <LocationSearch form={form} />
+            <DateSearch form={form as any} />
+            <GuestSearch form={form} />
+            <div className="flex justify-end! col-span-5 mt-2 ">
               <button
                 type="submit"
-                className="btn btn-primary w-100"
-                style={{ fontSize: '20px' }}
+                className="btn btn-primary w-[140px]! rounded-[30px]! h-11 "
+                style={{ fontSize: '16px' }}
               >
                 {t('search')}
               </button>

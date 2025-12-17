@@ -198,22 +198,29 @@ const GuestSearch = ({ form }: GuestSearchProps) => {
     );
   };
 
+  const getTotalAdults = () => {
+    return rooms.reduce((total, room) => total + room.AdultsCount, 0);
+  };
+
   return (
-    <div className="searchMenu-guests px-30 lg:py-4 lg:px-0 js-form-dd js-form-counters position-relative">
+    <div className="searchMenu-guests js-form-dd js-form-counters position-relative">
       <div
         data-bs-toggle="dropdown"
         data-bs-auto-close="outside"
         aria-expanded="false"
         data-bs-offset="0,22"
+        className="relative flex flex-col items-start justify-center border! border-gray-300! rounded-lg! px-4! h-[64px] bg-white!
+           hover:border-gray-500! transition-all duration-300"
       >
-        <div className="text-15 text-light-1 ls-2 lh-16">
-          {getTotalGuests()} {t('guests')} - {rooms.length} {t('rooms')}
+        <div className="text-[11px]! text-gray-500! ">Guests and Rooms</div>
+        <div className="text-[15px]! -mt-1">
+          {getTotalAdults()} Adults in {rooms.length} Rooms
         </div>
       </div>
 
-      <div className="shadow-2 dropdown-menu min-width-400">
+      <div className="shadow-2 dropdown-menu min-width-400 ">
         <div
-          className="bg-white px-30 py-30 rounded-4 counter-box"
+          className="bg-white p-3 rounded-lg! counter-box"
           style={{
             maxHeight: '500px',
             position: 'relative',
