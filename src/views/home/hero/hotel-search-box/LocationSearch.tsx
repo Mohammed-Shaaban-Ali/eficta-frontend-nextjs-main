@@ -79,7 +79,7 @@ const SearchBar = ({ form }: SearchBarProps) => {
             />
           </div>
         </div>
-        <div className="shadow-2 dropdown-menu min-width-400">
+        <div className="shadow-2 dropdown-menu min-width-400 -pt-[100px]">
           <div className="bg-white sm:px-0 rounded-4">
             <div
               ref={scrollRef}
@@ -95,12 +95,14 @@ const SearchBar = ({ form }: SearchBarProps) => {
                 <ul className="y-gap-5 js-results">
                   {cities?.map((item: cityTypes) => (
                     <li
-                      className={`-link d-block col-12 ${isRTL ? 'text-right' : 'text-left'} rounded-4 px-20 py-15 js-search-option mb-1 ${
-                        selectedLocation?.latitude === item.latitude &&
-                        selectedLocation?.longitude === item.longitude
-                          ? 'active'
-                          : ''
-                      }`}
+                      className={`-link d-block col-12
+                        cursor-pointer hover:bg-gray-100 transition-all duration-300
+                        ${isRTL ? 'text-right' : 'text-left'} rounded-4 px-20 py-15 js-search-option mb-1 ${
+                          selectedLocation?.latitude === item.latitude &&
+                          selectedLocation?.longitude === item.longitude
+                            ? 'active'
+                            : ''
+                        }`}
                       key={item.id}
                       role="button"
                       onClick={() => handleOptionClick(item)}

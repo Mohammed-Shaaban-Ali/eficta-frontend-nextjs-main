@@ -199,7 +199,7 @@ const FromAirport = forwardRef<FromAirportRef, SearchBarProps>(
           >
             <div
               className="relative flex items-center px-4! h-[64px]! bg-white! 
-            rounded-lg! border! border-gray-300! hover:border-gray-500! transition-all duration-300"
+            rounded-lg border border-gray-300! hover:border-gray-500! transition-all duration-300"
             >
               <label
                 htmlFor="fromAirport"

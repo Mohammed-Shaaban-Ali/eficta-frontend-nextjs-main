@@ -329,32 +329,45 @@ const FlightSearchBox = () => {
             <div
               className={` flex items-center relative ${tripType === 'oneWay' ? 'md:col-span-3' : 'md:col-span-2'}`}
             >
-              <div className="flex items-center relative gap-1 w-full">
+              <div className="flex items-center  gap-4! w-full relative">
                 <FromAirport form={form} ref={fromAirportRef} />
-                <button
-                  type="button"
-                  onClick={handleSwapAirports}
-                  className="  flex items-center justify-center w-10 h-10 rounded-full bg-white border border-gray-200 cursor-pointer transition-all duration-300 p-0 shrink-0 hover:bg-gray-50"
-                  onMouseEnter={() => setIsSwapHovered(true)}
-                  onMouseLeave={() => setIsSwapHovered(false)}
-                  aria-label={isRTL ? 'تبديل المطارات' : 'Swap airports'}
+                <div
+                  className="absolute left-1/2 -translate-x-1/2  top-0 bottom-0 
+                
+                 z-10 
+                rounded-full
+                flex items-center justify-center
+                "
                 >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+                  <button
+                    type="button"
+                    onClick={handleSwapAirports}
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-white border!
+                    
+                     hover:border-gray-500!
+                     border-gray-300! cursor-pointer transition-all duration-300 p-0 shrink-0 hover:bg-gray-50 -mx-[1px] z-10"
+                    onMouseEnter={() => setIsSwapHovered(true)}
+                    onMouseLeave={() => setIsSwapHovered(false)}
+                    aria-label={isRTL ? 'تبديل المطارات' : 'Swap airports'}
                   >
-                    <path
-                      d="M8 7L16 7M16 7L12 3M16 7L12 11M16 17L8 17M8 17L12 13M8 17L12 21"
-                      stroke="#9ca3af"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8 7L16 7M16 7L12 3M16 7L12 11M16 17L8 17M8 17L12 13M8 17L12 21"
+                        stroke="#9ca3af"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </div>
+
                 <ToAirport form={form} ref={toAirportRef} />
               </div>
             </div>
