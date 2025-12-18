@@ -54,7 +54,7 @@ const Index = () => {
                     key={tab?.id}
                     className={`
                       h-12 px-6! flex items-center justify-center gap-1.5 font-semibold text-lg rounded-[30px]! transition-all duration-300
-                      ${tab?.name === currentTab ? 'bg-white! text-black ' : ' text-white! hover:bg-white/20!'}`}
+                      ${tab?.name === currentTab ? 'bg-white text-black ' : ' text-white hover:bg-white/20!'}`}
                     onClick={() => setCurrentTab(tab?.name)}
                   >
                     {tab?.name === 'Hotel' ? (
@@ -65,7 +65,12 @@ const Index = () => {
                         `}
                       />
                     ) : (
-                      <RiFlightTakeoffFill size={20} className="" />
+                      <RiFlightTakeoffFill
+                        size={20}
+                        className={`
+                        ${tab?.name === currentTab ? 'text-primary' : 'text-white'}
+                        `}
+                      />
                     )}
                     {tab?.label}
                   </button>
