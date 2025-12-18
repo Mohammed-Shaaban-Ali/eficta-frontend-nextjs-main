@@ -242,8 +242,24 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  if (!isBeginning && swiperRef.current) {
-                    swiperRef.current.swiper.slidePrev();
+                  if (
+                    !isBeginning &&
+                    swiperRef.current &&
+                    swiperRef.current.swiper
+                  ) {
+                    const swiper = swiperRef.current.swiper;
+                    const currentTranslate = swiper.getTranslate();
+                    // Card width (300px) + spaceBetween from swiper params
+                    const spaceBetween = swiper.params.spaceBetween || 16;
+                    const slideWidth = 300 + spaceBetween;
+                    const newTranslate = isRTL
+                      ? currentTranslate - slideWidth
+                      : currentTranslate + slideWidth;
+                    swiper.translateTo(newTranslate, 300, () => {
+                      setIsBeginning(swiper.isBeginning);
+                      setIsEnd(swiper.isEnd);
+                      setActiveIndex(swiper.activeIndex);
+                    });
                   }
                 }}
               >
@@ -274,8 +290,20 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  if (!isEnd && swiperRef.current) {
-                    swiperRef.current.swiper.slideNext();
+                  if (!isEnd && swiperRef.current && swiperRef.current.swiper) {
+                    const swiper = swiperRef.current.swiper;
+                    const currentTranslate = swiper.getTranslate();
+                    // Card width (300px) + spaceBetween from swiper params
+                    const spaceBetween = swiper.params.spaceBetween || 16;
+                    const slideWidth = 300 + spaceBetween;
+                    const newTranslate = isRTL
+                      ? currentTranslate + slideWidth
+                      : currentTranslate - slideWidth;
+                    swiper.translateTo(newTranslate, 300, () => {
+                      setIsBeginning(swiper.isBeginning);
+                      setIsEnd(swiper.isEnd);
+                      setActiveIndex(swiper.activeIndex);
+                    });
                   }
                 }}
               >
@@ -298,6 +326,9 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
               modules={[Navigation, Pagination]}
               spaceBetween={16}
               slidesPerView={'auto'}
+              slidesPerGroup={1}
+              speed={300}
+              freeMode={false}
               centeredSlides={false}
               navigation={{
                 prevEl: '.swiper-button-prev-departure',
@@ -395,8 +426,24 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  if (!returnIsBeginning && returnSwiperRef.current) {
-                    returnSwiperRef.current.swiper.slidePrev();
+                  if (
+                    !returnIsBeginning &&
+                    returnSwiperRef.current &&
+                    returnSwiperRef.current.swiper
+                  ) {
+                    const swiper = returnSwiperRef.current.swiper;
+                    const currentTranslate = swiper.getTranslate();
+                    // Card width (300px) + spaceBetween from swiper params
+                    const spaceBetween = swiper.params.spaceBetween || 16;
+                    const slideWidth = 300 + spaceBetween;
+                    const newTranslate = isRTL
+                      ? currentTranslate - slideWidth
+                      : currentTranslate + slideWidth;
+                    swiper.translateTo(newTranslate, 300, () => {
+                      setReturnIsBeginning(swiper.isBeginning);
+                      setReturnIsEnd(swiper.isEnd);
+                      setReturnActiveIndex(swiper.activeIndex);
+                    });
                   }
                 }}
               >
@@ -427,8 +474,24 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  if (!returnIsEnd && returnSwiperRef.current) {
-                    returnSwiperRef.current.swiper.slideNext();
+                  if (
+                    !returnIsEnd &&
+                    returnSwiperRef.current &&
+                    returnSwiperRef.current.swiper
+                  ) {
+                    const swiper = returnSwiperRef.current.swiper;
+                    const currentTranslate = swiper.getTranslate();
+                    // Card width (300px) + spaceBetween from swiper params
+                    const spaceBetween = swiper.params.spaceBetween || 16;
+                    const slideWidth = 300 + spaceBetween;
+                    const newTranslate = isRTL
+                      ? currentTranslate + slideWidth
+                      : currentTranslate - slideWidth;
+                    swiper.translateTo(newTranslate, 300, () => {
+                      setReturnIsBeginning(swiper.isBeginning);
+                      setReturnIsEnd(swiper.isEnd);
+                      setReturnActiveIndex(swiper.activeIndex);
+                    });
                   }
                 }}
               >
@@ -451,6 +514,9 @@ const OfferSelection: React.FC<OfferSelectionProps> = ({
               modules={[Navigation, Pagination]}
               spaceBetween={16}
               slidesPerView={'auto'}
+              slidesPerGroup={1}
+              speed={300}
+              freeMode={false}
               centeredSlides={false}
               navigation={{
                 prevEl: '.swiper-button-prev-return',

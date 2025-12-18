@@ -130,8 +130,8 @@ const FlightBooking: React.FC = () => {
   if (isError || !flightFareData) return <NotFoundFlight />;
   return (
     <section className="pt-40 layout-pb-md">
-      <div className="container">
-        <div className="row">
+      <div className="container max-w-[1000px]! mx-auto">
+        {/* <div className="row">
           <div className="col-xl-7 col-lg-8 mt-30 select-none ">
             <CustomerInfo
               form={form}
@@ -139,21 +139,21 @@ const FlightBooking: React.FC = () => {
               members={members}
               isPending={isPending}
             />
-          </div>
-          <div className="col-xl-5 col-lg-4 mt-30 ">
-            <div className="booking-sidebar">
-              <FareDetails
-                flightData={flightFareData as FlightFareResponse}
-                members={members}
-                cabinClass={cabinClass}
-                returnDate={returnDate}
-                onOfferSelect={handleOfferSelect}
-                defaultOfferKey={offerKey}
-              />
-            </div>
-          </div>
+          </div> */}
+        {/* <div className="col-xl-5 col-lg-4 mt-30 "> */}
+        <div className="booking-sidebar">
+          <FareDetails
+            flightData={flightFareData as FlightFareResponse}
+            members={members}
+            cabinClass={cabinClass}
+            returnDate={returnDate}
+            onOfferSelect={handleOfferSelect}
+            defaultOfferKey={offerKey}
+          />
         </div>
       </div>
+      {/* </div> */}
+      {/*  </div> */}
     </section>
   );
 };

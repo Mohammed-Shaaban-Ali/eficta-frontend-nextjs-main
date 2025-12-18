@@ -27,11 +27,10 @@ const CustomerInfo = ({
   const [openForms, setOpenForms] = useState<number[]>([0]);
   return (
     <>
-      <div className="col-xl-7 col-lg-8 mt-30 select-none ">
+      {/* <div className="col-xl-7 col-lg-8 mt-30 select-none ">
         <div className="py-15 px-20 rounded-4 text-15 bg-blue-1-05 shadow-sm border-l-4 border-blue-1">
           {t('sign_in_notice')}
         </div>
-        {/* End register notify */}
 
         <h2 className="text-22 fw-500 mt-40 md:mt-24">{t('let_us_know')}</h2>
 
@@ -67,7 +66,6 @@ const CustomerInfo = ({
               {openForms.includes(index) && (
                 <div className="col-12 animate-slideDown">
                   <div className="row x-gap-20 y-gap-20 p-20 bg-white shadow-sm rounded-4 mt-10">
-                    {/* Hidden input for room allocation */}
                     <input
                       type="hidden"
                       {...register(`passengers.${index}.Allocation`)}
@@ -123,7 +121,7 @@ const CustomerInfo = ({
                         </label>
                       </div>
                     </div>
-                    {/* <div className="col-md-6">
+                    <div className="col-md-6">
                       <div className="form-input">
                         <select
                           {...register(`passengers[${index}].Type` as any, {
@@ -146,7 +144,7 @@ const CustomerInfo = ({
                           Passenger Type
                         </label>
                       </div>
-                    </div> */}
+                    </div>
 
                     <div className="col-md-6">
                       <div className="form-input">
@@ -276,9 +274,10 @@ const CustomerInfo = ({
             </button>
           </div>
         </form>
-      </div>
+      </div> */}
 
-      <div className="col-xl-5 col-lg-4 mt-30">
+      {/* <div className="col-xl-5 col-lg-4 mt-30"> */}
+      <div className=" mt-30">
         <div className="booking-sidebar">
           <BookingDetails />
         </div>

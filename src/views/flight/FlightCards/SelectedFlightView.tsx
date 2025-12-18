@@ -1,6 +1,20 @@
 'use client';
-import { memo, useState, useCallback, lazy, Suspense, useMemo, useEffect } from 'react';
-import { FaClock, FaUsers, FaArrowLeft, FaPlane } from 'react-icons/fa';
+import {
+  memo,
+  useState,
+  useCallback,
+  lazy,
+  Suspense,
+  useMemo,
+  useEffect,
+} from 'react';
+import {
+  FaClock,
+  FaUsers,
+  FaArrowLeft,
+  FaPlane,
+  FaCheck,
+} from 'react-icons/fa';
 import { MdOutlineFilterAltOff } from 'react-icons/md';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSelector, useDispatch } from 'react-redux';
@@ -10,6 +24,7 @@ import { resetFilters, setSortBy } from '@/store/flightFilterSlice';
 import ReturnFlightCard from './ReturnFlightCard';
 import RouteDisplay from './RouteDisplay';
 import { Amaranth } from 'next/font/google';
+import { FiCheckCircle } from 'react-icons/fi';
 
 // Lazy load FlightDetails
 const FlightDetails = lazy(() => import('../flight-details'));
@@ -276,7 +291,16 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
               routeNumber="1"
             />
           </div>
-          <div className="card shadow-sm mb-4">
+          <div className="card relative   mb-4 border-2! border-primary">
+            <div
+              className="absolute -top-3.5 left-1/2 -translate-x-1/2 h-7
+            flex items-center justify-center bg-primary text-white
+            font-medium! text-14
+             text-center px-2 rounded gap-1.5 flex-row-reverse rtl:flex-row"
+            >
+              {isRTL ? 'المختاره' : 'Selected'}
+              <FiCheckCircle size={16} />
+            </div>
             <div className="card-body p-4">
               <div className="row align-items-center g-3">
                 {/* Airline */}

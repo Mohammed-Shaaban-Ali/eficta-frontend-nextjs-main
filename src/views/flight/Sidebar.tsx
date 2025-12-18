@@ -43,6 +43,12 @@ const Sidebar: React.FC<SidebarProps> = ({
       dispatch(setAvailableAirlines(availableAirlines as any));
     }
   }, [dispatch, availableAirlines]);
+
+  // Handle Apply button click - scroll to top
+  const handleApplyClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <>
       <div className="sidebar__item -no-border">
@@ -60,7 +66,10 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="sidebar__item no-border">
         <h5 className="text-18 fw-500 mb-10">Sort By</h5>
         <div className="sidebar-checkbox">
-          <SortingOptions sortingOptions={sortingOptions} flightType={flightType} />
+          <SortingOptions
+            sortingOptions={sortingOptions}
+            flightType={flightType}
+          />
         </div>
       </div>
 
@@ -119,6 +128,15 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
       )} */}
+
+      <div className="sidebar__item pt-20">
+        <button
+          onClick={handleApplyClick}
+          className="button -blue-1 h-50 px-30 rounded-100 bg-blue-1 text-15 text-white w-100"
+        >
+          Apply
+        </button>
+      </div>
     </>
   );
 };
