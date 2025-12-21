@@ -377,7 +377,7 @@ const FlightSearchBox = () => {
       .map(([, error]: [string, any]) => {
         if (typeof error === 'object') {
           // Try different message properties
-          let message = error.message || error.custom || error.msg || null;
+          const message = error.message || error.custom || error.msg || null;
 
           // Replace technical reference errors with user-friendly messages
           if (message && typeof message === 'string') {
@@ -479,7 +479,7 @@ const FlightSearchBox = () => {
                     className="flex items-center justify-center w-10 h-10 rounded-full bg-white border!
                     
                      hover:border-gray-500!
-                     border-gray-300! cursor-pointer transition-all duration-300 p-0 shrink-0 hover:bg-gray-50 -mx-[1px] z-10"
+                     border-gray-300! cursor-pointer transition-all duration-300 p-0 shrink-0 hover:bg-gray-50 -mx-px z-10"
                     onMouseEnter={() => setIsSwapHovered(true)}
                     onMouseLeave={() => setIsSwapHovered(false)}
                     aria-label={isRTL ? 'تبديل المطارات' : 'Swap airports'}
