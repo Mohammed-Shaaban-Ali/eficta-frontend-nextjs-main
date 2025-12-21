@@ -235,6 +235,7 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
     setCurrentPage(1);
     setSelectedDeparture(null);
     setSelectedDepartureData(null);
+    setSelectedFlight(null);
   }, [filters]);
 
   // Track previous selected departure to prevent unnecessary updates
@@ -268,22 +269,12 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
     getMatchingReturnFlights,
   ]);
 
-  // Event handlers
-  const handleSelectDeparture = useCallback(
-    (departureFareKey: string, departureData: any) => {
-      if (selectedDeparture === departureFareKey) {
-        // If clicking the same card, deselect it
-        setSelectedDeparture(null);
-        setSelectedDepartureData(null);
-      } else {
-        // Select the new card
-        setSelectedDeparture(departureFareKey);
-        setSelectedDepartureData(departureData);
-      }
-    },
-    [selectedDeparture],
-  );
+  // Check if flight is one way
+  const isOneWay = useMemo(() => {
+    return !returnDate || returnDate.trim() === '';
+  }, [returnDate]);
 
+  // Event handlers
   const handleSelectFlight = useCallback(
     (departureFlightData: any, returnFlightData?: any) => {
       setSelectedFlight({
@@ -295,9 +286,31 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
         departureFlightData,
         returnFlightData,
       });
-      setSelectedFlight(null);
     },
     [adults, childrens, infants],
+  );
+
+  const handleSelectDeparture = useCallback(
+    (departureFareKey: string, departureData: any) => {
+      if (selectedDeparture === departureFareKey) {
+        // If clicking the same card, deselect it
+        setSelectedDeparture(null);
+        setSelectedDepartureData(null);
+        setSelectedFlight(null);
+      } else {
+        // Clear any previously selected flight
+        setSelectedFlight(null);
+        // If one way, directly open FlightDetails
+        if (isOneWay) {
+          handleSelectFlight(departureData);
+        } else {
+          // Select the new card for round trip
+          setSelectedDeparture(departureFareKey);
+          setSelectedDepartureData(departureData);
+        }
+      }
+    },
+    [selectedDeparture, isOneWay, handleSelectFlight],
   );
 
   const handleCloseFlightDetails = useCallback(() => {
@@ -307,12 +320,14 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
   const handleBackToList = useCallback(() => {
     setSelectedDeparture(null);
     setSelectedDepartureData(null);
+    setSelectedFlight(null);
   }, []);
 
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
     setSelectedDeparture(null);
     setSelectedDepartureData(null);
+    setSelectedFlight(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
@@ -352,8 +367,8 @@ const FlightProperties: React.FC<FlightPropertiesProps> = ({
     );
   }
 
-  // Show selected flight view when a departure is selected
-  if (selectedDeparture && selectedDepartureData) {
+  // Show selected flight view when a departure is selected (only for round trip)
+  if (selectedDeparture && selectedDepartureData && !isOneWay) {
     const packageKey = selectedDepartureData.package_info.package_key;
     // provider key
     const providerKey = selectedDepartureData.provider_key;
