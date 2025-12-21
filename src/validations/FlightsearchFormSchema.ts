@@ -14,7 +14,7 @@ export const flightSearchFormSchema = Joi.object({
     'any.required': 'Destination airport is required',
   }),
   departureDate: Joi.date().min('now').required().messages({
-    'date.base': 'Please select a valid departure date',
+    'date.base': 'Please select a departure date first',
     'date.min': 'Departure date cannot be in the past',
     'any.required': 'Departure date is required',
   }),
