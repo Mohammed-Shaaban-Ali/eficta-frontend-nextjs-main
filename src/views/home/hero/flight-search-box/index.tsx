@@ -52,6 +52,7 @@ const FlightSearchBox = () => {
   const fromAirportRef = useRef<FromAirportRef | null>(null);
   const toAirportRef = useRef<ToAirportRef | null>(null);
   const [isSwapHovered, setIsSwapHovered] = useState(false);
+  const savedReturnDateRef = useRef<string | undefined>(undefined);
 
   // Load saved search data from localStorage on mount (client-side only)
   useEffect(() => {
@@ -108,6 +109,8 @@ const FlightSearchBox = () => {
             form.setValue('returnDate', parsedData.returnDate, {
               shouldValidate: false,
             });
+            // Also save to ref so it can be restored when switching trip types
+            savedReturnDateRef.current = parsedData.returnDate;
           }
           if (parsedData.tripType) {
             form.setValue('tripType', parsedData.tripType, {
@@ -148,9 +151,27 @@ const FlightSearchBox = () => {
   }, []); // Run only once on mount
 
   const handleTripTypeChange = (type: 'roundTrip' | 'oneWay') => {
-    form.setValue('tripType', type);
-    if (type === 'oneWay') {
+    const currentTripType = form.getValues('tripType');
+    const currentReturnDate = form.getValues('returnDate');
+
+    if (currentTripType === 'roundTrip' && type === 'oneWay') {
+      // Save the return date before clearing it
+      if (currentReturnDate) {
+        savedReturnDateRef.current = currentReturnDate;
+      }
+      form.setValue('tripType', type);
       form.setValue('returnDate', '');
+    } else if (currentTripType === 'oneWay' && type === 'roundTrip') {
+      // Restore the saved return date when switching back to round trip
+      form.setValue('tripType', type);
+      if (savedReturnDateRef.current) {
+        form.setValue('returnDate', savedReturnDateRef.current, {
+          shouldValidate: false,
+        });
+      }
+    } else {
+      // Same type, just update it
+      form.setValue('tripType', type);
     }
   };
 
