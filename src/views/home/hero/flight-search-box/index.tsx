@@ -34,7 +34,9 @@ const FlightSearchBox = () => {
   const Router = useRouter();
 
   const form = useForm<FlightSearchParams>({
-    resolver: joiResolver(flightSearchFormSchema),
+    resolver: joiResolver(flightSearchFormSchema, {
+      abortEarly: false,
+    }),
     defaultValues: {
       fromAirport: '',
       toAirport: '',
@@ -299,10 +301,121 @@ const FlightSearchBox = () => {
   };
 
   const onError = (errors: any) => {
-    const errorMessages = Object.values(errors)
-      .map((error: any) => error.message)
+    console.log('errors', errors);
+
+    // Check if returnDate error is due to missing departureDate
+    if (errors.returnDate) {
+      const returnDateError = errors.returnDate;
+      let returnDateMessage: string | null = null;
+
+      if (typeof returnDateError === 'string') {
+        returnDateMessage = returnDateError;
+      } else if (returnDateError?.message) {
+        returnDateMessage = returnDateError.message;
+      } else if (returnDateError?.custom) {
+        returnDateMessage = returnDateError.custom;
+      }
+
+      // Check if the error is about missing departure date reference
+      if (
+        returnDateMessage &&
+        (returnDateMessage.includes('ref:departureDate') ||
+          returnDateMessage.includes('references "ref:departureDate"') ||
+          returnDateMessage.includes('Please select a departure date first'))
+      ) {
+        // Check if departureDate is actually missing
+        const departureDate = form.getValues('departureDate');
+        if (!departureDate || departureDate === '') {
+          toast.error('Please select a departure date first');
+          return;
+        }
+      }
+    }
+
+    // Handle root-level errors (from custom validation) - these have empty string as key
+    if (errors['']) {
+      const rootError = errors[''];
+
+      // Try to extract message from various possible locations
+      let rootMessage: string | null = null;
+
+      if (typeof rootError === 'string') {
+        rootMessage = rootError;
+      } else if (rootError?.message) {
+        rootMessage = rootError.message;
+      } else if (rootError?.custom) {
+        rootMessage = rootError.custom;
+      } else if (rootError?.type === 'any.custom' && rootError?.message) {
+        rootMessage = rootError.message;
+      }
+
+      // Check if this is the returnDate validation error
+      if (
+        rootMessage &&
+        rootMessage.includes('Please select a departure date first')
+      ) {
+        toast.error('Please select a departure date first');
+        return;
+      }
+
+      // Filter out incomplete or generic error messages
+      if (
+        rootMessage &&
+        typeof rootMessage === 'string' &&
+        rootMessage.trim() !== '' &&
+        rootMessage !== '"value" failed custom validation because ' &&
+        !rootMessage.includes('failed custom validation because')
+      ) {
+        toast.error(rootMessage);
+        return;
+      }
+    }
+
+    // Handle field-level errors
+    const errorMessages = Object.entries(errors)
+      .filter(([key]) => key !== '' && key !== 'root')
+      .map(([, error]: [string, any]) => {
+        if (typeof error === 'object') {
+          // Try different message properties
+          let message = error.message || error.custom || error.msg || null;
+
+          // Replace technical reference errors with user-friendly messages
+          if (message && typeof message === 'string') {
+            if (
+              message.includes('ref:departureDate') ||
+              message.includes('references "ref:departureDate"')
+            ) {
+              // Check if departureDate is missing
+              const departureDate = form.getValues('departureDate');
+              if (!departureDate || departureDate === '') {
+                return 'Please select a departure date first';
+              }
+            }
+          }
+
+          return message;
+        }
+        if (typeof error === 'string') {
+          // Replace technical reference errors with user-friendly messages
+          if (
+            error.includes('ref:departureDate') ||
+            error.includes('references "ref:departureDate"')
+          ) {
+            const departureDate = form.getValues('departureDate');
+            if (!departureDate || departureDate === '') {
+              return 'Please select a departure date first';
+            }
+          }
+          return error;
+        }
+        return null;
+      })
+      .filter(Boolean)
       .join('\n');
-    toast.error(errorMessages);
+
+    if (errorMessages) {
+      toast.error(errorMessages);
+    }
   };
 
   return (

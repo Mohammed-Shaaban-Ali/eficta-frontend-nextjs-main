@@ -19,20 +19,26 @@ export const flightSearchFormSchema = Joi.object({
     'any.required': 'Departure date is required',
   }),
   returnDate: Joi.date()
-    .greater(Joi.ref('departureDate'))
-    .optional()
-    .allow('')
+    .when('tripType', {
+      is: 'roundTrip',
+      then: Joi.required().messages({
+        'any.required': 'Return date is required for round trip',
+      }),
+      otherwise: Joi.optional().allow(''),
+    })
+    .when('departureDate', {
+      is: Joi.exist().not(null).not(''),
+      then: Joi.date().greater(Joi.ref('departureDate')).messages({
+        'date.greater': 'Return date must be after departure date',
+      }),
+    })
     .messages({
       'date.base': 'Please select a valid return date',
-      'date.greater': 'Return date must be after departure date',
     }),
-  tripType: Joi.string()
-    .valid('roundTrip', 'oneWay')
-    .required()
-    .messages({
-      'any.only': 'Trip type must be either roundTrip or oneWay',
-      'any.required': 'Trip type is required',
-    }),
+  tripType: Joi.string().valid('roundTrip', 'oneWay').required().messages({
+    'any.only': 'Trip type must be either roundTrip or oneWay',
+    'any.required': 'Trip type is required',
+  }),
   adults: Joi.number().min(1).max(9).required().messages({
     'number.min': 'At least 1 adult is required',
     'number.max': 'Maximum 9 adults allowed',
@@ -42,38 +48,42 @@ export const flightSearchFormSchema = Joi.object({
     'number.min': 'Children count cannot be negative',
     'number.max': 'Maximum 8 children allowed',
   }),
-  infants: Joi.number().min(0).max(8).optional().messages({
-    'number.min': 'Infants count cannot be negative',
-    'number.max': 'Maximum 8 infants allowed',
-  }),
+  infants: Joi.number()
+    .min(0)
+    .max(8)
+    .optional()
+    .when('adults', {
+      is: Joi.number().min(1),
+      then: Joi.number().max(Joi.ref('adults')).messages({
+        'number.max': 'Number of infants cannot exceed number of adults',
+      }),
+    })
+    .messages({
+      'number.min': 'Infants count cannot be negative',
+      'number.max': 'Maximum 8 infants allowed',
+    }),
   cabinClass: Joi.string().valid('ECONOMY', 'BUSINESS').required().messages({
     'any.only': 'Cabin class must be either ECONOMY or BUSINESS',
     'any.required': 'Cabin class is required',
   }),
-})
-  .custom((value, helpers) => {
-    // Custom validation: total passengers should not exceed 9
-    const totalPassengers =
-      (value.adults || 0) + (value.children || 0) + (value.infants || 0);
-    if (totalPassengers > 9) {
-      return helpers.error('any.custom', {
-        message: 'Total passengers cannot exceed 9',
-      });
-    }
+}).custom((value, helpers) => {
+  // Custom validation: Check if return date is provided without departure date
+  if (
+    value.returnDate &&
+    (!value.departureDate || value.departureDate === '')
+  ) {
+    return helpers.error('returnDate.custom', {
+      message: 'Please select a departure date first',
+    });
+  }
 
-    // Custom validation: infants cannot exceed adults
-    if ((value.infants || 0) > (value.adults || 0)) {
-      return helpers.error('any.custom', {
-        message: 'Number of infants cannot exceed number of adults',
-      });
-    }
-
-    // Custom validation: returnDate is required for roundTrip
-    if (value.tripType === 'roundTrip' && !value.returnDate) {
-      return helpers.error('any.custom', {
-        message: 'Return date is required for round trip',
-      });
-    }
-
-    return value;
-  });
+  // Custom validation: total passengers should not exceed 9
+  const totalPassengers =
+    (value.adults || 0) + (value.children || 0) + (value.infants || 0);
+  if (totalPassengers > 9) {
+    return helpers.error('any.custom', {
+      message: 'Total passengers cannot exceed 9',
+    });
+  }
+  return value;
+});
