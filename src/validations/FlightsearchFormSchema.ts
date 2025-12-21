@@ -33,7 +33,7 @@ export const flightSearchFormSchema = Joi.object({
       }),
     })
     .messages({
-      'date.base': 'Please select a valid return date',
+      'date.base': 'Please select a return date',
     }),
   tripType: Joi.string().valid('roundTrip', 'oneWay').required().messages({
     'any.only': 'Trip type must be either roundTrip or oneWay',
