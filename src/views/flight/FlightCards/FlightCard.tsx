@@ -206,9 +206,9 @@ const FlightCard = memo<FlightCardProps>(
                     departureFlightData?.fares?.[0]?.fare_info?.fare_detail
                       ?.currency_code
                   }{' '}
-                  {departureFlightData?.minimum_package_price}
+                  {departureFlightData?.minimum_package_price?.toFixed(2)}
                 </div>
-                <div className="small opacity-75 mb-2">
+                <div className="small opacity-75 mb-2 flex items-center justify-center">
                   <FaUsers size={10} className={isRTL ? 'ms-1' : 'me-1'} />
                   {departureFlightData?.fares?.[0]?.fare_info?.free_seats}{' '}
                   {t('seats_left')}

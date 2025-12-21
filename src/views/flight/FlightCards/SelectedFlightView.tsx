@@ -460,9 +460,9 @@ const SelectedFlightView = memo<SelectedFlightViewProps>(
                         selectedDepartureData?.fares?.[0]?.fare_info
                           ?.fare_detail?.currency_code
                       }{' '}
-                      {selectedDepartureData?.minimum_package_price}
+                      {selectedDepartureData?.minimum_package_price?.toFixed(2)}
                     </div>
-                    <div className="small opacity-75 mb-2">
+                    <div className="small opacity-75 mb-2 flex items-center justify-center">
                       <FaUsers size={12} className={isRTL ? 'ms-1' : 'me-1'} />
                       {
                         selectedDepartureData?.fares?.[0]?.fare_info?.free_seats

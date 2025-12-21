@@ -42,14 +42,14 @@ const ReturnFlightsSection = memo<ReturnFlightsSectionProps>(
         <div className="bg-light bg-opacity-50 rounded-4 p-4 mb-4">
           <div className="text-center py-5">
             <div className="mb-4">
-              <div className="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded-circle p-3 mb-3">
+              <div className="flex items-center justify-center bg-primary bg-opacity-10 rounded-circle p-3 mb-3">
                 <FaPlane className="text-primary" size={32} />
               </div>
               <h5 className="text-dark mb-2">{t('no_return_flights')}</h5>
               <p className="text-muted mb-4">{t('no_return_description')}</p>
             </div>
             <button
-              className="btn btn-primary btn-lg px-4 py-2 rounded-pill"
+              className="btn btn-primary btn-lg px-4 py-2 rounded-pill flex items-center justify-center"
               onClick={() => onSelectFlight(departureFlightData)}
             >
               <FaPlane className={isRTL ? 'ms-2' : 'me-2'} size={16} />
@@ -233,7 +233,7 @@ const ReturnFlightsSection = memo<ReturnFlightsSectionProps>(
                             </>
                           )}
                         </div>
-                        <div className="small text-muted mb-2 d-flex align-items-center justify-content-center gap-1">
+                        <div className="small text-muted mb-2 flex items-center justify-center gap-1">
                           <FaUsers size={10} />
                           {fareInfo?.free_seats} {t('seats_left')}
                         </div>

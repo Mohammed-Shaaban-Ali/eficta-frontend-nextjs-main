@@ -224,7 +224,7 @@ const ReturnFlightCard = memo<ReturnFlightCardProps>(
                     </>
                   )}
                 </div>
-                <div className="small text-muted mb-2 d-flex align-items-center justify-content-center gap-1">
+                <div className="small text-muted mb-2 flex items-center justify-center gap-1">
                   <FaUsers size={10} />
                   {fareInfo?.free_seats} {t('seats_left')}
                 </div>
