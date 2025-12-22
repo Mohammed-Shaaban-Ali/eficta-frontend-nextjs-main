@@ -9,6 +9,7 @@ import { enUS as en } from 'date-fns/locale';
 import { ar } from 'date-fns/locale/ar';
 import 'react-datepicker/dist/react-datepicker.css';
 import countryDialogs from '../../../../public/data/country_dailogs.json';
+import ClientSelect from '@/components/ClientSelect';
 
 // Register locales
 registerLocale('ar', ar);
@@ -52,7 +53,15 @@ const CustomerInfo = ({
           onSubmit={handleSubmit(onSubmit)}
           className="row x-gap-5 y-gap-5 pt-5"
         >
-          <div className="col-12 mt-5">
+          <div className="col-md-12">
+            <ClientSelect
+              form={form}
+              name="client_id"
+              label="Client"
+              required={false}
+            />
+          </div>
+          {/* <div className="col-12 mt-5">
             <h3 className="text-18 fw-500 mb-5">{t('contact_information')}</h3>
             <div className="row x-gap-20 y-gap-20 py-5 bg-white  mb-5 rounded-4">
               <div className="col-md-12">
@@ -338,7 +347,6 @@ const CustomerInfo = ({
                       </div>
                     </div>
 
-                    {/* Only show passport information for the lead passenger (index 0) */}
                     {index === 0 && (
                       <>
                         <div className="col-md-12">
@@ -481,7 +489,7 @@ const CustomerInfo = ({
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-12">
             <button
