@@ -42,6 +42,12 @@ const ClientSelect: React.FC<ClientSelectProps> = ({
     page,
   });
 
+  // Reset page when search changes
+  useEffect(() => {
+    setPage('1');
+    setAllItems([]);
+  }, [debouncedSearch]);
+
   // Update items when data changes
   useEffect(() => {
     if (data?.items) {
@@ -74,27 +80,23 @@ const ClientSelect: React.FC<ClientSelectProps> = ({
     }
   }, [data?.hasMore, isFetching, page]);
 
-  // Reset page when search changes
+  // Find selected client when form value changes (only sync when dropdown is closed)
   useEffect(() => {
-    setPage('1');
-    setAllItems([]);
-  }, [debouncedSearch]);
-
-  // Find selected client when form value changes
-  useEffect(() => {
-    if (formValue && allItems.length > 0) {
+    // Only sync when dropdown is closed to avoid interfering with user input
+    if (!isOpen && formValue && allItems.length > 0) {
       const client = allItems.find(
         (item) => item.id.toString() === formValue.toString(),
       );
-      if (client) {
+      if (client && (!selectedClient || selectedClient.id !== client.id)) {
         setSelectedClient(client);
         setSearchValue(client.text);
       }
-    } else if (!formValue) {
+    } else if (!isOpen && !formValue && selectedClient) {
+      // Clear selection only if form value is explicitly cleared and dropdown is closed
       setSelectedClient(null);
       setSearchValue('');
     }
-  }, [formValue, allItems]);
+  }, [formValue, allItems, isOpen]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -130,14 +132,11 @@ const ClientSelect: React.FC<ClientSelectProps> = ({
 
   const handleInputFocus = () => {
     setIsOpen(true);
-    // If there's a selected client, clear it to allow searching
+    // If there's a selected client, clear selection but keep search value to allow editing
     if (selectedClient) {
-      setSearchValue('');
+      setSearchValue(selectedClient.text);
       setSelectedClient(null);
       setValue(name, '', { shouldValidate: true });
-    }
-    if (searchValue && !selectedClient) {
-      refetch();
     }
   };
 
@@ -189,7 +188,7 @@ const ClientSelect: React.FC<ClientSelectProps> = ({
           }}
         >
           <div
-            className="bg-white px-20 py-20 sm:px-0 sm:py-15 rounded-4"
+            className="bg-white p-2 rounded-md"
             style={{
               flex: 1,
               overflow: 'hidden',
@@ -222,9 +221,11 @@ const ClientSelect: React.FC<ClientSelectProps> = ({
                     {allItems.map((item) => (
                       <li
                         key={item.id}
-                        className={`-link d-block col-12 text-left rounded-4 px-20 py-15 js-search-option mb-1 cursor-pointer transition-all duration-200 hover:bg-blue-1/5 ${
-                          selectedClient?.id === item.id ? 'bg-blue-1/10' : ''
-                        }`}
+                        className={`-link
+                          hover:bg-gray-100!
+                          d-block col-12 text-left rounded-4 px-20 py-15 js-search-option mb-1 cursor-pointer transition-all duration-200 hover:bg-blue-1/5 ${
+                            selectedClient?.id === item.id ? 'bg-blue-1/10' : ''
+                          }`}
                         role="button"
                         onClick={() => handleSelect(item)}
                       >

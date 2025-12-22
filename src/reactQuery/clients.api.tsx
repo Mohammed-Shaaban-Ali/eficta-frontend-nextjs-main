@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { executeApiRequest } from '@/utils/executeApiRequest';
 
-const url = 'https://gita.sa';
+const url = process.env.NEXT_PUBLIC_APP_AIRPORTS;
 
 export interface ClientItem {
   id: number;
@@ -30,7 +30,7 @@ export function useGetClientsQuery({
 
       return executeApiRequest<ClientsResponse>({
         method: 'GET',
-        url: `${url}/dashboard/information/select2/clients?${params.toString()}`,
+        url: `${url}/api/information/select2/clients?${params.toString()}`,
       });
     },
     queryKey: ['Clients', search, page],
