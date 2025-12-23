@@ -224,7 +224,9 @@ const ClientSelect: React.FC<ClientSelectProps> = ({
                         className={`-link
                           hover:bg-gray-100!
                           d-block col-12 text-left rounded-4 px-20 py-15 js-search-option mb-1 cursor-pointer transition-all duration-200 hover:bg-blue-1/5 ${
-                            selectedClient?.id === item.id ? 'bg-blue-1/10' : ''
+                            selectedClient?.id === item.id
+                              ? 'bg-blue-1/10'
+                              : ' '
                           }`}
                         role="button"
                         onClick={() => handleSelect(item)}
