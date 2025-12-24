@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { executeApiRequest } from '@/utils/executeApiRequest';
+import axios from 'axios';
 import { cityTypes } from '@/types/app/cityTypes';
 import { metaTypes } from '@/types/glopal/metaTypes';
 import {
@@ -13,6 +14,7 @@ import { bookingTypes } from '@/types/app/bookTypes';
 import { cancellationPolicyTypes } from '@/types/app/privacyTypes';
 
 const url = process.env.NEXT_PUBLIC_APP_EFICTA;
+const url2 = process.env.NEXT_PUBLIC_APP_AIRPORTS;
 
 export function useSearchHotelsQuery(data: searchHotelsParams) {
   return useQuery({
@@ -77,6 +79,25 @@ export function useHotelConfirmBookMutation() {
   });
 }
 
+export function useHotelQuotationMutation() {
+  return useMutation({
+    mutationFn: async (data: bookHotelRequest) => {
+      // Use axios directly for external URL
+      const response = await axios.post(
+        `${url2}/api/hotels-quotation/quotations-api`,
+        data,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+      return response.data;
+    },
+    mutationKey: ['HotelQuotation'],
+  });
+}
+
 export function useGetHotelDetailsQuery({
   uuid,
   hotelID,
@@ -137,5 +158,71 @@ export function useGetHotelCancellationRequestQuery({
     },
     queryKey: ['HotelCancellation', uuid, hotelID, packageID],
     staleTime: Infinity,
+  });
+}
+
+// Select2 interfaces
+export interface Select2Item {
+  id: number | string;
+  text: string;
+}
+
+interface Select2Response {
+  items: Select2Item[];
+  hasMore: boolean;
+}
+
+interface Select2QueryParams {
+  search?: string;
+  page?: string;
+}
+
+// Currencies endpoint
+export function useGetCurrenciesQuery({
+  search = '',
+  page = '1',
+}: Select2QueryParams) {
+  return useQuery({
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+      if (page) params.append('page', page);
+
+      return executeApiRequest<Select2Response>({
+        method: 'GET',
+        url: `${url2}/api/information/select2/currencies?${params.toString()}`,
+      });
+    },
+    queryKey: ['Currencies', search, page],
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+    enabled: true,
+  });
+}
+
+// Suppliers endpoint
+export function useGetSuppliersQuery({
+  search = '',
+  page = '1',
+  category = 'hotels',
+}: Select2QueryParams & { category?: string }) {
+  return useQuery({
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+      if (page) params.append('page', page);
+      if (category) params.append('category', category);
+
+      return executeApiRequest<Select2Response>({
+        method: 'GET',
+        url: `${url2}/api/information/select2/suppliers?${params.toString()}`,
+      });
+    },
+    queryKey: ['Suppliers', search, page, category],
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+    enabled: true,
   });
 }

@@ -9,8 +9,11 @@ import Destinations from '@/views/home/Destinations';
 import Testimonial from '@/views/home/Testimonial';
 import TestimonialLeftCol from '@/views/home/TestimonialLeftCol';
 import SelectFilter from '@/views/hotels/filter-tabs/SelectFilter';
-import PopularDestinations from '@/views/destinations/PopularDestinations';
 import { useTranslations } from 'next-intl';
+import Lastsearched from './NewHome/Lastsearched';
+import OurPackages from './NewHome/OurPackages';
+import RecommendedHotel from './NewHome/RecommendedHotel';
+import PopularDestinations from './NewHome/PopularDestinations';
 
 export const metadata = {
   title: 'Efica',
@@ -29,7 +32,17 @@ const Home = () => {
       <Hero1 />
       {/* End Hero 1 */}
 
-      <section className="layout-pt-lg layout-pb-md" data-aos="fade-up">
+      {/* new home page */}
+      <section className="bg-[#FFFDF5]">
+        <div className="container">
+          <Lastsearched />
+          <PopularDestinations />
+          <RecommendedHotel />
+          <OurPackages />
+        </div>
+      </section>
+
+      {/* <section className="layout-pt-lg layout-pb-md" data-aos="fade-up">
         <div className="container">
           <div className="row y-gap-20 justify-between items-end">
             <div className="col-auto">
@@ -155,9 +168,9 @@ const Home = () => {
             <Destinations />
           </div>
         </div>
-      </section>
+      </section> */}
 
-      <CallToActions />
+      {/* <CallToActions /> */}
     </>
   );
 };

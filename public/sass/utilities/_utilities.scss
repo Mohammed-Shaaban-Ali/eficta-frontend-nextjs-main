@@ -1153,20 +1153,21 @@ $_displays: none, inline-block, block, flex;
 
   label {
     position: absolute;
-    top: 0;
-    top: 26px;
+    top: 12px;
     padding: 0 15px;
     pointer-events: none;
     font-size: 14px;
     transition: all 0.2s e.$easeOutQuart;
+    z-index: 1;
   }
 
   textarea,
-  input {
+  input,
+  select {
     border: 1px solid var(--color-border);
     border-radius: 4px;
-    padding: 0 15px;
-    padding-top: 25px;
+    padding: 0 12px;
+    // padding-top: 20px;
     min-height: 70px;
     transition: all 0.2s e.$easeOutQuart;
 
@@ -1178,8 +1179,11 @@ $_displays: none, inline-block, block, flex;
   textarea:focus ~ label,
   textarea:valid ~ label,
   input:focus ~ label,
-  input:valid ~ label {
-    transform: translateY(-10px);
+  input:valid ~ label,
+  select:focus ~ label,
+  select:valid ~ label {
+    transform: translateY(-8px);
+    font-size: 12px;
   }
 }
 

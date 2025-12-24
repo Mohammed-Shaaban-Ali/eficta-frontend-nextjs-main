@@ -21,6 +21,7 @@ export default async function Page({ params }: { params: Props }) {
   const hotel_Id = resolvedParams?.hotel_Id;
   const package_Id = resolvedParams?.package_Id;
   const room_Id = resolvedParams?.room_Id;
+
   return (
     <>
       <section className="pt-40 layout-pb-md">

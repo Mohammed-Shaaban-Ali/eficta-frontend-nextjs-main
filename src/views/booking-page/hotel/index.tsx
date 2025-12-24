@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import {
   useHotelBookMutation,
   useHotelConfirmBookMutation,
+  useHotelQuotationMutation,
 } from '@/reactQuery/hotels.api';
 import { bookHotelRequest } from '@/types/requests/bookHotelRequest';
 import { toast } from 'react-hot-toast';
@@ -21,16 +22,34 @@ interface Props {
   roomId: string;
 }
 const BookingPage = ({ hotelID, uuid, packageID, roomId }: Props) => {
+  console.log('hotelID', hotelID);
   const [selectedPackage, setSelectedPackage] = useState<any>(null);
   const [membersCount, setMembersCount] = useState<number>(0);
   const router = useRouter();
   const form = useForm<bookHotelRequest>({
     defaultValues: {
-      passengers: [
+      title: '',
+      client_type: 'client',
+      client: 0,
+      email: '',
+      phone: '',
+      adults: 0,
+      children: 0,
+      infants: 0,
+      terms: '',
+      notes: '',
+      guests: [],
+      hotels: [
         {
-          PersonDetails: {
-            Name: { NamePrefix: 'Mr' },
-          },
+          checkIn: '',
+          checkOut: '',
+          hotel_id: 0,
+          buy_currency_id: 1,
+          buy_price: 0,
+          sell_currency_id: 0,
+          sell_price: 0,
+          supplier_id: 0,
+          rooms: [],
         },
       ],
     },
@@ -38,6 +57,8 @@ const BookingPage = ({ hotelID, uuid, packageID, roomId }: Props) => {
   const { mutateAsync: Book, isPending: pendingBook } = useHotelBookMutation();
   const { mutateAsync: ConfirmBook, isPending: pendingConfirm } =
     useHotelConfirmBookMutation();
+  const { mutateAsync: submitQuotation, isPending: pendingQuotation } =
+    useHotelQuotationMutation();
 
   useEffect(() => {
     const pcakageLocalStorage = localStorage.getItem('package');
@@ -59,8 +80,16 @@ const BookingPage = ({ hotelID, uuid, packageID, roomId }: Props) => {
       } else {
         setMembersCount(0);
       }
+
+      // Set default values for checkIn and checkOut
+      if (searchParams.checkIn) {
+        form.setValue('hotels.0.checkIn', searchParams.checkIn);
+      }
+      if (searchParams.checkOut) {
+        form.setValue('hotels.0.checkOut', searchParams.checkOut);
+      }
     }
-  }, []);
+  }, [form]);
   // Calculate total members from rooms data
   const members = selectedPackage?.rooms?.reduce(
     (acc: any, room: any, roomIndex: number) => {
@@ -80,65 +109,119 @@ const BookingPage = ({ hotelID, uuid, packageID, roomId }: Props) => {
     [] as { type: number; roomNumber: number; roomId: string }[],
   );
 
-  const onSubmit = async (data: bookHotelRequest) => {
-    try {
-      // Check if all members data is filled
-      const isAllMembersFilled = data.passengers.length === membersCount;
-      if (!isAllMembersFilled) {
-        toast.error('Please fill all members information');
-        return;
+  // Calculate total adults and children
+  const totalAdults = members?.filter((m: any) => m.type === 0).length || 0;
+  const totalChildren = members?.filter((m: any) => m.type === 1).length || 0;
+
+  // Update form values when members or selectedPackage changes
+  useEffect(() => {
+    if (totalAdults > 0) {
+      form.setValue('adults', totalAdults);
+    }
+    if (totalChildren > 0) {
+      form.setValue('children', totalChildren);
+    }
+  }, [totalAdults, totalChildren, form]);
+
+  // Update hotel data when selectedPackage is loaded
+  useEffect(() => {
+    if (selectedPackage) {
+      // Set hotel_id
+      if (hotelID) {
+        form.setValue('hotels.0.hotel_id', parseInt(hotelID));
+      } else if (selectedPackage.hotelId) {
+        form.setValue('hotels.0.hotel_id', selectedPackage.hotelId);
       }
 
-      const leadPaxId = generateRandomUUID();
-      console.log(data.passengers);
-      // Map passengers and ensure Type is properly converted to number
-      const passengers = data.passengers.map((item, index) => {
-        const personDetails: any = {
-          Name: {
-            GivenName: item.PersonDetails.Name.GivenName,
-            Surname: item.PersonDetails.Name.Surname,
-            NamePrefix: item.PersonDetails.Name.NamePrefix,
-          },
-          Type: Number(item.PersonDetails.Type),
-        };
+      // Set buy_currency_id to 1 (fixed value)
+      form.setValue('hotels.0.buy_currency_id', 1);
 
-        // Only add Age if it's a valid number
-        const age = Number(item.PersonDetails.Age);
-        if (!isNaN(age) && age !== null && age !== undefined) {
-          personDetails.Age = age;
-        }
+      // Set buy_price
+      if (selectedPackage.price?.finalPrice) {
+        form.setValue('hotels.0.buy_price', selectedPackage.price.finalPrice);
+      }
+    }
+  }, [selectedPackage, hotelID, form]);
 
-        return {
-          ...item,
-          Id: index === 0 ? leadPaxId : generateRandomUUID(),
-          PersonDetails: personDetails,
-        };
-      });
+  // Helper function to format date to YYYY-MM-DD
+  const formatDateToString = (
+    date: string | Date | null | undefined,
+  ): string => {
+    if (!date) return '';
 
-      const bookData = await Book({
-        uuid,
-        hotelID,
-        packageID,
-        leadPaxID: leadPaxId, // Use the same ID for leadPaxID
-        leadPaxAllocation: data.passengers[0].Allocation,
-        bookingPrice: selectedPackage.price.finalPrice,
-        passengers: passengers,
-      });
+    // If it's already a string in YYYY-MM-DD format, return it
+    if (typeof date === 'string') {
+      // Check if it's already in YYYY-MM-DD format
+      if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        return date;
+      }
+      // If it's an ISO string, extract the date part
+      if (date.includes('T')) {
+        return date.split('T')[0];
+      }
+      return date;
+    }
 
-      const dataBook = (await ConfirmBook({
-        bookingId: bookData?.bookingId.toString(),
-        paymentId: bookData?.paymentId.toString(),
-      })) as any;
+    // If it's a Date object, format it
+    if (date instanceof Date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
 
-      localStorage.setItem('success-book', JSON.stringify(dataBook.data));
-      localStorage.setItem(
-        'success-book-user',
-        JSON.stringify(data.passengers[0]),
-      );
+    return '';
+  };
 
-      form.reset();
-      router.push(`/success/hotel/${dataBook?.provider_reference}`);
+  const onSubmit = async (data: bookHotelRequest) => {
+    try {
+      console.log('data', data);
+      // Prepare the booking data in the new format
+      const bookingData: bookHotelRequest = {
+        title: data.title,
+        client_type: data.client_type || 'client',
+        client: data.client,
+        email: data.email,
+        phone: data.phone,
+        adults: data.adults || totalAdults,
+        children: data.children || totalChildren,
+        infants: data.infants || 0,
+        terms: data.terms || '',
+        notes: data.notes || '',
+        guests: data.guests.map((guest) => ({
+          name: guest.name,
+          type: guest.type,
+          passport_number: guest.passport_number,
+          passport_country: guest.passport_country,
+          nationality: guest.nationality,
+          issue_date: guest.issue_date,
+          expiry_date: guest.expiry_date,
+          birth_date: guest.birth_date,
+        })),
+        hotels: data.hotels.map((hotel) => ({
+          checkIn: formatDateToString(hotel.checkIn),
+          checkOut: formatDateToString(hotel.checkOut),
+          hotel_id: hotel.hotel_id || parseInt(hotelID) || undefined,
+          buy_currency_id: 1,
+          buy_price: hotel.buy_price || selectedPackage?.price?.finalPrice || 0,
+          sell_currency_id: hotel.sell_currency_id,
+          sell_price: hotel.sell_price,
+          supplier_id: hotel.supplier_id,
+          rooms: hotel.rooms.map((room) => ({
+            room_pax: room.room_pax,
+            room_board: room.room_board,
+            adult: room.adult,
+            child: room.child || 0,
+          })),
+        })),
+      };
+
+      // Submit to quotations API
+      const response = await submitQuotation(bookingData);
+
+      toast.success('Booking submitted successfully!');
     } catch (error) {
+      console.error('Error submitting booking:', error);
       toast.error(getError(error));
     }
   };
@@ -149,7 +232,8 @@ const BookingPage = ({ hotelID, uuid, packageID, roomId }: Props) => {
           form={form}
           onSubmit={onSubmit}
           members={members || []}
-          isPending={pendingBook || pendingConfirm}
+          isPending={pendingBook || pendingConfirm || pendingQuotation}
+          selectedPackage={selectedPackage}
         />
       </div>
     </>

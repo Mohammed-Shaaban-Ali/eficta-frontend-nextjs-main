@@ -1,3 +1,8 @@
+/* global css */
+.text-primary {
+  color: #0e8571;
+}
+
 @keyframes pulse {
   0%,
   100% {
