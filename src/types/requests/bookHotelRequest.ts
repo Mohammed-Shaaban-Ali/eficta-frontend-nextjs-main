@@ -10,19 +10,19 @@ export interface bookHotelRequest {
   infants: number; // default: 0, hidden
   terms: string;
   notes?: string;
-  guests: GuestType[];
+  guests?: GuestType[];
   hotels: HotelBookingType[];
 }
 
 export interface GuestType {
-  name: string;
-  type: 'adult' | 'child' | 'infant';
-  passport_number: string;
-  passport_country: string;
-  nationality: string;
-  issue_date: string; // date
-  expiry_date: string; // date
-  birth_date: string; // date
+  name?: string;
+  type?: 'adult' | 'child' | 'infant';
+  passport_number?: string;
+  passport_country?: string;
+  nationality?: string;
+  issue_date?: string; // date
+  expiry_date?: string; // date
+  birth_date?: string; // date
 }
 
 export interface HotelBookingType {
@@ -33,7 +33,7 @@ export interface HotelBookingType {
   buy_price: number; // required, from hotel
   sell_currency_id: number; // required, from select2
   sell_price: number; // required, float
-  supplier_id: number; // required, from select2
+  supplier_id?: number; // optional, removed from form
   rooms: RoomBookingType[];
 }
 

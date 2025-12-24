@@ -12,7 +12,7 @@ import { ar } from 'date-fns/locale/ar';
 import 'react-datepicker/dist/react-datepicker.css';
 import countryDialogs from '../../../../public/data/country_dailogs.json';
 import ClientSelect from '@/components/ClientSelect';
-import { CurrencySelect, SupplierSelect } from '@/components/Select2';
+import { CurrencySelect } from '@/components/Select2';
 
 // Register locales
 registerLocale('ar', ar);
@@ -241,9 +241,7 @@ const CustomerInfo = ({
                               paddingTop: '24px',
                             }}
                             type="text"
-                            {...register(`guests.${index}.name` as any, {
-                              required: true,
-                            })}
+                            {...register(`guests.${index}.name` as any)}
                           />
                           <label
                             style={{ top: '20px' }}
@@ -261,9 +259,7 @@ const CustomerInfo = ({
                       <div className="col-md-6">
                         <div className="form-input">
                           <select
-                            {...register(`guests.${index}.type` as any, {
-                              required: true,
-                            })}
+                            {...register(`guests.${index}.type` as any)}
                             style={{
                               minHeight: '70px',
                               paddingTop: '25px',
@@ -294,9 +290,7 @@ const CustomerInfo = ({
                         <div className="form-input">
                           <input
                             type="hidden"
-                            {...register(`guests.${index}.birth_date` as any, {
-                              required: true,
-                            })}
+                            {...register(`guests.${index}.birth_date` as any)}
                           />
                           <DatePicker
                             selected={
@@ -361,7 +355,6 @@ const CustomerInfo = ({
                             type="text"
                             {...register(
                               `guests.${index}.passport_number` as any,
-                              { required: true },
                             )}
                           />
                           <label
@@ -388,7 +381,6 @@ const CustomerInfo = ({
                             type="text"
                             {...register(
                               `guests.${index}.passport_country` as any,
-                              { required: true },
                             )}
                           />
                           <label
@@ -413,9 +405,7 @@ const CustomerInfo = ({
                               paddingTop: '24px',
                             }}
                             type="text"
-                            {...register(`guests.${index}.nationality` as any, {
-                              required: true,
-                            })}
+                            {...register(`guests.${index}.nationality` as any)}
                           />
                           <label
                             style={{ top: '20px' }}
@@ -436,9 +426,7 @@ const CustomerInfo = ({
                         <div className="form-input">
                           <input
                             type="hidden"
-                            {...register(`guests.${index}.issue_date` as any, {
-                              required: true,
-                            })}
+                            {...register(`guests.${index}.issue_date` as any)}
                           />
                           <DatePicker
                             selected={
@@ -498,9 +486,7 @@ const CustomerInfo = ({
                         <div className="form-input">
                           <input
                             type="hidden"
-                            {...register(`guests.${index}.expiry_date` as any, {
-                              required: true,
-                            })}
+                            {...register(`guests.${index}.expiry_date` as any)}
                           />
                           <DatePicker
                             selected={
@@ -705,20 +691,6 @@ const CustomerInfo = ({
                 </div>
                 {errors?.hotels?.[0]?.sell_price && (
                   <span className="text-red-1">Sell price is required</span>
-                )}
-              </div>
-
-              {/* Supplier ID (Select2) */}
-              <div className="col-md-6">
-                <SupplierSelect
-                  form={form}
-                  name="hotels.0.supplier_id"
-                  label="Supplier"
-                  required={true}
-                  category="hotels"
-                />
-                {errors?.hotels?.[0]?.supplier_id && (
-                  <span className="text-red-1">Supplier is required</span>
                 )}
               </div>
 

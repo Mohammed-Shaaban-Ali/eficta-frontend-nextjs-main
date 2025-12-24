@@ -48,7 +48,6 @@ const BookingPage = ({ hotelID, uuid, packageID, roomId }: Props) => {
           buy_price: 0,
           sell_currency_id: 0,
           sell_price: 0,
-          supplier_id: 0,
           rooms: [],
         },
       ],
@@ -175,7 +174,59 @@ const BookingPage = ({ hotelID, uuid, packageID, roomId }: Props) => {
 
   const onSubmit = async (data: bookHotelRequest) => {
     try {
-      console.log('data', data);
+      // console.log('data', data);
+
+      // Check if any guest has been filled (excluding type as it's set by default)
+      const hasAnyGuestFilled =
+        data.guests?.some((guest) => {
+          return (
+            guest.name ||
+            guest.passport_number ||
+            guest.passport_country ||
+            guest.nationality ||
+            guest.issue_date ||
+            guest.expiry_date ||
+            guest.birth_date
+          );
+        }) || false;
+
+      // If any guest is filled, check if all guests are completely filled
+      let finalGuests: any[] = [];
+      if (hasAnyGuestFilled && data.guests) {
+        const allGuestsFilled = data.guests.every((guest) => {
+          return (
+            guest.name &&
+            guest.type &&
+            guest.passport_number &&
+            guest.passport_country &&
+            guest.nationality &&
+            guest.issue_date &&
+            guest.expiry_date &&
+            guest.birth_date
+          );
+        });
+
+        if (!allGuestsFilled) {
+          toast.error(
+            'Please fill all guest information or leave all guests empty',
+          );
+          return;
+        }
+
+        // All guests are filled, include them
+        finalGuests = data.guests.map((guest) => ({
+          name: guest.name,
+          type: guest.type,
+          passport_number: guest.passport_number,
+          passport_country: guest.passport_country,
+          nationality: guest.nationality,
+          issue_date: guest.issue_date,
+          expiry_date: guest.expiry_date,
+          birth_date: guest.birth_date,
+        }));
+      }
+      // If no guest is filled, finalGuests remains empty array
+
       // Prepare the booking data in the new format
       const bookingData: bookHotelRequest = {
         title: data.title,
@@ -188,16 +239,7 @@ const BookingPage = ({ hotelID, uuid, packageID, roomId }: Props) => {
         infants: data.infants || 0,
         terms: data.terms || '',
         notes: data.notes || '',
-        guests: data.guests.map((guest) => ({
-          name: guest.name,
-          type: guest.type,
-          passport_number: guest.passport_number,
-          passport_country: guest.passport_country,
-          nationality: guest.nationality,
-          issue_date: guest.issue_date,
-          expiry_date: guest.expiry_date,
-          birth_date: guest.birth_date,
-        })),
+        ...(finalGuests.length > 0 && { guests: finalGuests }),
         hotels: data.hotels.map((hotel) => ({
           checkIn: formatDateToString(hotel.checkIn),
           checkOut: formatDateToString(hotel.checkOut),
@@ -206,7 +248,7 @@ const BookingPage = ({ hotelID, uuid, packageID, roomId }: Props) => {
           buy_price: hotel.buy_price || selectedPackage?.price?.finalPrice || 0,
           sell_currency_id: hotel.sell_currency_id,
           sell_price: hotel.sell_price,
-          supplier_id: hotel.supplier_id,
+          supplier_id: undefined,
           rooms: hotel.rooms.map((room) => ({
             room_pax: room.room_pax,
             room_board: room.room_board,
@@ -220,6 +262,8 @@ const BookingPage = ({ hotelID, uuid, packageID, roomId }: Props) => {
       const response = await submitQuotation(bookingData);
 
       toast.success('Booking submitted successfully!');
+      router.push(`/`);
+      form.reset();
     } catch (error) {
       console.error('Error submitting booking:', error);
       toast.error(getError(error));
