@@ -10,7 +10,7 @@ import Image from 'next/image';
 import HeaderShared from './HeaderShared';
 import { FaHeart, FaStar, FaMapMarkerAlt } from 'react-icons/fa';
 
-type Props = {};
+type Props = Record<string, never>;
 
 function RecommendedHotel({}: Props) {
   const swiperRef = useRef<any>(null);

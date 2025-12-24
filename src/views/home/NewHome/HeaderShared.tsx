@@ -2,7 +2,7 @@ import React from 'react';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import { IoArrowForward } from 'react-icons/io5';
 
-type Props = {};
+type Props = Record<string, never>;
 
 function HeaderShared({
   title,

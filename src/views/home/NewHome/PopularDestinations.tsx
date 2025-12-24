@@ -11,7 +11,7 @@ import HeaderShared from './HeaderShared';
 import { FaHeart, FaStar, FaMapMarkerAlt } from 'react-icons/fa';
 import { GoArrowRight } from 'react-icons/go';
 
-type Props = {};
+type Props = Record<string, never>;
 
 function PopularDestinations({}: Props) {
   return (

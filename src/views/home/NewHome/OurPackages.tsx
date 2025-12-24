@@ -10,7 +10,7 @@ import 'swiper/css/navigation';
 import Image from 'next/image';
 import HeaderShared from './HeaderShared';
 import { GoArrowRight } from 'react-icons/go';
-type Props = {};
+type Props = Record<string, never>;
 
 function OurPackages({}: Props) {
   const swiperRef = useRef<any>(null);
