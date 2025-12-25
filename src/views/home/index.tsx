@@ -14,7 +14,8 @@ import Lastsearched from './NewHome/Lastsearched';
 import OurPackages from './NewHome/OurPackages';
 import RecommendedHotel from './NewHome/RecommendedHotel';
 import PopularDestinations from './NewHome/PopularDestinations';
-
+import Navbar from './NewHome/Navbar';
+import NewFooter from './NewHome/Footer';
 export const metadata = {
   title: 'Efica',
   description: 'Efica',
@@ -29,9 +30,10 @@ const Home = () => {
 
   return (
     <>
+      {' '}
+      <Navbar />
       <Hero1 />
       {/* End Hero 1 */}
-
       {/* new home page */}
       <section className="bg-[#FFFDF5]">
         <div className="container">
@@ -41,7 +43,7 @@ const Home = () => {
           <OurPackages />
         </div>
       </section>
-
+      <NewFooter />
       {/* <section className="layout-pt-lg layout-pb-md" data-aos="fade-up">
         <div className="container">
           <div className="row y-gap-20 justify-between items-end">
@@ -169,7 +171,6 @@ const Home = () => {
           </div>
         </div>
       </section> */}
-
       {/* <CallToActions /> */}
     </>
   );

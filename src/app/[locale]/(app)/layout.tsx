@@ -32,9 +32,9 @@ export default async function Layout({
 
   return (
     <>
-      {shouldHideHeader ? <Navbar /> : <Header1 session={session} />}
+      <Header1 session={session} />
       {children}
-      {shouldHideHeader ? <NewFooter /> : <Footer />}
+      <Footer />
     </>
   );
 }
