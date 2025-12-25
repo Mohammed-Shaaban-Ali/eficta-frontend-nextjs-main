@@ -58,7 +58,11 @@ function Lastsearched({}: Props) {
               <div className="flex items-center gap-2.5">
                 <div className="w-14 h-14 rounded-full bg-[#0E8571] overflow-hidden">
                   <Image
-                    src={'/img/lastsearched.png'}
+                    src={
+                      index % 2 === 0
+                        ? '/img/recommended1.jpg'
+                        : '/img/recommended2.jpg'
+                    }
                     alt="lastsearched"
                     className="w-full h-full object-cover"
                     width={56}

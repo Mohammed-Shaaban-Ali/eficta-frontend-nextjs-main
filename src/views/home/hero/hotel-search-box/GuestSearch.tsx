@@ -77,7 +77,7 @@ const RoomCard = ({ room, index, form, onRemove }: RoomCardProps) => {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
         <div className=" w-full flex justify-between items-center gap-2">
           <span
             className="fw-medium text-[#6E7491]!"

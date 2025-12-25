@@ -62,7 +62,11 @@ function OurPackages({}: Props) {
             >
               <div className="w-full h-[200px] rounded-2xl bg-[#0E8571] overflow-hidden">
                 <Image
-                  src={'/img/lastsearched.png'}
+                  src={
+                    index % 2 === 0
+                      ? '/img/recommended1.jpg'
+                      : '/img/recommended2.jpg'
+                  }
                   alt="lastsearched"
                   className="w-full h-full object-cover"
                   width={280}
