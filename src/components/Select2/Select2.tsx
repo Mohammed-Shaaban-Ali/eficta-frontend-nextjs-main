@@ -110,7 +110,7 @@ const Select2: React.FC<Select2Props> = ({
       setSelectedItem(null);
       setSearchValue('');
     }
-  }, [formValue, allItems, isOpen]);
+  }, [formValue, allItems, isOpen, selectedItem]);
 
   // Close dropdown when clicking outside
   useEffect(() => {

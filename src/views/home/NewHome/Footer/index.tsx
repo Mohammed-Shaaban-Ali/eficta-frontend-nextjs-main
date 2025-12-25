@@ -5,7 +5,6 @@ import { BsFillMapFill } from 'react-icons/bs';
 import { FaLocationDot, FaSquarePhone } from 'react-icons/fa6';
 import { MdEmail } from 'react-icons/md';
 
-type Props = {};
 const links = [
   {
     label: 'Hotels',
@@ -20,7 +19,7 @@ const links = [
     href: '/International-license',
   },
 ];
-function Footer({}: Props) {
+function Footer() {
   return (
     <footer className="bg-[#0B6455]">
       <section className="py-10! container grid grid-cols-1! sm:grid-cols-4! gap-10!">

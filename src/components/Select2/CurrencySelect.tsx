@@ -92,7 +92,7 @@ const CurrencySelect: React.FC<CurrencySelectProps> = ({
       setSelectedItem(null);
       setSearchValue('');
     }
-  }, [formValue, allItems, isOpen]);
+  }, [formValue, allItems, isOpen, selectedItem]);
 
   // Close dropdown when clicking outside
   useEffect(() => {

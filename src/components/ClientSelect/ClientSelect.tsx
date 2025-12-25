@@ -96,7 +96,7 @@ const ClientSelect: React.FC<ClientSelectProps> = ({
       setSelectedClient(null);
       setSearchValue('');
     }
-  }, [formValue, allItems, isOpen]);
+  }, [formValue, allItems, isOpen, selectedClient]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
