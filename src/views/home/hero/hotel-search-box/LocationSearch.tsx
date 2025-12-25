@@ -7,6 +7,7 @@ import { cityTypes } from '@/types/app/cityTypes';
 import { UseFormReturn } from 'react-hook-form';
 import useDebounce from '@/hooks/useDebounce';
 import usePerfectScrollbar from '@/hooks/usePerfectScrollbar';
+import { RiMapPin2Fill } from 'react-icons/ri';
 
 interface SearchBarProps {
   form: UseFormReturn<any>;
@@ -45,7 +46,7 @@ const SearchBar = ({ form }: SearchBarProps) => {
 
   return (
     <>
-      <div className="searchMenu-date  col-span-2 js-form-dd js-calendar">
+      <div className="searchMenu-date  col-span-1 sm:col-span-2 md:col-span-1 js-form-dd js-calendar">
         <div
           data-bs-toggle="dropdown"
           data-bs-auto-close="true"
@@ -53,33 +54,40 @@ const SearchBar = ({ form }: SearchBarProps) => {
         >
           {/* label */}
           <div
-            className="relative flex items-center border! border-gray-300! rounded-lg! px-4! h-[64px] bg-white!
-           hover:border-gray-500! transition-all duration-300"
+            className="relative flex items-center  px-4! h-[64px] bg-transparent!
+           transition-all duration-300"
           >
             <label
               htmlFor="searchValue"
-              className={`absolute transition-all duration-200 pointer-events-none ${
+              className={`absolute transition-all font-semibold! duration-200 pointer-events-none ${
                 isActive
-                  ? 'top-2! text-[11px]! text-gray-500!'
-                  : 'top-1/2! -translate-y-1/2! text-[15px]! text-gray-400!'
+                  ? '-top-0.5!  text-[#737373]!'
+                  : 'top-1/2! -translate-y-1/2! text-[#737373]!'
               }`}
             >
-              {/* {t('placeholder')} */}
               Destination
             </label>
-            <input
-              autoComplete="off"
-              type="search"
-              className={`js-search js-dd-focus w-full! text-[15px]! font-medium! text-gray-900! bg-transparent! border-none! outline-none! p-0! ${
-                isActive ? 'mt-4!' : ''
-              }`}
-              {...register('searchValue')}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-            />
+            <div className="flex items-center gap-1 relative ">
+              <RiMapPin2Fill
+                size={20}
+                className={` 
+                  absolute top-[19px]!  left-0
+                  ${isActive ? 'text-[#737373]' : 'text-transparent'}`}
+              />
+              <input
+                autoComplete="off"
+                type="search"
+                className={`js-search js-dd-focus w-full font-bold! text-black! bg-transparent! border-none! outline-none! p-0! ${
+                  isActive ? 'mt-4! pl-6!' : ''
+                }`}
+                {...register('searchValue')}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+              />
+            </div>
           </div>
         </div>
-        <div className="shadow-2 dropdown-menu min-width-400 -pt-[100px]">
+        <div className="shadow-2 dropdown-menu min-width-400 ">
           <div className="bg-white sm:px-0 rounded-4">
             <div
               ref={scrollRef}

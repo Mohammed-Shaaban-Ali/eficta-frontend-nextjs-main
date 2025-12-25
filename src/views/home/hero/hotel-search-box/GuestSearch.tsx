@@ -5,6 +5,7 @@ import usePerfectScrollbar from '@/hooks/usePerfectScrollbar';
 import { UseFormReturn } from 'react-hook-form';
 import { searchHotelsParams } from '@/types/requests/searchHotelRequestTypes';
 import { useTranslations, useLocale } from 'next-intl';
+import { RiUserFill } from 'react-icons/ri';
 
 interface Room {
   AdultsCount: number;
@@ -19,9 +20,6 @@ interface RoomCardProps {
 }
 
 const RoomCard = ({ room, index, form, onRemove }: RoomCardProps) => {
-  const t = useTranslations('HomePage.hero_section.hotel.guest');
-  const locale = useLocale();
-  const isRTL = locale === 'ar';
   const { setValue, watch } = form;
   const rooms = watch('rooms');
 
@@ -52,167 +50,161 @@ const RoomCard = ({ room, index, form, onRemove }: RoomCardProps) => {
   };
 
   return (
-    <div className="mb-3">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h5 className="mb-0">
-          {t('room')} {index + 1}
-        </h5>
-        {index > 0 && (
+    <div
+      className="mb-4 pb-4"
+      // style={{
+      //   borderBottom: index < rooms.length - 1 ? '1px solid #e5e7eb' : 'none',
+      // }}
+    >
+      <div className="flex justify-between items-center gap-2">
+        <h6
+          className="mb-1 fw-semibold text-[#636363]!"
+          style={{ fontSize: '16px' }}
+        >
+          Room No. {index + 1}
+        </h6>
+        {rooms.length > 1 && (
           <button
             type="button"
-            className="btn btn-sm btn-outline-danger hover:text-white!"
+            className="btn btn-sm text-[14px]! flex items-center justify-center border-0 p-0.5 px-2
+          rounded
+          hover:bg-red-500/10! cursor-pointer text-red-500!
+          "
             onClick={() => onRemove(index)}
           >
-            {t('remove_room')}
+            remove room
           </button>
         )}
       </div>
 
-      <div className="row g-3 mb-3">
-        {/* Adults Section */}
-        <div className="col-6">
-          <div className="d-flex justify-content-between align-items-center">
-            <div className="d-flex align-items-center gap-2">
-              <i
-                className="icon-man text-gray-500"
-                style={{ fontSize: '20px' }}
-              />
-              <div>
-                <div className="text-15 lh-12 fw-500">{t('adults')}</div>
-                <div className="text-14 lh-12 text-light-1 mt-1">
-                  {t('adults_description')}
-                </div>
-              </div>
-            </div>
-            <div className="d-flex items-center gap-1!">
-              <button
-                type="button"
-                className={`d-flex align-items-center justify-content-center ${
+      <div className="grid grid-cols-2 gap-4 mb-3">
+        <div className=" w-full flex justify-between items-center gap-2">
+          <span
+            className="fw-medium text-[#6E7491]!"
+            style={{ fontSize: '14px', whiteSpace: 'nowrap' }}
+          >
+            Adults:
+          </span>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className={`btn btn-sm d-flex text-[20px]! font-bold! align-items-center justify-content-center border-0 p-0
+                w-7! h-7! text-[#605DEC]!
+                ${
                   room.AdultsCount <= 1
-                    ? 'bg-secondary hover:opacity-70 text-white'
-                    : 'bg-primary hover:opacity-70 text-white'
-                } border-0`}
-                style={{
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '4px',
-                  cursor: room.AdultsCount <= 1 ? 'not-allowed' : 'pointer',
-                }}
-                onClick={() =>
-                  handleAdultChange(Math.max(1, room.AdultsCount - 1))
+                    ? 'bg-gray-50! cursor-not-allowed '
+                    : 'bg-gray-100!'
                 }
-                disabled={room.AdultsCount <= 1}
-              >
-                <i className="icon-minus text-12" />
-              </button>
-              <div
-                className="d-flex align-items-center justify-content-center"
-                style={{ minWidth: '30px' }}
-              >
-                <div className="text-15 fw-500">{room.AdultsCount}</div>
-              </div>
-              <button
-                type="button"
-                className="d-flex 
-                hover:opacity-70 
-                align-items-center justify-content-center bg-primary text-white border-0"
-                style={{
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '4px',
-                }}
-                onClick={() => handleAdultChange(room.AdultsCount + 1)}
-              >
-                <i className="icon-plus text-12" />
-              </button>
-            </div>
+                `}
+              onClick={() =>
+                handleAdultChange(Math.max(1, room.AdultsCount - 1))
+              }
+              disabled={room.AdultsCount <= 1}
+            >
+              −
+            </button>
+            <span
+              className="fw-semibold text-[#6E7491]! d-flex align-items-center justify-content-center"
+              style={{
+                fontSize: '14px',
+              }}
+            >
+              {room.AdultsCount}
+            </span>
+            <button
+              type="button"
+              className={`btn btn-sm text-[20px]! font-bold! d-flex align-items-center justify-content-center border-0 p-0
+                w-7! h-7! text-[#605DEC]!
+                ${
+                  room.AdultsCount <= 1
+                    ? 'bg-gray-50! cursor-not-allowed '
+                    : 'bg-gray-100!'
+                }
+                `}
+              onClick={() => handleAdultChange(room.AdultsCount + 1)}
+            >
+              +
+            </button>
           </div>
         </div>
 
-        {/* Children Section */}
-        <div className="col-6">
-          <div className="d-flex justify-content-between align-items-center">
-            <div className="d-flex align-items-center gap-2">
-              <i
-                className="icon-child text-gray-500"
-                style={{ fontSize: '20px' }}
-              />
-              <div>
-                <div className="text-15 lh-12 fw-500">{t('children')}</div>
-                <div className="text-14 lh-12 text-light-1 mt-1">
-                  {t('children_description')}
-                </div>
-              </div>
-            </div>
-            <div className="d-flex items-center gap-1!">
-              <button
-                type="button"
-                className={`d-flex align-items-center justify-content-center ${
+        <div className="flex w-full items-center justify-between gap-2">
+          <span
+            className="fw-medium text-[#6E7491]!"
+            style={{ fontSize: '14px', whiteSpace: 'nowrap' }}
+          >
+            Children:
+          </span>
+          <div className="d-flex align-items-center gap-2">
+            <button
+              type="button"
+              className={`btn btn-sm text-[20px]! font-bold! d-flex align-items-center justify-content-center border-0 p-0
+                w-7! h-7! text-[#605DEC]!
+                ${
                   room.KidsAges.length === 0
-                    ? 'bg-secondary hover:opacity-70 text-white'
-                    : 'bg-primary hover:opacity-70 text-white'
-                } border-0`}
-                style={{
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '4px',
-                  cursor:
-                    room.KidsAges.length === 0 ? 'not-allowed' : 'pointer',
-                }}
-                onClick={() =>
-                  handleChildChange(Math.max(0, room.KidsAges.length - 1))
+                    ? 'bg-gray-50! cursor-not-allowed '
+                    : 'bg-gray-100!'
                 }
-                disabled={room.KidsAges.length === 0}
-              >
-                <i className="icon-minus text-12" />
-              </button>
-              <div
-                className="d-flex align-items-center justify-content-center"
-                style={{ minWidth: '30px' }}
-              >
-                <div className="text-15 fw-500">{room.KidsAges.length}</div>
-              </div>
-              <button
-                type="button"
-                className="d-flex hover:opacity-70 align-items-center justify-content-center bg-primary text-white border-0"
-                style={{
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '4px',
-                }}
-                onClick={() => handleChildChange(room.KidsAges.length + 1)}
-              >
-                <i className="icon-plus text-12" />
-              </button>
-            </div>
+                `}
+              onClick={() =>
+                handleChildChange(Math.max(0, room.KidsAges.length - 1))
+              }
+              disabled={room.KidsAges.length === 0}
+            >
+              −
+            </button>
+            <span
+              className="fw-semibold text-[#6E7491]! d-flex align-items-center justify-content-center"
+              style={{
+                fontSize: '14px',
+              }}
+            >
+              {room.KidsAges.length}
+            </span>
+            <button
+              type="button"
+              className={`btn btn-sm text-[20px]! font-bold! d-flex align-items-center justify-content-center border-0 p-0
+                w-7! h-7! text-[#605DEC]!
+                ${
+                  room.KidsAges.length === 0
+                    ? 'bg-gray-50! cursor-not-allowed '
+                    : 'bg-gray-100!'
+                }
+                `}
+              onClick={() => handleChildChange(room.KidsAges.length + 1)}
+            >
+              +
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="row">
-        {room.KidsAges.map((age: number, idx: number) => (
-          <div key={idx} className="col-md-6 mt-3">
-            <label
-              className="form-label text-muted"
-              style={{ fontSize: '14px' }}
-            >
-              {t('child_age', { number: idx + 1 })}
-            </label>
-            <select
-              className="form-select"
-              style={{ fontSize: '12px' }}
-              value={age}
-              onChange={(e) => handleAgeChange(idx, parseInt(e.target.value))}
-            >
-              {Array.from({ length: 18 }, (_, i) => (
-                <option key={i} value={i}>
-                  {t('years_old', { number: i })}
-                </option>
-              ))}
-            </select>
-          </div>
-        ))}
-      </div>
+      {room.KidsAges.length > 0 && (
+        <div className="row mt-3">
+          {room.KidsAges.map((age: number, idx: number) => (
+            <div key={idx} className="col-md-6 mb-2">
+              <label
+                className="form-label text-muted mb-1"
+                style={{ fontSize: '13px' }}
+              >
+                Child {idx + 1} Age
+              </label>
+              <select
+                className="form-select form-select-sm"
+                style={{ fontSize: '14px' }}
+                value={age}
+                onChange={(e) => handleAgeChange(idx, parseInt(e.target.value))}
+              >
+                {Array.from({ length: 18 }, (_, i) => (
+                  <option key={i} value={i}>
+                    {i} {i === 1 ? 'year' : 'years'} old
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -278,25 +270,28 @@ const GuestSearch = ({ form }: GuestSearchProps) => {
   return (
     <div
       ref={dropdownRef}
-      className="searchMenu-guests js-form-dd js-form-counters position-relative"
+      className="searchMenu-guests col-span-1 js-form-dd
+       js-form-counters position-relative"
     >
       <div
         data-bs-toggle="dropdown"
         data-bs-auto-close="outside"
         aria-expanded="false"
         data-bs-offset="0,22"
-        className="relative flex flex-col items-start justify-center border! border-gray-300! rounded-lg! px-4! h-[64px] bg-white!
-           hover:border-gray-500! transition-all duration-300"
+        className="relative flex flex-col items-start justify-center rounded-lg! px-4! h-[64px] transition-all duration-300"
       >
-        <div className="text-[11px]! text-gray-500! ">Guests and Rooms</div>
-        <div className="text-[15px]! -mt-1">
+        <div className=" font-semibold!  text-[#737373]! mb-0!">
+          Guests and Rooms
+        </div>
+        <div className="font-bold! text-black! -mt-1! flex items-center gap-1">
+          <RiUserFill size={18} className="text-[#737373]" />
           {getTotalAdults()} Adults in {rooms.length} Rooms
         </div>
       </div>
 
       <div className="shadow-2 dropdown-menu w-full sm:min-w-[500px]! ">
         <div
-          className="bg-white p-3 rounded-lg! counter-box"
+          className="bg-white p-4 rounded-lg! counter-box"
           style={{
             maxHeight: '500px',
             position: 'relative',
@@ -304,6 +299,7 @@ const GuestSearch = ({ form }: GuestSearchProps) => {
           }}
           ref={scrollRef}
         >
+          {/* Room cards */}
           {rooms.map((room, index) => (
             <RoomCard
               key={index}
@@ -313,36 +309,27 @@ const GuestSearch = ({ form }: GuestSearchProps) => {
               onRemove={removeRoom}
             />
           ))}
-          <div className="border-top pt-2 mt-3 d-flex justify-content-between align-items-center">
-            <button
-              type="button"
-              className="d-flex hover:bg-gray-100! rounded-lg! p-2 transition-all duration-300 align-items-center gap-2 btn btn-link text-primary p-0 border-0 text-decoration-none"
-              onClick={addRoom}
-              style={{ fontSize: '14px' }}
-            >
-              <div
-                className="d-flex align-items-center justify-content-center border border-primary rounded-circle"
-                style={{
-                  width: '24px',
-                  height: '24px',
-                }}
-              >
-                <i
-                  className="icon-plus text-primary"
-                  style={{ fontSize: '12px' }}
-                />
-              </div>
-              {t('add_room')}
-            </button>
-            <button
-              type="button"
-              className="btn btn-link hover:bg-gray-100! rounded-lg! p-2 transition-all duration-300 text-primary p-0 border-0 text-decoration-none"
-              onClick={handleApply}
-              style={{ fontSize: '14px', fontWeight: '500' }}
-            >
-              {t('apply') || 'Apply'}
-            </button>
+
+          {/* Add Room Button - Centered */}
+          <div
+            className="flex justify-center items-center mx-auto text-[#0E8571]! my-2 border-2 border-[#0E8571]! 
+          bg-[#0E8571]/5! hover:bg-[#0E8571]/10! cursor-pointer
+          rounded-full! w-10! h-10!"
+            onClick={addRoom}
+          >
+            +
           </div>
+
+          {/* Confirm/Select Button */}
+          <button
+            type="button"
+            className="btn w-100 h-11! mt-2 border-0 text-white fw-semibold
+            transition-all duration-300 rounded-3xl!
+            bg-[#0E8571]! hover:bg-[#0E8571]/80! cursor-pointer"
+            onClick={handleApply}
+          >
+            Select
+          </button>
         </div>
       </div>
     </div>

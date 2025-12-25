@@ -10,6 +10,7 @@ import { searchHotelsParams } from '@/types/requests/searchHotelRequestTypes';
 import { searchFormResolver } from '@/utils/validationResolver';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
+import { FaSearch } from 'react-icons/fa';
 
 const HotelSearchBox = () => {
   const t = useTranslations('HomePage.hero_section.hotel');
@@ -74,28 +75,31 @@ const HotelSearchBox = () => {
 
   return (
     <>
-      <div className="relative mt-4!  ">
+      <div className="relative  ">
         <div
-          className="container bg-white p-4! rounded-2xl! "
+          className="container bg-[#E7F3F1] p-2! py-4 sm:p-4! rounded-b-2xl! md:rounded-tr-2xl! "
           style={{ width: '100%' }}
         >
-          <h4 className="text-[17px]! font-normal! text-gray-700! mb-4!">
-            Where do you want to stay?
-          </h4>
           <form
             onSubmit={form.handleSubmit(onSubmit, onError)}
-            className={`grid grid-cols-1 md:grid-cols-5 gap-2.5 `}
+            className={`grid grid-cols-1! md:grid-cols-5! gap-x-2! gap-y-4! w-full! `}
             style={{ width: '100%' }}
           >
             <LocationSearch form={form} />
             <DateSearch form={form as any} />
             <GuestSearch form={form} />
-            <div className="flex justify-end! col-span-5 mt-2 ">
+            <div className="flex justify-end! items-center! col-span-1 mt-2 ">
               <button
                 type="submit"
-                className="btn btn-primary w-[140px]! rounded-[30px]! h-11 "
+                className=" bg-[#0E8571]! hover:bg-[#0E8571]/80! cursor-pointer 
+                text-white! px-4! sm:px-6! w-full! sm:w-[200px]!
+                flex items-center justify-center gap-2 rounded-[30px]! h-11 
+                font-bold! transition-all duration-300
+                "
                 style={{ fontSize: '16px' }}
               >
+                <FaSearch />
+
                 {t('search')}
               </button>
             </div>

@@ -9,6 +9,8 @@ import { useTranslations, useLocale } from 'next-intl';
 import gregorian from 'react-date-object/calendars/gregorian';
 import gregorian_en from 'react-date-object/locales/gregorian_en';
 import gregorian_ar from 'react-date-object/locales/gregorian_ar';
+import { RiCalendar2Fill } from 'react-icons/ri';
+import { BsCalendar2DateFill } from 'react-icons/bs';
 
 interface DateSearchProps {
   form: UseFormReturn<{
@@ -103,7 +105,6 @@ const DateSearch: React.FC<DateSearchProps> = ({ form }) => {
     if (!dateStr) return t('placeholder');
     const date = new Date(dateStr);
     return date.toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', {
-      weekday: 'short',
       day: 'numeric',
       month: 'short',
       year: 'numeric',
@@ -117,25 +118,29 @@ const DateSearch: React.FC<DateSearchProps> = ({ form }) => {
   return (
     <div className="searchMenu-date col-span-2 js-form-dd js-calendar">
       <div
-        className="flex items-center border!  border-gray-300! rounded-lg! h-[64px]! bg-white! hover:border-gray-500!
+        className="flex items- rounded-lg! h-[64px]! 
          transition-all duration-300 cursor-pointer"
         onClick={openDatePicker}
       >
         {/* Check In */}
         <div className="flex-1 px-3! py-2! flex flex-col justify-center">
-          <div className="text-[11px]! text-gray-500! mb-0!">Check In</div>
-          <div className="text-[15px]! font-medium! text-gray-900! -mt-1!">
+          <div className=" font-semibold!  text-[#737373]! mb-0!">Check In</div>
+          <div className="font-bold! text-black! -mt-1! flex items-center gap-1 text-nowrap">
+            <BsCalendar2DateFill size={18} className="text-[#737373]" />
             {formatDisplayDate(checkIn)}
           </div>
         </div>
 
         {/* Divider */}
-        <div className="w-px h-[64px] bg-gray-300" />
+        {/* <div className="w-px h-[64px] bg-gray-300" /> */}
 
         {/* Check Out */}
         <div className="flex-1 px-3! py-2 flex flex-col justify-center">
-          <div className="text-[11px]! text-gray-500!">Check Out</div>
-          <div className="text-[15px]! font-medium! text-gray-900! -mt-1!">
+          <div className=" font-semibold!  text-[#737373]! mb-0!">
+            Check Out
+          </div>
+          <div className="font-bold! text-black! -mt-1! flex items-center gap-1 text-nowrap">
+            <BsCalendar2DateFill size={18} className="text-[#737373] " />
             {formatDisplayDate(checkOut)}
           </div>
         </div>
